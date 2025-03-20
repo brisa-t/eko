@@ -323,7 +323,7 @@ class PostCard extends StatelessWidget {
                                           post.image == null)
                                         GifWidget(url: post.gifURL!),
                                       if (post.image != null)
-                                                ImageWidget(text: post.image!),
+                                        ImageWidget(text: post.image!),
                                       if (post.gifURL != null ||
                                           post.image != null)
                                         const SizedBox(height: 6.0),
@@ -394,11 +394,12 @@ class PostCard extends StatelessWidget {
                                           listen: true)
                                       .liked,
                                   likeBuilder: (isLiked) {
+                                    
                                     return SvgPicture.string(
                                       '''
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
            fill="${isLiked ? '#FF3040' : 'none'}" 
-           stroke="${isLiked ? '#FF3040' : '#${Theme.of(context).colorScheme.onSurface.value.toRadixString(16)}'}" 
+           stroke="${isLiked ? '#FF3040' : '#${Theme.of(context).colorScheme.onSurface.toARGB32().toRadixString(16).substring(2)}'}" 
            stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
         <path d="M9 18v-6H5l7-7 7 7h-4v6H9z"/>
       </svg>
@@ -448,7 +449,7 @@ class PostCard extends StatelessWidget {
                                       '''
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
            fill="${isDisliked ? '#FF3040' : 'none'}" 
-           stroke="${isDisliked ? '#FF3040' : '#${Theme.of(context).colorScheme.onSurface.value.toRadixString(16)}'}" 
+           stroke="${isDisliked ? '#FF3040' : '#${Theme.of(context).colorScheme.onSurface.toARGB32().toRadixString(16).substring(2)}'}" 
            stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
         <path d="M15 6v6h4l-7 7-7-7h4V6h6z"/>
       </svg>
@@ -509,7 +510,7 @@ class PostCard extends StatelessWidget {
                                     }
                                   },
                                   child: SvgPicture.string(
-                                    '''<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#${Theme.of(context).colorScheme.onSurface.value.toRadixString(16)}"  stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-circle"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>''',
+                                    '''<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#${Theme.of(context).colorScheme.onSurface.toARGB32().toRadixString(16).substring(2)}"  stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-circle"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>''',
                                     width: c.postIconSize,
                                     height: c.postIconSize,
                                   ),
@@ -530,8 +531,8 @@ class PostCard extends StatelessWidget {
                                   },
                                   child: SvgPicture.string(
                                     Platform.isIOS
-                                        ? '''<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#${Theme.of(context).colorScheme.onSurface.value.toRadixString(16)}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-share"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/></svg>'''
-                                        : '''<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#${Theme.of(context).colorScheme.onSurface.value.toRadixString(16)}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-share-2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>''',
+                                        ? '''<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#${Theme.of(context).colorScheme.onSurface.toARGB32().toRadixString(16).substring(2)}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-share"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/></svg>'''
+                                        : '''<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#${Theme.of(context).colorScheme.onSurface.toARGB32().toRadixString(16).substring(2)}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-share-2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>''',
                                     width: c.postIconSize,
                                     height: c.postIconSize,
                                   ),
