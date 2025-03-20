@@ -188,6 +188,7 @@ class PostsHandling {
   List<FeedChunk> feedChunks = [];
 
   Future<String> createPost(Map<String, dynamic> post) async {
+    print(post);
     final user = FirebaseAuth.instance.currentUser!;
     final firestore = FirebaseFirestore.instance;
     final String time = DateTime.now().toUtc().toIso8601String();

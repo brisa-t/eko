@@ -42,7 +42,7 @@ class ComposePage extends StatelessWidget {
                   heroTag: null,
                   onPressed: () =>
                       Provider.of<ComposeController>(context, listen: false)
-                          .addGifPressed(),
+                          .addImagePressed(),
                   shape: const CircleBorder(),
                   child:
                       const Icon(Icons.add_photo_alternate_outlined, size: 40),

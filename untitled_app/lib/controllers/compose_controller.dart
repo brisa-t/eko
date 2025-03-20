@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:extended_image/extended_image.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/models/current_user.dart';
@@ -20,6 +22,7 @@ import '../custom_widgets/controllers/pagination_controller.dart'
 import '../custom_widgets/pagination.dart';
 import '../custom_widgets/group_card.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ComposeController extends ChangeNotifier {
   final BuildContext context;
@@ -40,6 +43,7 @@ class ComposeController extends ChangeNotifier {
   bool showCount0 = false;
   bool showCount1 = false;
   GiphyGif? gif;
+  String? image;
   bool isAtSymbolTyped = false;
   bool isLoading = false;
   List<AppUser> hits = [];
@@ -233,6 +237,41 @@ class ComposeController extends ChangeNotifier {
     );
   }
 
+  Future<String?> uploadImage(File imageFile) async {
+    var url =
+        Uri.parse("https://createimage-146952619766.us-central1.run.app/");
+    var request = http.MultipartRequest("POST", url);
+
+    request.files
+        .add(await http.MultipartFile.fromPath('image', imageFile.path));
+
+    var response = await request.send();
+
+    if (response.statusCode == 200) {
+      String responseText = await response.stream.bytesToString();
+      return responseText;
+    } else {
+      return null;
+    }
+  }
+
+  addImagePressed() async {
+    locator<NavBarController>().disable();
+    final ImagePicker picker = ImagePicker();
+    final XFile? imageLocal =
+        await picker.pickImage(source: ImageSource.gallery);
+
+    if (imageLocal != null) {
+      File imageFile = File(imageLocal.path);
+      String? ascii = await uploadImage(File(imageFile.path));
+      if (ascii != null) {
+        image = ascii;
+      }
+      notifyListeners();
+    } else {}
+    locator<NavBarController>().enable();
+  }
+
   addGifPressed() async {
     locator<NavBarController>().disable();
     GiphyGif? newGif = await GiphyGet.getGif(
@@ -299,6 +338,9 @@ class ComposeController extends ChangeNotifier {
         post["gifUrl"] = gif!.images!.fixedWidth.url;
         post["gifSource"] = gif!.url;
       }
+      if (image != null) {
+        post["image"] = image;
+      }
 
       showDialog(
         context: context,
@@ -317,6 +359,7 @@ class ComposeController extends ChangeNotifier {
                       title: Post.parseText(post["title"]),
                       author: AppUser.fromCurrent(locator<CurrentUser>()),
                       body: Post.parseText(post["body"]),
+                      image: post["image"],
                       likes: 0),
                   isPreview: true),
             ),
@@ -346,6 +389,7 @@ class ComposeController extends ChangeNotifier {
                         gifURL: post["gifUrl"],
                         postId: postID,
                         time: DateTime.now().toUtc().toIso8601String(),
+                        image: post["image"],
                         title: Post.parseText(post["title"]),
                         author: AppUser.fromCurrent(locator<CurrentUser>()),
                         body: Post.parseText(post["body"]),
