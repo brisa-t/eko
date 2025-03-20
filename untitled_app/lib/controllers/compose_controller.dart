@@ -323,7 +323,8 @@ class ComposeController extends ChangeNotifier {
           text: AppLocalizations.of(context)!.tooManyChar, context: context);
     } else if (titleController.text == "" &&
         bodyController.text == "" &&
-        gif == null) {
+        gif == null &&
+        image == null) {
       titleFocus.requestFocus();
       showSnackBar(
           text: AppLocalizations.of(context)!.emptyFieldError,
