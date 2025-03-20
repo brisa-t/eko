@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ImageWidget extends StatelessWidget {
   final String text;
@@ -8,29 +9,27 @@ class ImageWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-        padding: EdgeInsets.only(right: 50),
-        child: FittedBox(
-            fit: BoxFit.contain,
-            child: Text(
-              text,
-              style: TextStyle(
-                fontWeight: FontWeight.w900,
-                color: Theme.of(context).colorScheme.onSurface,
-
-                fontFamily: 'Courier', // Use a monospaced font for ASCII art
-                fontSize: 25, // Base font size, can be adjusted
-              ),
-            )));
-
-    // FittedBox(
-    //   fit: BoxFit.contain,
-    //   child: Text(
-    //     text,
-    //     style: const TextStyle(
-    //       fontFamily: 'Courier', // Use a monospaced font for ASCII art
-    //       fontSize: 10, // Base font size, can be adjusted
-    //     ),
-    //   ),
-    // );
+      padding: EdgeInsets.only(right: 50),
+      child: FittedBox(
+        fit: BoxFit.contain,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: Text(
+            text,
+            style: GoogleFonts.martianMono(
+              textStyle: TextStyle(
+                  fontWeight: FontWeight.w900,
+                  color: Theme.of(context).brightness == Brightness.light
+                      ? Colors.black
+                      : Colors.white,
+                  fontSize: 25,
+                  height: 1.0),
+            ),
+            softWrap: false,
+            overflow: TextOverflow.clip,
+          ),
+        ),
+      ),
+    );
   }
 }
