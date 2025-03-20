@@ -360,7 +360,8 @@ class ComposeController extends ChangeNotifier {
                       author: AppUser.fromCurrent(locator<CurrentUser>()),
                       body: Post.parseText(post["body"]),
                       image: post["image"],
-                      likes: 0),
+                      likes: 0,
+                      dislikes: 0),
                   isPreview: true),
             ),
             actions: <Widget>[
@@ -394,6 +395,7 @@ class ComposeController extends ChangeNotifier {
                         author: AppUser.fromCurrent(locator<CurrentUser>()),
                         body: Post.parseText(post["body"]),
                         likes: 0,
+                        dislikes: 0,
                       ),
                     );
 
