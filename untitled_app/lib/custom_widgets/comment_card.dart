@@ -263,9 +263,8 @@ class _Card extends StatelessWidget {
                                   text: chunk,
                                   style: TextStyle(
                                     fontSize: 14,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                   ),
                                 );
                               }

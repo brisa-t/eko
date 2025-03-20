@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:untitled_app/custom_widgets/controllers/pagination_controller.dart';
 import 'package:untitled_app/custom_widgets/gif_widget.dart';
@@ -445,16 +446,17 @@ class PostCard extends StatelessWidget {
                                           listen: true)
                                       .liked,
                                   likeBuilder: (isLiked) {
-                                    return Icon(
-                                      size: c.postIconSize,
-                                      isLiked
-                                          ? CupertinoIcons.heart_solid
-                                          : CupertinoIcons.heart,
-                                      color: isLiked
-                                          ? const Color(0xFFff3040)
-                                          : Theme.of(context)
-                                              .colorScheme
-                                              .onSurface,
+                                    return SvgPicture.string(
+                                      '''
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+           fill="${isLiked ? '#FF3040' : 'none'}" 
+           stroke="${isLiked ? '#FF3040' : '#${Theme.of(context).colorScheme.onSurface.value.toRadixString(16)}'}" 
+           stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 18v-6H5l7-7 7 7h-4v6H9z"/>
+      </svg>
+      ''',
+                                      width: c.postIconSize,
+                                      height: c.postIconSize,
                                     );
                                   },
                                   onTap: (isLiked) async {
@@ -479,13 +481,14 @@ class PostCard extends StatelessWidget {
                                       const Duration(milliseconds: 600),
                                   bubblesSize: 25,
                                   bubblesColor: const BubblesColor(
-                                      dotPrimaryColor:
-                                          Color.fromARGB(255, 52, 105, 165),
-                                      dotSecondaryColor:
-                                          Color.fromARGB(255, 65, 43, 161),
-                                      dotThirdColor:
-                                          Color.fromARGB(255, 196, 68, 211),
-                                      dotLastColor: Color(0xFFff3040)),
+                                    dotPrimaryColor:
+                                        Color.fromARGB(255, 52, 105, 165),
+                                    dotSecondaryColor:
+                                        Color.fromARGB(255, 65, 43, 161),
+                                    dotThirdColor:
+                                        Color.fromARGB(255, 196, 68, 211),
+                                    dotLastColor: Color(0xFFff3040),
+                                  ),
                                 ),
                                 LikeButton(
                                   isLiked: Provider.of<PostCardController>(
@@ -493,16 +496,17 @@ class PostCard extends StatelessWidget {
                                           listen: true)
                                       .disliked,
                                   likeBuilder: (isDisliked) {
-                                    return Icon(
-                                      size: c.postIconSize,
-                                      isDisliked
-                                          ? CupertinoIcons.down_arrow
-                                          : CupertinoIcons.down_arrow,
-                                      color: isDisliked
-                                          ? const Color(0xFFff3040)
-                                          : Theme.of(context)
-                                              .colorScheme
-                                              .onSurface,
+                                    return SvgPicture.string(
+                                      '''
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+           fill="${isDisliked ? '#FF3040' : 'none'}" 
+           stroke="${isDisliked ? '#FF3040' : '#${Theme.of(context).colorScheme.onSurface.value.toRadixString(16)}'}" 
+           stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 6v6h4l-7 7-7-7h4V6h6z"/>
+      </svg>
+      ''',
+                                      width: c.postIconSize,
+                                      height: c.postIconSize,
                                     );
                                   },
                                   onTap: (isDisliked) async {
@@ -527,13 +531,14 @@ class PostCard extends StatelessWidget {
                                       const Duration(milliseconds: 600),
                                   bubblesSize: 25,
                                   bubblesColor: const BubblesColor(
-                                      dotPrimaryColor:
-                                          Color.fromARGB(255, 52, 105, 165),
-                                      dotSecondaryColor:
-                                          Color.fromARGB(255, 65, 43, 161),
-                                      dotThirdColor:
-                                          Color.fromARGB(255, 196, 68, 211),
-                                      dotLastColor: Color(0xFFff3040)),
+                                    dotPrimaryColor:
+                                        Color.fromARGB(255, 52, 105, 165),
+                                    dotSecondaryColor:
+                                        Color.fromARGB(255, 65, 43, 161),
+                                    dotThirdColor:
+                                        Color.fromARGB(255, 196, 68, 211),
+                                    dotLastColor: Color(0xFFff3040),
+                                  ),
                                 ),
                                 InkWell(
                                   onTap: () {
@@ -555,16 +560,14 @@ class PostCard extends StatelessWidget {
                                       }
                                     }
                                   },
-                                  child: Icon(
-                                    CupertinoIcons.chat_bubble,
-                                    color:
-                                        Theme.of(context).colorScheme.onSurface,
-                                    size: c.postIconSize,
+                                  child: SvgPicture.string(
+                                    '''<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#${Theme.of(context).colorScheme.onSurface.value.toRadixString(16)}"  stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-circle"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>''',
+                                    width: c.postIconSize,
+                                    height: c.postIconSize,
                                   ),
                                 ),
                                 const SizedBox(width: 12),
                                 InkWell(
-                                  //iconSize: c.postIconSize,
                                   onTap: () {
                                     if (Provider.of<PostCardController>(context,
                                             listen: false)
@@ -577,16 +580,12 @@ class PostCard extends StatelessWidget {
                                               .sharePressed();
                                     }
                                   },
-                                  child: Icon(
-                                    kIsWeb
-                                        ? CupertinoIcons
-                                            .arrowshape_turn_up_right
-                                        : Platform.isIOS
-                                            ? CupertinoIcons.share
-                                            : CupertinoIcons
-                                                .arrowshape_turn_up_right,
-                                    color:
-                                        Theme.of(context).colorScheme.onSurface,
+                                  child: SvgPicture.string(
+                                    Platform.isIOS
+                                        ? '''<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#${Theme.of(context).colorScheme.onSurface.value.toRadixString(16)}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-share"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/></svg>'''
+                                        : '''<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#${Theme.of(context).colorScheme.onSurface.value.toRadixString(16)}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-forward"><polyline points="15 17 20 12 15 7"/><path d="M4 18v-2a4 4 0 0 1 4-4h12"/></svg>''',
+                                    width: c.postIconSize,
+                                    height: c.postIconSize,
                                   ),
                                 ),
                               ],
