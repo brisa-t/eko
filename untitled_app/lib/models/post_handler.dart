@@ -559,7 +559,7 @@ class PostsHandling {
                 .collection('posts')
                 .doc(rootUid)
                 .collection("comments")
-                .orderBy('time', descending: true)))
+                .orderBy('time', descending: false)))
         .map<Future<Post>>((raw) async {
       AppUser user = AppUser();
       await user.readUserData(raw.author);
