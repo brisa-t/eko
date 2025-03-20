@@ -81,6 +81,7 @@ dependencies:
     path: ./giphy_get-custom/
   flutter_dotenv: ^5.2.1
   flutter_expandable_fab: ^2.3.0
+  google_fonts: ^6.2.1
 dev_dependencies:
   
   # flutter_test:
