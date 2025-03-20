@@ -10,6 +10,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../custom_widgets/profile_picture_loading.dart';
 import '../models/group_handler.dart' show Group;
 import '../custom_widgets/profile_avatar.dart';
+import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 
 class ComposePage extends StatelessWidget {
   final Group? group;
@@ -38,17 +39,28 @@ class ComposePage extends StatelessWidget {
             onTap: () => Provider.of<ComposeController>(context, listen: false)
                 .hideKeyboard(),
             child: Scaffold(
-              floatingActionButton: SizedBox(
-                width: 70,
-                child: FloatingActionButton.large(
-                  heroTag: null,
-                  onPressed: () =>
+              //
+              floatingActionButtonLocation: ExpandableFab.location,
+              floatingActionButton: ExpandableFab(
+                openButtonBuilder: RotateFloatingActionButtonBuilder(
+                  child: const Icon(Icons.add_photo_alternate_outlined)
+                ),
+                type: ExpandableFabType.up,
+                distance: 70.0,
+                children: [
+                  FloatingActionButton.small(
+                    heroTag: null,
+                    child: const Icon(Icons.perm_media),
+                    onPressed: () {}, // Ascii the fuck out of it
+                  ),
+                  FloatingActionButton.small(
+                    heroTag: null,
+                    child: const Icon(Icons.search),
+                    onPressed: () =>
                       Provider.of<ComposeController>(context, listen: false)
                           .addGifPressed(),
-                  shape: const CircleBorder(),
-                  child:
-                      const Icon(Icons.add_photo_alternate_outlined, size: 40),
-                ),
+                  ),
+                ],
               ),
               appBar: AppBar(
                 surfaceTintColor: Colors.transparent,
@@ -74,8 +86,9 @@ class ComposePage extends StatelessWidget {
                           Provider.of<ComposeController>(context, listen: false)
                               .postPressed(context),
                       style: TextButton.styleFrom(
-                          backgroundColor:
-                              Theme.of(context).colorScheme.surfaceContainerHighest),
+                          backgroundColor: Theme.of(context)
+                              .colorScheme
+                              .surfaceContainerHighest),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -83,8 +96,7 @@ class ComposePage extends StatelessWidget {
                             AppLocalizations.of(context)!.postButton,
                             style: TextStyle(
                                 fontSize: 20,
-                                color:
-                                    Theme.of(context).colorScheme.onSurface),
+                                color: Theme.of(context).colorScheme.onSurface),
                           ),
                           SizedBox(
                             width: width * 0.02,
@@ -173,8 +185,7 @@ class ComposePage extends StatelessWidget {
                             style: TextStyle(
                                 fontSize: 30,
                                 fontWeight: FontWeight.bold,
-                                color:
-                                    Theme.of(context).colorScheme.onSurface),
+                                color: Theme.of(context).colorScheme.onSurface),
                             decoration: InputDecoration(
                               contentPadding: EdgeInsets.all(height * 0.01),
                               hintText: AppLocalizations.of(context)!.postTitle,
@@ -314,8 +325,7 @@ class ComposePage extends StatelessWidget {
                             style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.normal,
-                                color:
-                                    Theme.of(context).colorScheme.onSurface),
+                                color: Theme.of(context).colorScheme.onSurface),
                             decoration: InputDecoration(
                               contentPadding: EdgeInsets.all(height * 0.01),
                               hintText: AppLocalizations.of(context)!.addText,
@@ -326,11 +336,9 @@ class ComposePage extends StatelessWidget {
                                       .colorScheme
                                       .onSurfaceVariant),
                               border: InputBorder.none,
-                              
                             ),
                           ),
                         ),
-
                         Consumer<ComposeController>(
                           builder: (context, composeController, _) =>
                               (composeController.showCount1 &&
@@ -347,7 +355,6 @@ class ComposePage extends StatelessWidget {
                                     )
                                   : Container(),
                         ),
-                        
                       ],
                     ),
                   ),
@@ -369,14 +376,12 @@ class ComposePage extends StatelessWidget {
                           },
                           textCapitalization: TextCapitalization.sentences,
                           maxLines: null,
-                          cursorColor:
-                              Theme.of(context).colorScheme.onSurface,
+                          cursorColor: Theme.of(context).colorScheme.onSurface,
                           keyboardType: TextInputType.text,
                           style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.normal,
-                              color:
-                                  Theme.of(context).colorScheme.onSurface),
+                              color: Theme.of(context).colorScheme.onSurface),
                           decoration: InputDecoration(
                             contentPadding: EdgeInsets.all(height * 0.01),
                             hintText: AppLocalizations.of(context)!.addText,
