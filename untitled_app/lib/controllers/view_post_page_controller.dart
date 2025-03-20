@@ -22,7 +22,7 @@ import '../custom_widgets/controllers/pagination_controller.dart'
     show PaginationGetterReturn;
 import '../models/feed_post_cache.dart';
 import 'bottom_nav_bar_controller.dart';
-import '../secrets/secrets.dart' as s;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class PostPageController extends ChangeNotifier {
   final Post? passedPost;
@@ -134,7 +134,7 @@ class PostPageController extends ChangeNotifier {
     context.pop();
   }
 
-   void _popDialog() {
+  void _popDialog() {
     Navigator.of(context, rootNavigator: true).pop();
   }
 
@@ -444,7 +444,7 @@ class PostPageController extends ChangeNotifier {
     locator<NavBarController>().disable();
     GiphyGif? newGif = await GiphyGet.getGif(
       context: context,
-      apiKey: s.GIPHY_API_KEY,
+      apiKey: dotenv.env["GIPHY_API_KEY"]!,
       lang: GiphyLanguage.english,
       //randomID: "abcd", // Optional - An ID/proxy for a specific user.
       tabColor: Colors.teal,
