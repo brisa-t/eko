@@ -195,7 +195,9 @@ class CommentCardController extends ChangeNotifier {
       liking = true;
       liked = locator<CurrentUser>()
           .checkIsLiked(post.postId); //prevent user from double likeing
-
+if (disliked) {
+        dislikePressed();
+      }
       if (liked) {
         liked = false;
         //locator<FeedPostCache>().updateLikes(post.postId, -1);
@@ -227,13 +229,16 @@ class CommentCardController extends ChangeNotifier {
     }
     //}
   }
+
   dislikePressed() async {
     //if (post.author.uid != locator<CurrentUser>().getUID()) {
     if (!disliking) {
       disliking = true;
       disliked = locator<CurrentUser>()
           .checkIsDisliked(post.postId); //prevent user from double likeing
-
+      if (liked) {
+        likePressed();
+      }
       if (disliked) {
         disliked = false;
         //locator<FeedPostCache>().updateLikes(post.postId, -1);
@@ -261,7 +266,7 @@ class CommentCardController extends ChangeNotifier {
           notifyListeners();
         }
       }
-      liking = false;
+      disliking = false;
     }
     //}
   }

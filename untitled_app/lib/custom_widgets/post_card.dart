@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -7,7 +6,6 @@ import 'package:untitled_app/custom_widgets/controllers/pagination_controller.da
 import 'package:untitled_app/custom_widgets/gif_widget.dart';
 import 'package:untitled_app/custom_widgets/image_widget.dart';
 import 'package:untitled_app/custom_widgets/time_stamp.dart';
-import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/models/current_user.dart';
 import 'package:untitled_app/models/feed_post_cache.dart';
 import 'package:untitled_app/utilities/locator.dart';
@@ -18,7 +16,6 @@ import 'package:provider/provider.dart';
 import '../custom_widgets/profile_avatar.dart';
 import 'dart:io' show Platform;
 import 'package:like_button/like_button.dart';
-import 'package:flutter/foundation.dart';
 
 Widget postCardBuilder(dynamic post) {
   post as Post;
@@ -43,6 +40,37 @@ Widget profilePostCardBuilder(dynamic post) {
     isOnProfile: true,
     showGroup: true,
   );
+}
+
+class CountDisplay extends StatelessWidget {
+  final int count;
+  final VoidCallback onTap;
+
+  const CountDisplay({
+    Key? key,
+    required this.count,
+    required this.onTap,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(width: 4),
+          Text(
+            count.toString(),
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(width: 4),
+        ],
+      ),
+    );
+  }
 }
 
 class PostCard extends StatelessWidget {
@@ -128,15 +156,7 @@ class PostCard extends StatelessWidget {
                                   .isLoggedIn())
                           ? context
                               .push("/feed/post/${post.postId}", extra: post)
-                              .then((v) async {
-                              // notifier.rebuild();
-
-                              //comments = await locator<PostsHandling>().countComments(post.postId);
-
-                              // Provider.of<PaginationController>(context,
-                              //         listen: false)
-                              //     .rebuildFunction();
-                            })
+                              .then((v) async {})
                           : null,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -394,7 +414,6 @@ class PostCard extends StatelessWidget {
                                           listen: true)
                                       .liked,
                                   likeBuilder: (isLiked) {
-                                    
                                     return SvgPicture.string(
                                       '''
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -422,9 +441,9 @@ class PostCard extends StatelessWidget {
                                     }
                                     return false;
                                   },
-                                  likeCount: null,
                                   likeCountAnimationType:
                                       LikeCountAnimationType.none,
+                                  likeCountPadding: null,
                                   circleSize: 0,
                                   animationDuration:
                                       const Duration(milliseconds: 600),
@@ -438,6 +457,22 @@ class PostCard extends StatelessWidget {
                                         Color.fromARGB(255, 196, 68, 211),
                                     dotLastColor: Color(0xFFff3040),
                                   ),
+                                ),
+                                CountDisplay(
+                                  count: Provider.of<PostCardController>(
+                                          context,
+                                          listen: true)
+                                      .post
+                                      .likes,
+                                  onTap: () {
+                                    if (Provider.of<PostCardController>(context,
+                                            listen: false)
+                                        .isLoggedIn()) {
+                                      context.push(
+                                          "/feed/post/${post.postId}/likes",
+                                          extra: post.postId);
+                                    }
+                                  },
                                 ),
                                 LikeButton(
                                   isLiked: Provider.of<PostCardController>(
@@ -472,9 +507,9 @@ class PostCard extends StatelessWidget {
                                     }
                                     return false;
                                   },
-                                  likeCount: null,
                                   likeCountAnimationType:
                                       LikeCountAnimationType.none,
+                                  likeCountPadding: null,
                                   circleSize: 0,
                                   animationDuration:
                                       const Duration(milliseconds: 600),
@@ -489,6 +524,25 @@ class PostCard extends StatelessWidget {
                                     dotLastColor: Color(0xFFff3040),
                                   ),
                                 ),
+                                CountDisplay(
+                                  count: Provider.of<PostCardController>(
+                                          context,
+                                          listen: true)
+                                      .post
+                                      .dislikes,
+                                  onTap: () {
+                                    if (Provider.of<PostCardController>(context,
+                                            listen: false)
+                                        .isLoggedIn()) {
+                                      context.push(
+                                          "/feed/post/${post.postId}/dislikes",
+                                          extra: post.postId);
+                                    }
+                                  },
+                                ),
+                                SizedBox(
+                                  width: 5,
+                                ),
                                 InkWell(
                                   onTap: () {
                                     if (Provider.of<PostCardController>(context,
@@ -499,8 +553,6 @@ class PostCard extends StatelessWidget {
                                             .push("/feed/post/${post.postId}",
                                                 extra: post)
                                             .then((v) async {
-                                          //comments = await locator<PostsHandling>().countComments(post.postId);
-
                                           Provider.of<PaginationController>(
                                                   context,
                                                   listen: false)
@@ -515,7 +567,34 @@ class PostCard extends StatelessWidget {
                                     height: c.postIconSize,
                                   ),
                                 ),
-                                const SizedBox(width: 12),
+                                SizedBox(
+                                  width: 3,
+                                ),
+                                CountDisplay(
+                                  count: Provider.of<PostCardController>(
+                                          context,
+                                          listen: true)
+                                      .post
+                                      .commentCount,
+                                  onTap: () {
+                                    if (Provider.of<PostCardController>(context,
+                                            listen: false)
+                                        .isLoggedIn()) {
+                                      if (!isPreview && !isPostPage) {
+                                        context
+                                            .push("/feed/post/${post.postId}",
+                                                extra: post)
+                                            .then((v) async {
+                                          Provider.of<PaginationController>(
+                                                  context,
+                                                  listen: false)
+                                              .rebuildFunction();
+                                        });
+                                      }
+                                    }
+                                  },
+                                ),
+                                const SizedBox(width: 5),
                                 InkWell(
                                   onTap: () {
                                     if (Provider.of<PostCardController>(context,
@@ -540,36 +619,8 @@ class PostCard extends StatelessWidget {
                               ],
                             ),
                           ),
-                          Padding(
-                            padding: EdgeInsets.only(
-                                left: c.postPaddingHoriz + width * 0.115 + 14,
-                                bottom: 9),
-                            child: RichText(
-                              text: TextSpan(
-                                style: likeCommentTextStyle,
-                                children: [
-                                  //TextSpan(text:"${formatTime(post.time)} • "),
-                                  //,
-                                  TextSpan(
-                                      recognizer: TapGestureRecognizer()
-                                        ..onTap = () {
-                                          if (Provider.of<PostCardController>(
-                                                  context,
-                                                  listen: false)
-                                              .isLoggedIn()) {
-                                            context.push(
-                                                "/feed/post/${post.postId}/likes",
-                                                extra: post.postId);
-                                          }
-                                        },
-                                      text:
-                                          "${Provider.of<PostCardController>(context, listen: true).post.likes} ${Provider.of<PostCardController>(context, listen: true).post.likes == 1 ? AppLocalizations.of(context)!.like : AppLocalizations.of(context)!.likes} • "),
-                                  TextSpan(
-                                      text:
-                                          "${Provider.of<PostCardController>(context, listen: true).post.commentCount} ${Provider.of<PostCardController>(context, listen: true).post.commentCount == 1 ? AppLocalizations.of(context)!.comment : AppLocalizations.of(context)!.comments}")
-                                ],
-                              ),
-                            ),
+                          SizedBox(
+                            height: 8,
                           ),
                           SizedBox(
                             width: width,

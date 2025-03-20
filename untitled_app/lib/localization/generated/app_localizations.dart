@@ -371,11 +371,23 @@ abstract class AppLocalizations {
   /// **'Likes'**
   String get likes;
 
+  /// No description provided for @dislikes.
+  ///
+  /// In en, this message translates to:
+  /// **'Dislikes'**
+  String get dislikes;
+
   /// No description provided for @like.
   ///
   /// In en, this message translates to:
   /// **'Like'**
   String get like;
+
+  /// No description provided for @dislike.
+  ///
+  /// In en, this message translates to:
+  /// **'Dislike'**
+  String get dislike;
 
   /// No description provided for @comments.
   ///
@@ -844,6 +856,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'See Likes'**
   String get viewLikes;
+
+  /// No description provided for @viewDislikes.
+  ///
+  /// In en, this message translates to:
+  /// **'See Dislikes'**
+  String get viewDislikes;
 
   /// No description provided for @updateRequiredTitle.
   ///

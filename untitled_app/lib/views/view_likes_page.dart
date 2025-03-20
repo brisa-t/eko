@@ -8,17 +8,19 @@ import '../custom_widgets/searched_user_card.dart';
 
 class ViewLikesPage extends StatelessWidget {
   final String postId;
-  const ViewLikesPage({super.key, required this.postId});
+  final bool dislikes;
+  const ViewLikesPage({super.key, required this.postId, this.dislikes = false});
 
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.sizeOf(context).height;
     return ChangeNotifierProvider(
-      create: (context) => ViewLikesPageController(postId: postId),
+      create: (context) =>
+          ViewLikesPageController(postId: postId, dislikes: dislikes),
       builder: (context, child) {
         return Scaffold(
           appBar: AppBar(
-            title: Text(AppLocalizations.of(context)!.viewLikes),
+            title: dislikes ? Text(AppLocalizations.of(context)!.viewDislikes): Text(AppLocalizations.of(context)!.viewLikes),
             automaticallyImplyLeading: false,
             leading: IconButton(
               icon: Icon(Icons.arrow_back_ios_rounded,

@@ -2,7 +2,9 @@
   "es": [
     "signIn",
     "signInToComment",
+    "dislikes",
     "like",
+    "dislike",
     "comments",
     "comment",
     "addText",
@@ -57,6 +59,7 @@
     "getTheApp",
     "gifLoadingError",
     "viewLikes",
+    "viewDislikes",
     "updateRequiredTitle",
     "updateRequiredBody",
     "updateAvailable",

@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:untitled_app/controllers/view_post_page_controller.dart';
 import 'package:untitled_app/custom_widgets/count_down_timer.dart';
 import 'package:untitled_app/custom_widgets/gif_widget.dart';
@@ -203,34 +204,6 @@ class _Card extends StatelessWidget {
                                 )),
                           ),
                           const SizedBox(width: 8.0),
-                          // TextButton(
-                          //   onPressed: () {
-                          //     if (Provider.of<CommentCardController>(
-                          //             context,
-                          //             listen: false)
-                          //         .isLoggedIn()) {
-                          //       Provider.of<CommentCardController>(context,
-                          //               listen: false)
-                          //           .avatarPressed();
-                          //     }
-                          //   },
-                          //   style: TextButton.styleFrom(
-                          //     padding: EdgeInsets.zero,
-                          //     minimumSize: const Size(0, 0),
-                          //     tapTargetSize:
-                          //         MaterialTapTargetSize.shrinkWrap,
-                          //   ),
-                          //   child: Text(
-                          //     "@${post.author.username}",
-                          //     style: TextStyle(
-                          //       fontSize: 16,
-                          //       fontWeight: FontWeight.w300,
-                          //       color: Theme.of(context)
-                          //           .colorScheme
-                          //           .onBackground,
-                          //     ),
-                          //   ),
-                          // ),
                         ],
                       ),
                       const SizedBox(height: 8.0),
@@ -309,14 +282,17 @@ class _Card extends StatelessWidget {
                             listen: true)
                         .liked),
                     likeBuilder: (isLiked) {
-                      return Icon(
-                        size: c.commentIconSize,
-                        isLiked
-                            ? CupertinoIcons.heart_solid
-                            : CupertinoIcons.heart,
-                        color: isLiked
-                            ? const Color(0xFFff3040)
-                            : Theme.of(context).colorScheme.onSurface,
+                      return SvgPicture.string(
+                        '''
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+           fill="${isLiked ? '#FF3040' : 'none'}" 
+           stroke="${isLiked ? '#FF3040' : '#${Theme.of(context).colorScheme.onSurface.toARGB32().toRadixString(16).substring(2)}'}" 
+           stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 18v-6H5l7-7 7 7h-4v6H9z"/>
+      </svg>
+      ''',
+                        width: c.postIconSize,
+                        height: c.postIconSize,
                       );
                     },
                     onTap: (isLiked) async {
@@ -354,31 +330,32 @@ class _Card extends StatelessWidget {
                     isLiked: (Provider.of<CommentCardController>(context,
                             listen: true)
                         .disliked),
-                    likeBuilder: (isLiked) {
-                      return Icon(
-                        size: c.commentIconSize,
-                        isLiked
-                            ? CupertinoIcons.heart_solid
-                            : CupertinoIcons.heart,
-                        color: isLiked
-                            ? const Color(0xFFff3040)
-                            : Theme.of(context).colorScheme.onSurface,
+                    likeBuilder: (isDisliked) {
+                      return SvgPicture.string(
+                        '''
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+           fill="${isDisliked ? '#FF3040' : 'none'}" 
+           stroke="${isDisliked ? '#FF3040' : '#${Theme.of(context).colorScheme.onSurface.toARGB32().toRadixString(16).substring(2)}'}" 
+           stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 6v6h4l-7 7-7-7h4V6h6z"/>
+      </svg>
+      ''',
                       );
                     },
-                    onTap: (isLiked) async {
+                    onTap: (isDisliked) async {
                       if (Provider.of<CommentCardController>(context,
                               listen: false)
                           .isLoggedIn()) {
                         Provider.of<CommentCardController>(context,
                                 listen: false)
-                            .likePressed();
-                        return !isLiked;
+                            .dislikePressed();
+                        return !isDisliked;
                       }
-                      return isLiked;
+                      return isDisliked;
                     },
                     likeCount: Provider.of<CommentCardController>(context,
                             listen: true)
-                        .likes,
+                        .dislikes,
                     countBuilder: (int? count, bool isLiked, String text) {
                       return Text(
                         text,

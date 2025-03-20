@@ -74,7 +74,9 @@
 
     "close":"Close",
     "likes":"Likes",
+    "dislikes":"Dislikes",
     "like":"Like",
+    "dislike":"Dislike",
     "comments":"Comments",
     "comment":"Comment",
     "follow":"Follow",
@@ -177,6 +179,7 @@
 
     "gifLoadingError":"Failed to load",
     "viewLikes":"See Likes",
+    "viewDislikes":"See Dislikes",
 
 
     "updateRequiredTitle":"Update Required",

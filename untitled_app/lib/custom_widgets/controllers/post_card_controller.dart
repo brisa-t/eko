@@ -172,7 +172,9 @@ class PostCardController extends ChangeNotifier {
       //get action
       liked = locator<CurrentUser>()
           .checkIsLiked(post.postId); //prevent user from double likeing
-
+      if (disliked) {
+        dislikePressed();
+      }
       if (liked) {
         //set bool
         liked = false;
@@ -257,7 +259,9 @@ class PostCardController extends ChangeNotifier {
       //get action
       disliked = locator<CurrentUser>()
           .checkIsDisliked(post.postId); //prevent user from double likeing
-
+      if (liked) {
+        likePressed();
+      }
       if (disliked) {
         //set bool
         disliked = false;

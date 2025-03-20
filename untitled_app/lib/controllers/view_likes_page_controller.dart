@@ -6,10 +6,11 @@ import '../models/post_handler.dart';
 
 class ViewLikesPageController extends ChangeNotifier {
   final String postId;
-  ViewLikesPageController({required this.postId});
+  final bool dislikes;
+  ViewLikesPageController({required this.postId, this.dislikes = false});
 
   Future<PaginationGetterReturn> getter(dynamic uid) async {
-    return locator<PostsHandling>().getPostLikes(uid, postId);
+    return dislikes ? locator<PostsHandling>().getPostDislikes(uid, postId) : locator<PostsHandling>().getPostLikes(uid, postId);
   }
 
   dynamic startAfterQuery(dynamic user) async {

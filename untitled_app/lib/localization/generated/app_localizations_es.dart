@@ -147,7 +147,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get likes => 'Likes';
 
   @override
+  String get dislikes => 'Dislikes';
+
+  @override
   String get like => 'Like';
+
+  @override
+  String get dislike => 'Dislike';
 
   @override
   String get comments => 'Comments';
@@ -382,6 +388,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get viewLikes => 'See Likes';
+
+  @override
+  String get viewDislikes => 'See Dislikes';
 
   @override
   String get updateRequiredTitle => 'Update Required';

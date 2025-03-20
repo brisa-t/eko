@@ -495,6 +495,36 @@ class PostsHandling {
         end: (userList.length < c.usersOnSearch), payload: userList);
   }
 
+  //people who dislike a post
+  Future<PaginationGetterReturn> getPostDislikes(
+      dynamic uid, String postId) async {
+    late QuerySnapshot<Map<String, dynamic>> snapshot;
+
+    if (uid == null) {
+      //initial data
+      snapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where("profileData.dislikedPosts", arrayContains: postId)
+          .limit(c.usersOnSearch)
+          .get();
+    } else {
+      snapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where("profileData.dislikedPosts", arrayContains: postId)
+          .orderBy('uid', descending: true)
+          .startAfter([uid])
+          .limit(c.usersOnSearch)
+          .get();
+    }
+    final userList = snapshot.docs.map<AppUser>((doc) {
+      var data = doc.data();
+      return AppUser.fromJson(data);
+    }).toList();
+
+    return PaginationGetterReturn(
+        end: (userList.length < c.usersOnSearch), payload: userList);
+  }
+
 //user profile
   Future<PaginationGetterReturn> getProfilePosts(dynamic time) async {
     final user = FirebaseAuth.instance.currentUser!.uid;

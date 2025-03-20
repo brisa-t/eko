@@ -185,6 +185,17 @@ final goRouter = GoRouter(
                         );
                       },
                     ),
+                    GoRoute(
+                      path: 'dislikes',
+                      name: 'dislikes',
+                      builder: (context, state) {
+                        String postId = state.extra as String;
+                        return ViewLikesPage(
+                          postId: postId,
+                          dislikes: true,
+                        );
+                      },
+                    ),
                   ],
                 ),
               ],
@@ -312,7 +323,7 @@ final goRouter = GoRouter(
                   builder: (context, state) => const EditProfile(),
                 ),
                 GoRoute(
-                  // FIXME
+                    // FIXME
                     // onExit: (context) {
                     //   locator<NavBarController>().enable();
                     //   return true;
