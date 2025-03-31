@@ -398,11 +398,9 @@ class PostPageController extends ChangeNotifier {
           title: null,
           dislikes: 0,
         );
-        data.items.insert(
-            0,
-            Post.fromRaw(
-                newComment, AppUser.fromCurrent(locator<CurrentUser>()), 0,
-                rootPostId: post!.postId));
+        data.items.add(Post.fromRaw(
+            newComment, AppUser.fromCurrent(locator<CurrentUser>()), 0,
+            rootPostId: post!.postId));
       }
     } else {
       final returnedId = await locator<PostsHandling>().createComment(
@@ -421,7 +419,7 @@ class PostPageController extends ChangeNotifier {
           postId: returnedId,
           commentCount: 0,
           dislikes: 0);
-      data.items.insert(0, newComment);
+      data.items.add(newComment);
       // if (post!.hasCache) {
       //   locator<FeedPostCache>().updateComments(post!.postId, 1);
       //   if (builtFromID) {
