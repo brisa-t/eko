@@ -84,7 +84,6 @@ class _ComposePageState extends State<ComposePage> {
                       Provider.of<ComposeController>(context, listen: false)
                           .addGifPressed();
                     },
-                    shape: const CircleBorder(),
                     child: const Icon(Icons.gif_box_rounded),
                   ),
                 ],
