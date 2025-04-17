@@ -158,14 +158,8 @@ class _PollWidgetState extends State<PollWidget> {
       );
     }
 
-    return Container(
+    return SizedBox(
       width: width * 0.7,
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainer,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Theme.of(context).colorScheme.outline),
-      ),
-      padding: EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -180,87 +174,79 @@ class _PollWidgetState extends State<PollWidget> {
               padding: const EdgeInsets.only(bottom: 8.0),
               child: InkWell(
                 onTap:
-                _hasVoted || widget.isPreview ? null : () => _vote(index),
+                    _hasVoted || widget.isPreview ? null : () => _vote(index),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        Text(
-                          option,
-                          style: TextStyle(
-                            fontWeight: isSelected
-                                ? FontWeight.bold
-                                : FontWeight.normal,
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
-                        ),
-                        if (_hasVoted) Spacer(),
-                        if (_hasVoted)
-                          Text(
-                            '${(percentage * 100).toStringAsFixed(0)}%',
-                            style: TextStyle(
-                              fontWeight: isSelected
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurfaceVariant,
-                            ),
-                          ),
-                      ],
-                    ),
-                    SizedBox(height: 4),
                     Stack(
                       children: [
+                        // Background container
                         Container(
-                          height: 32,
+                          height: 48,
                           width: double.infinity,
                           decoration: BoxDecoration(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .surfaceContainerLow,
-                            borderRadius: BorderRadius.circular(16),
+                            color: widget.isPreview
+                                ? Theme.of(context).colorScheme.surfaceContainerHighest
+                                : Theme.of(context).colorScheme.outlineVariant,
+                            borderRadius: BorderRadius.circular(8),
                           ),
                         ),
+                        // Fill container for votes
                         AnimatedContainer(
                           duration: Duration(milliseconds: 500),
                           curve: Curves.easeInOut,
-                          height: 32,
+                          height: 48,
                           width: MediaQuery.of(context).size.width *
-                              0.65 *
+                              0.7 *
                               percentage,
                           decoration: BoxDecoration(
                             color: isSelected
                                 ? Theme.of(context).colorScheme.primary
-                                : Theme.of(context)
-                                    .colorScheme
-                                    .surfaceContainerHigh,
-                            borderRadius: BorderRadius.circular(16),
+                                : Theme.of(context).colorScheme.outlineVariant,
+                            borderRadius: BorderRadius.circular(8),
                           ),
                         ),
+                        // Content container (text and icons)
                         Container(
-                          height: 32,
+                          height: 48,
                           width: double.infinity,
-                          alignment: Alignment.centerLeft,
                           padding: EdgeInsets.symmetric(horizontal: 12),
                           child: Row(
                             children: [
-                              if (!_hasVoted)
-                                Icon(
-                                  Icons.circle_outlined,
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface,
-                                  size: 16,
+                              Expanded(
+                                child: Text(
+                                  option,
+                                  style: TextStyle(
+                                    fontWeight: isSelected
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                    color: isSelected && _hasVoted
+                                        ? Theme.of(context)
+                                            .colorScheme
+                                            .onPrimary
+                                        : Theme.of(context)
+                                            .colorScheme
+                                            .onSurface,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                              if (_hasVoted && isSelected)
-                                Icon(
-                                  Icons.check_circle,
-                                  color:
-                                      Theme.of(context).colorScheme.onPrimary,
-                                  size: 16,
+                              ),
+                              if (_hasVoted)
+                                Text(
+                                  '${(percentage * 100).toStringAsFixed(0)}%',
+                                  style: TextStyle(
+                                    fontWeight: isSelected
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                    color: isSelected
+                                        ? Theme.of(context)
+                                            .colorScheme
+                                            .onPrimary
+                                        : Theme.of(context)
+                                            .colorScheme
+                                            .onSurfaceVariant,
+                                  ),
                                 ),
-                              SizedBox(width: 8),
                             ],
                           ),
                         ),

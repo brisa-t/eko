@@ -302,6 +302,7 @@ class ComposeController extends ChangeNotifier {
       if (ascii != null) {
         image = ascii;
         gif = null;
+        isPoll = false;
       }
       notifyListeners();
     } else {}
@@ -322,6 +323,7 @@ class ComposeController extends ChangeNotifier {
     if (newGif != null) {
       gif = newGif;
       image = null;
+      isPoll = false;
     }
     notifyListeners();
     locator<NavBarController>().enable();
