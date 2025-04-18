@@ -8,6 +8,8 @@
     "option":"Option",
     "addOption":"Add option",
     "needTwoOptions":"You need at least two poll options",
+    "votes":"votes",
+    "removeVote":"Remove vote",
 
 
     "invalidUserName":"Username does not meet requirements",

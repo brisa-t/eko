@@ -3,6 +3,8 @@
     "option",
     "addOption",
     "needTwoOptions",
+    "votes",
+    "removeVote",
     "signIn",
     "signInToComment",
     "dislikes",

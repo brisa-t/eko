@@ -143,6 +143,18 @@ abstract class AppLocalizations {
   /// **'You need at least two poll options'**
   String get needTwoOptions;
 
+  /// No description provided for @votes.
+  ///
+  /// In en, this message translates to:
+  /// **'votes'**
+  String get votes;
+
+  /// No description provided for @removeVote.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove vote'**
+  String get removeVote;
+
   /// No description provided for @invalidUserName.
   ///
   /// In en, this message translates to:

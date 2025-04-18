@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:untitled_app/custom_widgets/controllers/post_card_controller.dart';
+import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/models/current_user.dart';
 import 'package:untitled_app/utilities/locator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,142 +10,82 @@ import '../utilities/constants.dart' as c;
 class PollWidget extends StatefulWidget {
   final String postId;
   final List<String> options;
+  final Map<String, int> pollVoteCounts;
   final bool isPreview;
 
   const PollWidget({
-    Key? key,
+    super.key,
     required this.postId,
     required this.options,
+    required this.pollVoteCounts,
     this.isPreview = false,
-  }) : super(key: key);
+  });
 
   @override
-  State<PollWidget> createState() => _PollWidgetState();
+  State<PollWidget> createState() => PollWidgetState();
 }
 
-class _PollWidgetState extends State<PollWidget> {
-  int? _selectedOption;
-  Map<int, int> _voteCounts = {};
-  int _totalVotes = 0;
-  bool _hasVoted = false;
-  bool _isLoading = true;
+class PollWidgetState extends State<PollWidget> {
+  int? selectedOption;
+  Map<int, int> voteCounts = {};
+  int totalVotes = 0;
+  bool hasVoted = false;
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    if (!widget.isPreview) {
-      // _loadPollData();
-      _isLoading = false;
-      _initZeros();
-    } else {
-      // For preview, just show empty bars
-      _isLoading = false;
-      _initZeros();
-    }
+    loadPollData();
   }
 
-  void _initZeros() {
+  void loadPollData() {
+    int total = 0;
     for (int i = 0; i < widget.options.length; i++) {
-      _voteCounts[i] = 0;
+      final count = widget.pollVoteCounts[i.toString()] ?? 0;
+      voteCounts[i] = count;
+      total += count;
+    }
+    totalVotes = total;
+
+    // Check if user has already voted
+    final userVote = locator<CurrentUser>().checkPollVote(widget.postId);
+
+    if (userVote != null) {
+      selectedOption = userVote;
+      hasVoted = true;
+    }
+
+    isLoading = false;
+  }
+
+  Future<void> vote(int optionIndex) async {
+    if (hasVoted || widget.isPreview) return;
+
+    final success =
+        await locator<CurrentUser>().addPollVote(widget.postId, optionIndex);
+
+    if (success) {
+      setState(() {
+        selectedOption = optionIndex;
+        hasVoted = true;
+        voteCounts[optionIndex] = (voteCounts[optionIndex] ?? 0) + 1;
+        totalVotes++;
+      });
     }
   }
 
-  // Future<void> _loadPollData() async {
-  //   setState(() {
-  //     _isLoading = true;
-  //   });
+  Future<void> removeVote() async {
+    if (!hasVoted || widget.isPreview) return;
 
-  //   try {
-  //     // Check if user has already voted
-  //     final currentUser = locator<CurrentUser>();
-  //     final userVote = currentUser.getPollVote(widget.postId);
+    final success = await locator<CurrentUser>().removePollVote(widget.postId);
 
-  //     if (userVote != null) {
-  //       _selectedOption = userVote;
-  //       _hasVoted = true;
-  //     }
-
-  //     // Get vote counts from Firestore
-  //     final postDoc = await FirebaseFirestore.instance
-  //         .collection('posts')
-  //         .doc(widget.postId)
-  //         .get();
-
-  //     final Map<int, int> counts = {};
-  //     int total = 0;
-
-  //     if (postDoc.exists && postDoc.data()!.containsKey('pollVoteCounts')) {
-  //       // If post has vote counts, use them
-  //       final Map<String, dynamic> voteCounts =
-  //           postDoc.data()!['pollVoteCounts'];
-
-  //       for (int i = 0; i < widget.options.length; i++) {
-  //         final count = voteCounts[i.toString()] ?? 0;
-  //         counts[i] = count;
-  //         total += count;
-  //       }
-
-  //       // Get total votes
-  //       total = postDoc.data()!['totalPollVotes'] ?? total;
-  //     } else {
-  //       // If post doesn't have vote counts, initialize with zeros
-  //       for (int i = 0; i < widget.options.length; i++) {
-  //         counts[i] = 0;
-  //       }
-  //     }
-
-  //     setState(() {
-  //       _voteCounts = counts;
-  //       _totalVotes = total;
-  //       _isLoading = false;
-  //     });
-  //   } catch (e) {
-  //     setState(() {
-  //       _isLoading = false;
-  //       _initZeros();
-  //     });
-  //   }
-  // }
-
-  Future<void> _vote(int optionIndex) async {
-    if (_hasVoted || widget.isPreview) return;
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      final currentUser = locator<CurrentUser>();
-
-      // Send vote to Firestore through CurrentUser
-      // final success = await currentUser.addPollVote(widget.postId, optionIndex);
-      final success = true;
-
-      if (success) {
-        setState(() {
-          _selectedOption = optionIndex;
-          _hasVoted = true;
-          _voteCounts[optionIndex] = (_voteCounts[optionIndex] ?? 0) + 1;
-          _totalVotes++;
-          _isLoading = false;
-        });
-      } else {
-        // If update failed, show error
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to register vote. Please try again.')),
-        );
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    } catch (e) {
-      print('Error voting: $e');
+    if (success) {
       setState(() {
-        _isLoading = false;
+        selectedOption = null;
+        hasVoted = false;
+        // voteCounts[optionIndex] = (voteCounts[optionIndex] ?? 0) - 1;
+        totalVotes--;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
     }
   }
 
@@ -152,7 +93,7 @@ class _PollWidgetState extends State<PollWidget> {
   Widget build(BuildContext context) {
     final width = c.widthGetter(context);
 
-    if (_isLoading) {
+    if (isLoading) {
       return Center(
         child: CircularProgressIndicator(),
       );
@@ -166,15 +107,14 @@ class _PollWidgetState extends State<PollWidget> {
           ...widget.options.asMap().entries.map((entry) {
             final index = entry.key;
             final option = entry.value;
-            final isSelected = _selectedOption == index;
-            final voteCount = _voteCounts[index] ?? 0;
-            double percentage = _totalVotes > 0 ? voteCount / _totalVotes : 0;
+            final isSelected = selectedOption == index;
+            final voteCount = voteCounts[index] ?? 0;
+            double percentage = totalVotes > 0 ? voteCount / totalVotes : 0;
 
             return Padding(
               padding: const EdgeInsets.only(bottom: 8.0),
               child: InkWell(
-                onTap:
-                    _hasVoted || widget.isPreview ? null : () => _vote(index),
+                onTap: hasVoted || widget.isPreview ? null : () => vote(index),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -186,7 +126,9 @@ class _PollWidgetState extends State<PollWidget> {
                           width: double.infinity,
                           decoration: BoxDecoration(
                             color: widget.isPreview
-                                ? Theme.of(context).colorScheme.surfaceContainerHighest
+                                ? Theme.of(context)
+                                    .colorScheme
+                                    .surfaceContainerHighest
                                 : Theme.of(context).colorScheme.outlineVariant,
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -206,7 +148,6 @@ class _PollWidgetState extends State<PollWidget> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        // Content container (text and icons)
                         Container(
                           height: 48,
                           width: double.infinity,
@@ -220,7 +161,7 @@ class _PollWidgetState extends State<PollWidget> {
                                     fontWeight: isSelected
                                         ? FontWeight.bold
                                         : FontWeight.normal,
-                                    color: isSelected && _hasVoted
+                                    color: isSelected && hasVoted
                                         ? Theme.of(context)
                                             .colorScheme
                                             .onPrimary
@@ -231,7 +172,7 @@ class _PollWidgetState extends State<PollWidget> {
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-                              if (_hasVoted)
+                              if (hasVoted)
                                 Text(
                                   '${(percentage * 100).toStringAsFixed(0)}%',
                                   style: TextStyle(
@@ -257,15 +198,29 @@ class _PollWidgetState extends State<PollWidget> {
               ),
             );
           }).toList(),
-          if (_hasVoted && !widget.isPreview)
+          if (hasVoted && !widget.isPreview)
             Padding(
               padding: const EdgeInsets.only(top: 8.0),
-              child: Text(
-                '$_totalVotes votes',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  fontSize: 12,
-                ),
+              child: Row(
+                children: [
+                  Text(
+                    '$totalVotes ${AppLocalizations.of(context)!.votes}',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontSize: 12,
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: removeVote,
+                    child: Text(
+                      AppLocalizations.of(context)!.removeVote,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        fontSize: 12,
+                      ),
+                    ),
+                  )
+                ],
               ),
             ),
         ],

@@ -33,6 +33,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get needTwoOptions => 'You need at least two poll options';
 
   @override
+  String get votes => 'votes';
+
+  @override
+  String get removeVote => 'Remove vote';
+
+  @override
   String get invalidUserName => 'Nombre de usuario no cumple los requisitos';
 
   @override

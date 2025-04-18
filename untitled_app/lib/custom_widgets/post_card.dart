@@ -136,7 +136,6 @@ class PostCard extends StatelessWidget {
         //builder: (context, child) {
         return Consumer<PostCardController>(
           builder: (context, notifier, child) {
-            // print(post.body);
             final width = c.widthGetter(context);
             final likeCommentTextStyle = TextStyle(
                 fontFamily: DefaultTextStyle.of(context).style.fontFamily,
@@ -341,19 +340,16 @@ class PostCard extends StatelessWidget {
                                         ),
                                       const SizedBox(height: 6.0),
                                       // display gif/image/poll
-                                      if (post.isPoll &&
-                                          post.pollOptions != null &&
-                                          post.pollOptions!.isNotEmpty)
+                                      if (post.isPoll)
                                         PollWidget(
                                           postId: post.postId,
                                           options: post.pollOptions!,
+                                          pollVoteCounts: post.pollVoteCounts!,
                                           isPreview: isPreview,
                                         ),
-                                      if (post.gifURL != null &&
-                                          post.image == null &&
-                                          !post.isPoll)
+                                      if (post.gifURL != null)
                                         GifWidget(url: post.gifURL!),
-                                      if (post.image != null && !post.isPoll)
+                                      if (post.image != null)
                                         ImageWidget(text: post.image!),
                                       if (post.gifURL != null ||
                                           post.image != null ||

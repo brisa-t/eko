@@ -29,6 +29,7 @@ class Post {
   final bool isVerified;
   final bool isPoll;
   final List<String>? pollOptions;
+  final Map<String, int>? pollVoteCounts;
 
   //for comments
   final String? rootPostId;
@@ -52,6 +53,7 @@ class Post {
     this.isVerified = false,
     this.isPoll = false,
     this.pollOptions,
+    this.pollVoteCounts,
   });
 
   static Post fromRaw(RawPostObject rawPost, AppUser user, int commentCount,
@@ -75,6 +77,7 @@ class Post {
       isVerified: user.isVerified,
       isPoll: rawPost.isPoll,
       pollOptions: rawPost.pollOptions,
+      pollVoteCounts: rawPost.pollVoteCounts,
     );
   }
 
@@ -126,6 +129,7 @@ class RawPostObject {
   final int dislikes;
   final bool isPoll;
   final List<String>? pollOptions;
+  final Map<String, int>? pollVoteCounts;
 
   RawPostObject({
     required this.tags,
@@ -141,11 +145,12 @@ class RawPostObject {
     required this.dislikes,
     this.isPoll = false,
     this.pollOptions,
+    this.pollVoteCounts,
   });
   static RawPostObject fromJson(Map<String, dynamic> json, String id) {
     return RawPostObject(
       tags: (json["tags"] ?? ["public"]).cast<String>(),
-      gifSource: json["gifSourcef"],
+      gifSource: json["gifSource"],
       gifUrl: json["gifUrl"],
       postID: id,
       image: json["image"],
@@ -158,6 +163,9 @@ class RawPostObject {
       isPoll: json["isPoll"] ?? false,
       pollOptions: json["pollOptions"] != null
           ? List<String>.from(json["pollOptions"])
+          : null,
+      pollVoteCounts: json["pollVoteCounts"] != null
+          ? Map<String, int>.from(json["pollVoteCounts"])
           : null,
     );
   }

@@ -393,7 +393,11 @@ class ComposeController extends ChangeNotifier {
         final validOptions =
             pollOptions.where((option) => option.trim().isNotEmpty).toList();
         post["pollOptions"] = validOptions;
-        post["pollVoteCounts"] = List<int>.filled(validOptions.length, 0);
+        Map<String, int> voteCounts = {};
+        for (int i = 0; i < validOptions.length; i++) {
+          voteCounts[i.toString()] = 0;
+        }
+        post["pollVoteCounts"] = voteCounts;
       }
 
       showDialog(
@@ -405,22 +409,20 @@ class ComposeController extends ChangeNotifier {
             content: SingleChildScrollView(
               child: PostCard(
                   post: Post(
-                    tags: tags,
-                    gifSource: post["gifSource"],
-                    gifURL: post["gifUrl"],
-                    postId: "postId",
-                    time: "", //DateTime.now().toUtc().toIso8601String(),
-                    title: Post.parseText(post["title"]),
-                    author: AppUser.fromCurrent(locator<CurrentUser>()),
-                    body: Post.parseText(post["body"]),
-                    image: post["image"],
-                    likes: 0,
-                    dislikes: 0,
-                    isPoll: post["isPoll"] ?? false,
-                    pollOptions: post["pollOptions"] != null
-                        ? List<String>.from(post["pollOptions"])
-                        : null,
-                  ),
+                      tags: tags,
+                      gifSource: post["gifSource"],
+                      gifURL: post["gifUrl"],
+                      postId: "postId",
+                      time: "", //DateTime.now().toUtc().toIso8601String(),
+                      title: Post.parseText(post["title"]),
+                      author: AppUser.fromCurrent(locator<CurrentUser>()),
+                      body: Post.parseText(post["body"]),
+                      image: post["image"],
+                      likes: 0,
+                      dislikes: 0,
+                      isPoll: post["isPoll"] ?? false,
+                      pollOptions: post["pollOptions"],
+                      pollVoteCounts: post["pollVoteCounts"]),
                   isPreview: true),
             ),
             actions: <Widget>[
@@ -459,9 +461,8 @@ class ComposeController extends ChangeNotifier {
                         likes: 0,
                         dislikes: 0,
                         isPoll: post["isPoll"] ?? false,
-                        pollOptions: post["pollOptions"] != null
-                            ? List<String>.from(post["pollOptions"])
-                            : null,
+                        pollOptions: post["pollOptions"],
+                        pollVoteCounts: post["pollVoteCounts"],
                       ),
                     );
 
