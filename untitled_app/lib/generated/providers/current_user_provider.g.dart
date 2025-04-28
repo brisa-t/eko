@@ -6,12 +6,12 @@ part of '../../providers/current_user_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$currentUserHash() => r'f8620ab1ce1da5b1a7104a7633ed53fa5053213f';
+String _$currentUserHash() => r'2a5a23ace7df37cc09495e73f802213ea77f72f8';
 
 /// See also [CurrentUser].
 @ProviderFor(CurrentUser)
 final currentUserProvider =
-    NotifierProvider<CurrentUser, CurrentUserModel?>.internal(
+    NotifierProvider<CurrentUser, CurrentUserModel>.internal(
   CurrentUser.new,
   name: r'currentUserProvider',
   debugGetCreateSourceHash:
@@ -20,6 +20,6 @@ final currentUserProvider =
   allTransitiveDependencies: null,
 );
 
-typedef _$CurrentUser = Notifier<CurrentUserModel?>;
+typedef _$CurrentUser = Notifier<CurrentUserModel>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

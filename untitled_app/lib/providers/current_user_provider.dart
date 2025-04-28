@@ -9,13 +9,13 @@ part '../generated/providers/current_user_provider.g.dart';
 class CurrentUser extends _$CurrentUser {
   @override
   // This is nullable instead of async so that we can just bang it. Await will happen inside the require auth widget.
-  CurrentUserModel? build() {
+  CurrentUserModel build() {
     final auth = ref.watch(authProvider);
     // If uid is null, wait for authProvider to emit a non-null uid
     if (auth.uid != null) {
-      _init();
+      reload();
     }
-    return null;
+    return CurrentUserModel.loading();
   }
 
   Future<List<String>> _getPeopleWhoBlockedMe() async {
@@ -32,16 +32,16 @@ class CurrentUser extends _$CurrentUser {
     }
   }
 
-  Future<void> _init() async {
+  Future<void> reload() async {
+    final uid = ref.read(authProvider).uid!;
     final userRef = FirebaseFirestore.instance.collection('users');
-    final results = await Future.wait([
-      userRef.doc(ref.read(authProvider).uid!).get(),
-      _getPeopleWhoBlockedMe()
-    ]);
+    final results =
+        await Future.wait([userRef.doc(uid).get(), _getPeopleWhoBlockedMe()]);
     final mainData =
         (results[0] as DocumentSnapshot<Map<String, dynamic>>).data();
     assert(mainData != null);
     mainData!['blockedBy'] = results[1];
+
     state = CurrentUserModel.fromJson(mainData);
   }
 }

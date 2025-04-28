@@ -22,7 +22,7 @@ class RequireAuth extends ConsumerWidget {
       });
       return SizedBox.expand();
     }
-    if (user == null) {
+    if (user.user.uid.isEmpty) {
       return Center(child: LoadingSpinner());
     }
     return child;
