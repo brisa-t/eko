@@ -3,20 +3,6 @@ import 'package:flutter/services.dart';
 import '../utilities/constants.dart' as c;
 
 class CustomInputField extends StatefulWidget {
-  const CustomInputField({super.key});
-
-  @override
-  State<CustomInputField> createState() => _CustomInputField();
-}
-
-class _CustomInputField extends State<CustomInputField> {
-  @override
-  Widget build(BuildContext context) {
-    return const Placeholder();
-  }
-}
-
-class CustomInputFeild extends StatelessWidget {
   final int? maxLen;
   final String? label;
   final TextEditingController controller;
@@ -35,7 +21,7 @@ class CustomInputFeild extends StatelessWidget {
 
   final void Function(String)? onChanged;
   final void Function()? onEditingComplete;
-  const CustomInputFeild(
+  const CustomInputField(
       {this.label,
       required this.controller,
       this.onChanged,
@@ -56,47 +42,52 @@ class CustomInputFeild extends StatelessWidget {
       super.key});
 
   @override
+  State<CustomInputField> createState() => _CustomInputField();
+}
+
+class _CustomInputField extends State<CustomInputField> {
+  @override
   Widget build(BuildContext context) {
     double feildWidth;
-    bool hidden = password;
+    bool hidden = widget.password;
 
-    if (width == null) {
+    if (widget.width == null) {
       feildWidth = c.widthGetter(context) * 0.9;
     } else {
-      feildWidth = width!;
+      feildWidth = widget.width!;
     }
     return Container(
       alignment: Alignment.bottomCenter,
-      padding: padding
+      padding: widget.padding
           ? const EdgeInsets.only(top: 10, bottom: 10)
           : const EdgeInsets.only(),
       width: feildWidth,
-      height: height,
+      height: widget.height,
       child: TextFormField(
-        maxLength: maxLen,
+        maxLength: widget.maxLen,
         cursorColor: Theme.of(context).colorScheme.onSurface,
         obscureText: hidden,
 
-        enabled: enabled,
+        enabled: widget.enabled,
         inputFormatters: [
-          FilteringTextInputFormatter.allow(RegExp(filter)),
+          FilteringTextInputFormatter.allow(RegExp(widget.filter)),
         ],
-        textInputAction: textInputAction,
-        autovalidateMode: validator,
-        validator: validatorFunction,
-        controller: controller,
-        focusNode: focus,
-        onChanged: onChanged,
-        onEditingComplete: onEditingComplete,
+        textInputAction: widget.textInputAction,
+        autovalidateMode: widget.validator,
+        validator: widget.validatorFunction,
+        controller: widget.controller,
+        focusNode: widget.focus,
+        onChanged: widget.onChanged,
+        onEditingComplete: widget.onEditingComplete,
         //autofocus: true,
-        keyboardType: inputType,
+        keyboardType: widget.inputType,
         style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.normal,
             color: Theme.of(context).colorScheme.onSurface),
         decoration: InputDecoration(
-          counterText: showCounter ? null : '',
-          labelText: label,
+          counterText: widget.showCounter ? null : '',
+          labelText: widget.label,
           labelStyle: TextStyle(
             fontSize: 18,
             letterSpacing: 1,
@@ -115,11 +106,13 @@ class CustomInputFeild extends StatelessWidget {
               borderRadius: BorderRadius.circular(10.0),
               borderSide:
                   BorderSide(color: Theme.of(context).colorScheme.onSurface)),
-          suffixIcon: password
+          suffixIcon: widget.password
               ? IconButton(
                   icon: Icon(hidden ? Icons.visibility_off : Icons.visibility),
                   onPressed: () {
-                    hidden = !hidden;
+                    setState(() {
+                      hidden = !hidden;
+                    });
                   })
               : null,
         ),
