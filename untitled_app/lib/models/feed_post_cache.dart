@@ -1,6 +1,6 @@
-import 'package:untitled_app/custom_widgets/controllers/post_card_controller.dart';
+import 'package:untitled_app/custom_widgets/post_card.dart';
 import 'package:untitled_app/models/post_handler.dart' show Post;
-Map<String, PostCardController> postMap = {};
+Map<String, PostCard> postMap = {};
 class Cache {
   List<dynamic> items;
   bool end;

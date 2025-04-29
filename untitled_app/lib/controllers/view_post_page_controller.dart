@@ -165,7 +165,8 @@ class PostPageController extends ChangeNotifier {
     _pop();
     locator<FeedPostCache>().removePostFromAllCaches(post!.postId);
     _pop();
-    postMap[post!.postId]!.visible = false;
+    // TODO: 
+    // postMap[post!.postId]!.visible = false; 
     locator<PostsHandling>().deleteData('posts/${post!.postId}');
   }
 
