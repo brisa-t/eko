@@ -49,7 +49,7 @@ class ReAuthPage extends StatelessWidget {
               SizedBox(
                 height: width * 0.2,
               ),
-              CustomInputFeild(
+              CustomInputField(
                 textInputAction: TextInputAction.go,
                 // onEditingComplete: () =>
                 //     prov.Provider.of<LoginController>(context, listen: false)

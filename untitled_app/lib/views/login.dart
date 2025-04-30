@@ -115,7 +115,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           backgroundColor: Theme.of(context).colorScheme.outlineVariant,
           title: Text(AppLocalizations.of(context)!.resetPassword),
           content: SingleChildScrollView(
-            child: CustomInputFeild(
+            child: CustomInputField(
               label: AppLocalizations.of(context)!.email,
               controller: emailController,
               inputType: TextInputType.emailAddress,
@@ -196,13 +196,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         : 'images/eko_logo.png'),
               ),
               SizedBox(height: height * .05),
-              CustomInputFeild(
+              CustomInputField(
                 focus: emailFocus,
                 label: AppLocalizations.of(context)!.email,
                 controller: emailController,
                 inputType: TextInputType.emailAddress,
               ),
-              CustomInputFeild(
+              CustomInputField(
                 textInputAction: TextInputAction.go,
                 onEditingComplete: () => loginPressed(),
                 focus: passwordFocus,

@@ -46,10 +46,18 @@ class CustomInputField extends StatefulWidget {
 }
 
 class _CustomInputField extends State<CustomInputField> {
+  bool hidden = false;
+  @override
+  void initState() {
+    super.initState();
+    if (widget.password) {
+      hidden = true;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     double feildWidth;
-    bool hidden = widget.password;
 
     if (widget.width == null) {
       feildWidth = c.widthGetter(context) * 0.9;
@@ -67,7 +75,6 @@ class _CustomInputField extends State<CustomInputField> {
         maxLength: widget.maxLen,
         cursorColor: Theme.of(context).colorScheme.onSurface,
         obscureText: hidden,
-
         enabled: widget.enabled,
         inputFormatters: [
           FilteringTextInputFormatter.allow(RegExp(widget.filter)),
@@ -79,7 +86,6 @@ class _CustomInputField extends State<CustomInputField> {
         focusNode: widget.focus,
         onChanged: widget.onChanged,
         onEditingComplete: widget.onEditingComplete,
-        //autofocus: true,
         keyboardType: widget.inputType,
         style: TextStyle(
             fontSize: 18,

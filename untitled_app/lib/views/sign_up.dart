@@ -285,7 +285,7 @@ class GetInfo extends StatelessWidget {
             SizedBox(
               height: height * 0.03,
             ),
-            CustomInputFeild(
+            CustomInputField(
               focus: prov.Provider.of<SignUpController>(context, listen: false)
                   .nameFocus,
               label: AppLocalizations.of(context)!.name,
@@ -296,7 +296,7 @@ class GetInfo extends StatelessWidget {
               // maxLen: c.maxNameChars,
             ),
             // SizedBox(height: height * c.loginPadding),
-            CustomInputFeild(
+            CustomInputField(
               onChanged: (s) =>
                   prov.Provider.of<SignUpController>(context, listen: false)
                       .onUsernameChanged(s),
@@ -376,7 +376,7 @@ class GetInfo extends StatelessWidget {
                 ],
               ),
             SizedBox(height: height * c.loginPadding),
-            CustomInputFeild(
+            CustomInputField(
               label: AppLocalizations.of(context)!.email,
               focus: prov.Provider.of<SignUpController>(context, listen: false)
                   .emailFocus,
@@ -406,7 +406,7 @@ class GetInfo extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(AppLocalizations.of(context)!.month),
-                        CustomInputFeild(
+                        CustomInputField(
                           filter: r'[0-9]*',
                           showCounter: false,
                           maxLen: 2,
@@ -430,7 +430,7 @@ class GetInfo extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(AppLocalizations.of(context)!.day),
-                          CustomInputFeild(
+                          CustomInputField(
                             filter: r'[0-9]*',
                             showCounter: false,
                             maxLen: 2,
@@ -453,7 +453,7 @@ class GetInfo extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(AppLocalizations.of(context)!.year),
-                        CustomInputFeild(
+                        CustomInputField(
                           filter: r'[0-9]*',
                           showCounter: false,
                           maxLen: 4,
@@ -563,7 +563,7 @@ class GetPassword extends StatelessWidget {
               color: Theme.of(context).colorScheme.onSurface,
             ),
             SizedBox(height: height * 0.04),
-            CustomInputFeild(
+            CustomInputField(
               onChanged: (s) =>
                   prov.Provider.of<SignUpController>(context, listen: false)
                       .passwordChanged(),
@@ -581,7 +581,7 @@ class GetPassword extends StatelessWidget {
               password: true,
             ),
             SizedBox(height: height * c.loginPadding),
-            CustomInputFeild(
+            CustomInputField(
               onChanged: (s) =>
                   prov.Provider.of<SignUpController>(context, listen: false)
                       .passwordChanged(),

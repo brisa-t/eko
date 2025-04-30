@@ -138,7 +138,7 @@ class _ResetPasswordPage extends StatelessWidget {
               ),
 
               SizedBox(height: height * c.loginPadding),
-              CustomInputFeild(
+              CustomInputField(
                 onChanged: (s) =>
                     prov.Provider.of<AuthActionInterfaceController>(context,
                             listen: false)
@@ -160,7 +160,7 @@ class _ResetPasswordPage extends StatelessWidget {
                 password: true,
               ),
               SizedBox(height: height * c.loginPadding),
-              CustomInputFeild(
+              CustomInputField(
                 onChanged: (s) =>
                     prov.Provider.of<AuthActionInterfaceController>(context,
                             listen: false)

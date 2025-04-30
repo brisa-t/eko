@@ -243,7 +243,7 @@ class PostPageController extends ChangeNotifier {
               ),
             ),
 
-            //  CustomInputFeild(
+            //  CustomInputField(
             //   focus: reportFocus,
             //   label: AppLocalizations.of(context)!.comments,
             //   controller: reportController,
