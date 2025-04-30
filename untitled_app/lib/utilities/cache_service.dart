@@ -17,9 +17,11 @@ class CacheService<T> {
 
   T? getItem(String key) {
     final item = _map[key];
-    // return null if the requested item is not present;
+    // return null if the requested item is not present if it isn't null remove it from the map
     if (item == null) {
       return null;
+    } else {
+      _map.remove(key);
     }
     // if there is no duration we don't need to check if the data is fresh
     if (this.validTime == null) {

@@ -6,7 +6,7 @@ part of '../../providers/user_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$userHash() => r'6bdfe5e3df54d17b2b1a7c18a50211a770faf217';
+String _$userHash() => r'b4bd3378f660148155a6f035e5efa123c033f4ce';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -29,7 +29,7 @@ class _SystemHash {
   }
 }
 
-abstract class _$User extends BuildlessAsyncNotifier<UserModel> {
+abstract class _$User extends BuildlessAutoDisposeAsyncNotifier<UserModel> {
   late final String uid;
 
   FutureOr<UserModel> build(
@@ -80,7 +80,8 @@ class UserFamily extends Family<AsyncValue<UserModel>> {
 }
 
 /// See also [User].
-class UserProvider extends AsyncNotifierProviderImpl<User, UserModel> {
+class UserProvider
+    extends AutoDisposeAsyncNotifierProviderImpl<User, UserModel> {
   /// See also [User].
   UserProvider(
     String uid,
@@ -133,7 +134,7 @@ class UserProvider extends AsyncNotifierProviderImpl<User, UserModel> {
   }
 
   @override
-  AsyncNotifierProviderElement<User, UserModel> createElement() {
+  AutoDisposeAsyncNotifierProviderElement<User, UserModel> createElement() {
     return _UserProviderElement(this);
   }
 
@@ -153,12 +154,13 @@ class UserProvider extends AsyncNotifierProviderImpl<User, UserModel> {
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin UserRef on AsyncNotifierProviderRef<UserModel> {
+mixin UserRef on AutoDisposeAsyncNotifierProviderRef<UserModel> {
   /// The parameter `uid` of this provider.
   String get uid;
 }
 
-class _UserProviderElement extends AsyncNotifierProviderElement<User, UserModel>
+class _UserProviderElement
+    extends AutoDisposeAsyncNotifierProviderElement<User, UserModel>
     with UserRef {
   _UserProviderElement(super.provider);
 

@@ -4,11 +4,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:untitled_app/providers/auth_provider.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
+import 'package:untitled_app/providers/user_cache_provider.dart';
 import 'package:untitled_app/types/user.dart';
 // Necessary for code-generation to work
 part '../generated/providers/user_provider.g.dart';
 
-@Riverpod(keepAlive: false)
+@riverpod
 class User extends _$User {
   Timer? _disposeTimer;
   @override
@@ -35,6 +36,11 @@ class User extends _$User {
     if (ref.watch(authProvider).uid == uid) {
       return UserModel.fromCurrent(ref.watch(currentUserProvider)!);
     }
+    final cacheValue = ref.read(userCacheProvider).getItem(uid);
+    if (cacheValue != null) {
+      return cacheValue;
+    }
+
     final userRef = FirebaseFirestore.instance.collection('users');
     final data = await userRef.doc(uid).get();
     return UserModel.fromJson(data.data());
