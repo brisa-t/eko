@@ -15,6 +15,7 @@ class Followers extends ConsumerStatefulWidget {
 }
 
 class _FollowersState extends ConsumerState<Followers> {
+  
   Future<(List<MapEntry<String, Never?>>, bool)> getter(
       List<MapEntry<String, Never?>> data, List<String> fullFollowers) async {
     // // value form constants

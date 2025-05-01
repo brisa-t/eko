@@ -39,7 +39,7 @@ abstract class UserModel with _$UserModel {
     if (json == null) return UserModel.userNotFound();
     final profileData = json['profileData'] ?? {};
     return UserModel(
-      name: profileData['name'] ?? '',
+      name: json['name'] ?? '',
       username: json['username'] ?? '',
       profilePicture: profileData['profilePicture'] ?? '',
       bio: profileData['bio'] ?? '',

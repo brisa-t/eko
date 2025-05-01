@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:untitled_app/models/post_handler.dart';
 import 'package:untitled_app/providers/auth_provider.dart';
 import 'package:untitled_app/types/current_user.dart';
+import 'package:untitled_app/utilities/locator.dart';
 // Necessary for code-generation to work
 part '../generated/providers/current_user_provider.g.dart';
 
@@ -32,6 +34,23 @@ class CurrentUser extends _$CurrentUser {
     }
   }
 
+  Future<bool> blockUser(String blockedUid) async {
+    try {
+      final firestore = FirebaseFirestore.instance;
+      final uid = ref.read(authProvider).uid!;
+      await firestore.collection('users').doc(uid).update({
+        'blockedUsers': FieldValue.arrayUnion([blockedUid])
+      });
+
+      state.blockedBy.add(blockedUid);
+
+      removeFollower(blockedUid);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   Future<void> reload() async {
     final uid = ref.read(authProvider).uid!;
     final userRef = FirebaseFirestore.instance.collection('users');
@@ -43,5 +62,50 @@ class CurrentUser extends _$CurrentUser {
     mainData!['blockedBy'] = results[1];
 
     state = CurrentUserModel.fromJson(mainData);
+  }
+
+  Future<bool> addFollower(String otherUid) async {
+    try {
+      final firestore = FirebaseFirestore.instance;
+      final uid = ref.read(authProvider).uid!;
+      await Future.wait([
+        firestore.collection('users').doc(uid).update({
+          'profileData.following': FieldValue.arrayUnion([otherUid])
+        }),
+        firestore.collection('users').doc(otherUid).update({
+          'profileData.followers': FieldValue.arrayUnion([uid])
+        }),
+        locator<PostsHandling>().addActivty(
+            type: 'follow',
+            content: 'Someone followed you',
+            path: uid,
+            user: otherUid)
+      ]);
+
+      state.user.following.add(otherUid);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> removeFollower(String otherUid) async {
+    try {
+      final firestore = FirebaseFirestore.instance;
+      final uid = ref.read(authProvider).uid!;
+      await Future.wait([
+        firestore.collection('users').doc(uid).update({
+          'profileData.following': FieldValue.arrayRemove([otherUid])
+        }),
+        firestore.collection('users').doc(otherUid).update({
+          'profileData.followers': FieldValue.arrayRemove([uid])
+        })
+      ]);
+
+      state.user.following.remove(otherUid);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 }

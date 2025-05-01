@@ -81,7 +81,7 @@ class _UserCardState extends ConsumerState<UserCard> {
 
   void onCardPressed(UserModel user) {
     if (!widget.blockedPage) {
-      context.push('/feed/sub_profile/${user.uid}', extra: user);
+      context.push('/feed/sub_profile/${user.uid}');
     }
   }
 

@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
-import 'package:untitled_app/models/users.dart';
+import 'package:untitled_app/types/user.dart';
 import '../custom_widgets/profile_avatar.dart';
 import '../controllers/bottom_nav_bar_controller.dart';
 import '../utilities/locator.dart';
 import '../utilities/constants.dart' as c;
 
 class ProfileHeader extends StatelessWidget {
-  final AppUser user;
+  final UserModel user;
   final bool loggedIn;
 
   const ProfileHeader({
@@ -154,38 +154,3 @@ class _ProfilePageTopNumberDisplay extends StatelessWidget {
     );
   }
 }
-
-// goFollowing(context, List<dynamic> following) async {
-//   locator<NavBarController>().disable();
-//   context.pop("/profile/following");
-//   // Navigator.push(
-//   //   context,
-//   //   MaterialPageRoute(
-//   //     builder: (context) => prov.ChangeNotifierProvider(
-//   //       create: (context) =>
-//   //           FollowingController(context: context, following: following),
-//   //       child: Following(
-//   //         following: following,
-//   //       ),
-//   //     ),
-//   //   ),
-//   // );
-//   locator<NavBarController>().enable();
-// }
-
-// goFollowers(context, List<dynamic> followers) async {
-//   locator<NavBarController>().disable();
-//   await Navigator.push(
-//     context,
-//     MaterialPageRoute(
-//       builder: (context) => prov.ChangeNotifierProvider(
-//         create: (context) =>
-//             FollowersController(context: context, followers: followers),
-//         child: Followers(
-//           followers: followers,
-//         ),
-//       ),
-//     ),
-//   );
-//   locator<NavBarController>().enable();
-// }

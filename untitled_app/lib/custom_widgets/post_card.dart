@@ -298,8 +298,7 @@ class _PostCardState extends State<PostCard> {
 
   avatarPressed(BuildContext context) async {
     if (post.author.uid != locator<CurrentUser>().getUID()) {
-      await context.push('/feed/sub_profile/${post.author.uid}',
-          extra: post.author);
+      await context.push('/feed/sub_profile/${post.author.uid}');
     } else {
       context.go('/profile');
     }

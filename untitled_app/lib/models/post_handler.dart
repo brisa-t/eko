@@ -218,7 +218,6 @@ class PostsHandling {
   List<FeedChunk> feedChunks = [];
 
   Future<String> createPost(Map<String, dynamic> post) async {
-    print(post);
     final user = FirebaseAuth.instance.currentUser!;
     final firestore = FirebaseFirestore.instance;
     final String time = DateTime.now().toUtc().toIso8601String();
@@ -593,15 +592,17 @@ class PostsHandling {
 
 //sub
   Future<PaginationGetterReturn> getSubProfilePosts(
-      dynamic time, AppUser user) async {
+      dynamic time, String uid) async {
     final postList = (await newGetPosts(
             time,
             FirebaseFirestore.instance
                 .collection('posts')
-                .where('author', isEqualTo: user.uid)
+                .where('author', isEqualTo: uid)
                 .where('tags', arrayContains: 'public')
                 .orderBy('time', descending: true)))
         .map<Future<Post>>((raw) async {
+      AppUser user = AppUser();
+      await user.readUserData(uid);
       return Post.fromRaw(raw, user, await countComments(raw.postID));
     }).toList();
 

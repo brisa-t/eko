@@ -143,11 +143,8 @@ final goRouter = GoRouter(
                 GoRoute(
                   path: 'sub_profile/:id',
                   name: 'sub_profile',
-                  builder: (context, state) {
-                    AppUser? user = state.extra as AppUser?;
-                    String id = state.pathParameters['id']!;
-                    return OtherProfile(user: user, id: id);
-                  },
+                  builder: (context, state) =>
+                      OtherProfile(uid: state.pathParameters['id']!),
                 ),
                 GoRoute(
                   path: 'recent',
