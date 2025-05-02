@@ -339,36 +339,32 @@ class _HeaderState extends ConsumerState<_Header> {
           loggedIn: authState.uid != null,
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 20),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              SizedBox(
-                width: width * 0.4,
-                height: width * 0.1,
-                child: TextButton(
-                  style: TextButton.styleFrom(
-                    side: BorderSide(
-                        width: 2,
-                        color: Theme.of(context).colorScheme.onSurface),
+            padding: const EdgeInsets.symmetric(vertical: 15),
+            child: Center(
+              child: InkWell(
+                onTap: () => _onFollowPressed(),
+                child: Container(
+                  width: width * 0.45,
+                  height: width * 0.09,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(Radius.circular(10)),
+                    color: _isFollowing
+                        ? Theme.of(context).colorScheme.surfaceContainer
+                        : Theme.of(context).colorScheme.primaryContainer,
                   ),
-                  onPressed: () => _onFollowPressed(),
                   child: Text(
                     _isFollowing
                         ? AppLocalizations.of(context)!.following
                         : AppLocalizations.of(context)!.follow,
                     style: TextStyle(
-                      fontSize: 16,
-                      letterSpacing: 1,
-                      fontWeight: FontWeight.normal,
+                      fontSize: 14,
                       color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                 ),
               ),
-            ],
-          ),
-        ),
+            )),
         Divider(
           color: Theme.of(context).colorScheme.outline,
           height: c.dividerWidth,
