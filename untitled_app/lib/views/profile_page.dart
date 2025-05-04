@@ -10,9 +10,9 @@ import 'package:untitled_app/utilities/locator.dart';
 import '../controllers/bottom_nav_bar_controller.dart';
 import '../custom_widgets/profile_page_header.dart';
 import '../custom_widgets/pagination.dart';
-import '../custom_widgets/post_card.dart';
 import '../models/post_handler.dart';
 import '../utilities/constants.dart' as c;
+import '../widgets/post_card.dart';
 
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
@@ -29,7 +29,7 @@ class ProfilePage extends ConsumerWidget {
       child: Scaffold(
         body: PaginationPage(
           getter: (time) => locator<PostsHandling>().getProfilePosts(time),
-          card: profilePostCardBuilder,
+          card: (post) => profilePostCardBuilder(post.id),
           startAfterQuery: (post) =>
               locator<PostsHandling>().getTimeFromPost(post),
           header: const _Header(),
