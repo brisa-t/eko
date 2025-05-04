@@ -21,27 +21,27 @@ class CurrentUser extends _$CurrentUser {
     return CurrentUserModel.loading();
   }
 
-  void addUidToLiked(String uid) {
+  void addIdToLiked(String id) {
     final likes = [...state.likedPosts];
-    likes.add(uid);
+    likes.add(id);
     state = state.copyWith(likedPosts: likes);
   }
 
-  void removeUidFromLiked(String uid) {
+  void removeIdFromLiked(String id) {
     final likes = [...state.likedPosts];
-    likes.remove(uid);
+    likes.remove(id);
     state = state.copyWith(likedPosts: likes);
   }
 
-  void addUidToDisliked(String uid) {
+  void addIdToDisliked(String id) {
     final dislikes = [...state.likedPosts];
-    dislikes.add(uid);
+    dislikes.add(id);
     state = state.copyWith(dislikedPosts: dislikes);
   }
 
-  void removeUidfromDisliked(String uid) {
+  void removeIdfromDisliked(String id) {
     final dislikes = [...state.likedPosts];
-    dislikes.remove(uid);
+    dislikes.remove(id);
     state = state.copyWith(dislikedPosts: dislikes);
   }
 

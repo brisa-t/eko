@@ -12,6 +12,7 @@ import 'package:untitled_app/interfaces/user.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/post_provider.dart';
 import 'package:untitled_app/providers/user_provider.dart';
+import 'package:untitled_app/utilities/enums.dart';
 import 'package:untitled_app/widgets/time_stamp.dart';
 import '../utilities/constants.dart' as c;
 import 'package:provider/provider.dart' as prov;
@@ -95,10 +96,6 @@ class _Loading extends StatelessWidget {
 }
 
 class _PostCardState extends ConsumerState<PostCard> {
-  bool liked = false;
-  bool disliked = false;
-  bool liking = false;
-  bool disliking = false;
   bool sharing = false;
   bool isSelf = false;
 
@@ -458,7 +455,7 @@ class _PostCardState extends ConsumerState<PostCard> {
                             children: [
                               SizedBox(width: width * 0.115 + 8),
                               LikeButton(
-                                isLiked: liked,
+                                isLiked: post.likeState == LikeState.isLiked,
                                 likeBuilder: (isLiked) {
                                   return SvgPicture.string(
                                     '''
@@ -476,7 +473,17 @@ class _PostCardState extends ConsumerState<PostCard> {
                                 onTap: (isLiked) async {
                                   if (isLoggedIn()) {
                                     if (!widget.isPreview) {
-                                      // likePressed();
+                                      if (!isLiked) {
+                                        ref
+                                            .read(
+                                                postProvider(post.id).notifier)
+                                            .addLike();
+                                      } else {
+                                        ref
+                                            .read(
+                                                postProvider(post.id).notifier)
+                                            .removeLike();
+                                      }
                                       return !isLiked;
                                     }
                                     return isLiked;
@@ -510,7 +517,7 @@ class _PostCardState extends ConsumerState<PostCard> {
                                 },
                               ),
                               LikeButton(
-                                isLiked: disliked,
+                                isLiked: false, //dislike
                                 likeBuilder: (isDisliked) {
                                   return SvgPicture.string(
                                     '''

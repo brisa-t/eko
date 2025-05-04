@@ -12,6 +12,7 @@ part '../generated/providers/post_provider.g.dart';
 @riverpod
 class Post extends _$Post {
   Timer? _disposeTimer;
+  bool isLikeStateChanging = false;
   @override
   Future<PostModel> build(String id) async {
     // *** This block is for lifecycle management *** //
@@ -66,34 +67,64 @@ class Post extends _$Post {
   }
 
   Future<void> addLike() async {
-		final prevState = await future;
-    if (prevState.likeState == LikeState.isLiked) {
-			return;
-		}
-      try {
-        final firestore = FirebaseFirestore.instance;
-        final user = ref.read(currentUserProvider).user.uid;
-        await Future.wait([
-          firestore.collection('users').doc(user).update({
-            'profileData.likedPosts':
-                FieldValue.arrayUnion([prevState.id])
-          }),
-               firestore
-                  .collection('posts')
-                  .doc(prevState.id)
-                  .update({'likes': FieldValue.increment(1)})
-                      ]);
-
-          likedPosts.add(postId);
-
-        stateIsLiking = false;
-        return true;
-      } catch (e) {
-        stateIsLiking = false;
-        return false;
-      }
-    } else {
-      return false;
+    if (isLikeStateChanging) {
+      return;
     }
+    final prevState = await future;
+    if (prevState.likeState == LikeState.isLiked) {
+      return;
+    }
+    isLikeStateChanging = true;
+    try {
+      state = AsyncData(prevState.copyWith(
+          likeState: LikeState.isLiked, likes: prevState.likes + 1));
+      final firestore = FirebaseFirestore.instance;
+      final user = ref.read(currentUserProvider).user.uid;
+      await Future.wait([
+        firestore.collection('users').doc(user).update({
+          'profileData.likedPosts': FieldValue.arrayUnion([prevState.id])
+        }),
+        firestore
+            .collection('posts')
+            .doc(prevState.id)
+            .update({'likes': FieldValue.increment(1)})
+      ]);
+      // ref.read(currentUserProvider.notifier).addIdToLiked(prevState.id);
+    } catch (e) {
+      state = AsyncData(prevState);
+      // ref.read(currentUserProvider.notifier).removeIdFromLiked(prevState.id);
+    }
+    isLikeStateChanging = false;
+  }
+
+  Future<void> removeLike() async {
+    if (isLikeStateChanging) {
+      return;
+    }
+    final prevState = await future;
+    if (prevState.likeState != LikeState.isLiked) {
+      return;
+    }
+    isLikeStateChanging = true;
+    try {
+      state = AsyncData(prevState.copyWith(
+          likeState: LikeState.neutral, likes: prevState.likes + 1));
+      final firestore = FirebaseFirestore.instance;
+      final user = ref.read(currentUserProvider).user.uid;
+      await Future.wait([
+        firestore.collection('users').doc(user).update({
+          'profileData.dislikedPosts': FieldValue.arrayRemove([prevState.id])
+        }),
+        firestore
+            .collection('posts')
+            .doc(prevState.id)
+            .update({'dislikes': FieldValue.increment(-1)}),
+      ]);
+      // ref.read(currentUserProvider.notifier).addIdToLiked(prevState.id);
+    } catch (e) {
+      state = AsyncData(prevState);
+      // ref.read(currentUserProvider.notifier).removeIdFromLiked(prevState.id);
+    }
+    isLikeStateChanging = false;
   }
 }

@@ -29,7 +29,7 @@ class ProfilePage extends ConsumerWidget {
       child: Scaffold(
         body: PaginationPage(
           getter: (time) => locator<PostsHandling>().getProfilePosts(time),
-          card: (post) => profilePostCardBuilder(post.id),
+          card: (post) => profilePostCardBuilder(post.postId),
           startAfterQuery: (post) =>
               locator<PostsHandling>().getTimeFromPost(post),
           header: const _Header(),
