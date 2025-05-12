@@ -517,7 +517,8 @@ class _PostCardState extends ConsumerState<PostCard> {
                                 },
                               ),
                               LikeButton(
-                                isLiked: false, //dislike
+                                isLiked: post.likeState ==
+                                    LikeState.isDisliked, //dislike
                                 likeBuilder: (isDisliked) {
                                   return SvgPicture.string(
                                     '''
@@ -535,7 +536,17 @@ class _PostCardState extends ConsumerState<PostCard> {
                                 onTap: (isDisliked) async {
                                   if (isLoggedIn()) {
                                     if (!widget.isPreview) {
-                                      // dislikePressed();
+                                      if (!isDisliked) {
+                                        ref
+                                            .read(
+                                                postProvider(post.id).notifier)
+                                            .addDislike();
+                                      } else {
+                                        ref
+                                            .read(
+                                                postProvider(post.id).notifier)
+                                            .removeDislike();
+                                      }
                                       return !isDisliked;
                                     }
                                     return isDisliked;
