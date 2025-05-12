@@ -6,7 +6,7 @@ part of '../../providers/user_cache_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$userCacheHash() => r'ebb1db2487292e400ba23a1f6d9252a7a9eda6ab';
+String _$userCacheHash() => r'1d48993ceff77932f221568b7556dfbf0eca7ed0';
 
 /// See also [userCache].
 @ProviderFor(userCache)

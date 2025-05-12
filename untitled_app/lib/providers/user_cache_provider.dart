@@ -9,7 +9,11 @@ part '../generated/providers/user_cache_provider.g.dart';
 @Riverpod(keepAlive: true)
 CacheService<UserModel> userCache(Ref ref) {
   return CacheService<UserModel>(
-    onInsert: (uid) => ref.invalidate(userProvider(uid)),
+    onInsert: (uid) {
+      if (ref.exists(userProvider(uid))) {
+        ref.invalidate(userProvider(uid));
+      }
+    },
     keySelector: (user) => user.uid,
     validTime: const Duration(minutes: 3),
   );

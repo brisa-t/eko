@@ -34,14 +34,11 @@ class Post extends _$Post {
       _disposeTimer?.cancel();
     });
     // ********************************************* //
-
+    // await Future.delayed(Duration(seconds: 100));
     final cacheValue = ref.read(postCacheProvider).getItem(id);
-    print(id);
     if (cacheValue != null) {
-      print("good");
       return cacheValue;
     }
-    print("bad");
     final postsRef = FirebaseFirestore.instance.collection('posts');
     final data = await Future.wait([postsRef.doc(id).get(), countComments(id)]);
     final postData = data[0] as DocumentSnapshot<Map<String, dynamic>>;

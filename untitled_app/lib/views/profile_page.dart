@@ -8,6 +8,7 @@ import 'package:untitled_app/interfaces/post.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/post_cache_provider.dart';
+import 'package:untitled_app/providers/post_provider.dart';
 import 'package:untitled_app/types/post.dart';
 import 'package:untitled_app/utilities/enums.dart';
 import 'package:untitled_app/utilities/locator.dart';
@@ -44,7 +45,10 @@ class ProfilePage extends ConsumerWidget {
             })));
     final onlyPosts = postList.map((item) => item.key).toList();
     ref.read(postCacheProvider).putAll(onlyPosts);
-    await Future.delayed(Duration(seconds: 1));
+    // start the providers going a frame early
+    for (final post in onlyPosts) {
+      ref.read(postProvider(post.id));
+    }
     //     .map<Future<Post>>((raw) async {
     //   return Post.fromRaw(raw, AppUser.fromCurrent(locator<CurrentUser>()),
     //       await countComments(raw.postID),
@@ -61,7 +65,7 @@ class ProfilePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     Future<void> onRefresh() async {
-      return await ref.refresh(currentUserProvider);
+      await ref.read(currentUserProvider.notifier).reload();
     }
 
     return PopScope(

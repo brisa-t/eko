@@ -13,6 +13,7 @@ import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/post_provider.dart';
 import 'package:untitled_app/providers/user_provider.dart';
 import 'package:untitled_app/utilities/enums.dart';
+import 'package:untitled_app/widgets/post_loader.dart';
 import 'package:untitled_app/widgets/time_stamp.dart';
 import '../utilities/constants.dart' as c;
 import 'package:provider/provider.dart' as prov;
@@ -91,7 +92,7 @@ class _Error extends StatelessWidget {
 class _Loading extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return const CircularProgressIndicator();
+    return const ShimmerPost();
   }
 }
 

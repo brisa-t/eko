@@ -10,7 +10,9 @@ part '../generated/providers/post_cache_provider.g.dart';
 CacheService<PostModel> postCache(Ref ref) {
   return CacheService<PostModel>(
     onInsert: (id) {
-      ref.invalidate(postProvider(id));
+      if (ref.exists(postProvider(id))) {
+        ref.invalidate(postProvider(id));
+      }
     },
     keySelector: (post) => post.id,
     validTime: const Duration(minutes: 3),

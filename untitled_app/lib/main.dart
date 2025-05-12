@@ -12,6 +12,7 @@ import 'package:untitled_app/models/notification_service.dart';
 import 'package:untitled_app/models/version_control.dart';
 import 'package:untitled_app/providers/post_cache_provider.dart';
 import 'package:untitled_app/providers/user_cache_provider.dart';
+import 'package:untitled_app/utilities/provider_debugger.dart';
 import 'utilities/themes/dark_theme_provider.dart';
 import 'utilities/themes/dark_theme_styles.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -83,7 +84,13 @@ Future<void> main() async {
     FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true)
   ]);
 
-  runApp(ProviderScope(child: const MyApp()));
+  if (kDebugMode) {
+    runApp(ProviderScope(observers: [
+      ProviderDebuggerObserver(),
+    ], child: const MyApp()));
+  } else {
+    ProviderScope(child: const MyApp());
+  }
 }
 
 class MyApp extends ConsumerWidget {

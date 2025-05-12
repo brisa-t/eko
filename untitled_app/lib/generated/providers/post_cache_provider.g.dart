@@ -6,7 +6,7 @@ part of '../../providers/post_cache_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$postCacheHash() => r'6f080c776688a676dfed39629d34136bb3b314d5';
+String _$postCacheHash() => r'47cd5947b8cfeda8f2d50b2d892120e09c4afa0d';
 
 /// See also [postCache].
 @ProviderFor(postCache)
