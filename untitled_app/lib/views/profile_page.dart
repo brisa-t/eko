@@ -7,7 +7,7 @@ import 'package:untitled_app/custom_widgets/shimmer_loaders.dart'
 import 'package:untitled_app/interfaces/post.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
-import 'package:untitled_app/providers/post_cache_provider.dart';
+import 'package:untitled_app/providers/post_pool_provider.dart';
 import 'package:untitled_app/providers/post_provider.dart';
 import 'package:untitled_app/types/post.dart';
 import 'package:untitled_app/utilities/enums.dart';
@@ -32,19 +32,24 @@ class ProfilePage extends ConsumerWidget {
     final query =
         list.isEmpty ? baseQuery : baseQuery.startAfter([list.last.value]);
     final postList = await Future.wait(
-        await query.get().then((data) => data.docs.map((raw) async {
-              final json = raw.data();
-              json['id'] = raw.id;
-              json['commentCount'] =
-                  await countComments(raw.id); // commentCount;
-              final post = PostModel.fromJson(json, LikeState.neutral);
-              final likeState =
-                  ref.read(currentUserProvider.notifier).getLikeState(raw.id);
-              return MapEntry(
-                  post.copyWith(likeState: likeState), json['time'] as String);
-            })));
+      await query.get().then(
+            (data) => data.docs.map(
+              (raw) async {
+                final json = raw.data();
+                json['id'] = raw.id;
+                json['commentCount'] =
+                    await countComments(raw.id); // commentCount;
+                final post = PostModel.fromJson(json, LikeState.neutral);
+                final likeState =
+                    ref.read(currentUserProvider.notifier).getLikeState(raw.id);
+                return MapEntry(post.copyWith(likeState: likeState),
+                    json['time'] as String);
+              },
+            ),
+          ),
+    );
     final onlyPosts = postList.map((item) => item.key).toList();
-    ref.read(postCacheProvider).putAll(onlyPosts);
+    ref.read(postPoolProvider).putAll(onlyPosts);
     // start the providers going a frame early
     for (final post in onlyPosts) {
       ref.read(postProvider(post.id));

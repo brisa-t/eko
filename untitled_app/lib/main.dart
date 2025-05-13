@@ -10,8 +10,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:untitled_app/models/firebase_helper.dart';
 import 'package:untitled_app/models/notification_service.dart';
 import 'package:untitled_app/models/version_control.dart';
-import 'package:untitled_app/providers/post_cache_provider.dart';
-import 'package:untitled_app/providers/user_cache_provider.dart';
+import 'package:untitled_app/providers/post_pool_provider.dart';
+import 'package:untitled_app/providers/user_pool_provider.dart';
 import 'package:untitled_app/utilities/provider_debugger.dart';
 import 'utilities/themes/dark_theme_provider.dart';
 import 'utilities/themes/dark_theme_styles.dart';
@@ -99,8 +99,8 @@ class MyApp extends ConsumerWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.watch(postCacheProvider);
-    ref.watch(userCacheProvider);
+    ref.watch(postPoolProvider);
+    ref.watch(userPoolProvider);
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,

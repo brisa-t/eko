@@ -7,8 +7,8 @@ import 'package:untitled_app/utilities/cache_service.dart';
 part '../generated/providers/user_cache_provider.g.dart';
 
 @Riverpod(keepAlive: true)
-CacheService<UserModel> userCache(Ref ref) {
-  return CacheService<UserModel>(
+PoolService<UserModel> userPool(Ref ref) {
+  return PoolService<UserModel>(
     onInsert: (uid) {
       if (ref.exists(userProvider(uid))) {
         ref.invalidate(userProvider(uid));
