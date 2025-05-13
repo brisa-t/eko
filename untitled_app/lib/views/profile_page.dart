@@ -77,26 +77,17 @@ class ProfilePage extends ConsumerWidget {
       canPop: false,
       onPopInvoked: (didPop) => locator<NavBarController>().goBranch(0),
       child: Scaffold(
-          body: InfiniteScrolly<String, String>(
-        getter: (data) async {
-          return await getter(data, ref);
-        },
-        widget: profilePostCardBuilder,
-        header: const _Header(),
-        onRefresh: onRefresh,
-        initialLoadingWidget: FeedLoader(),
-      )
-          // PaginationPage(
-          //       getter: (time) => locator<PostsHandling>().getProfilePosts(time),
-          //       card: (post) => profilePostCardBuilder(post.postId),
-          //       startAfterQuery: (post) =>
-          //           locator<PostsHandling>().getTimeFromPost(post),
-          //       header: const _Header(),
-          //       initialLoadingWidget: const FeedLoader(),
-          //       externalData: locator<FeedPostCache>().profileCache,
-          //       extraRefresh: onRefresh,
-          //     ),
-          ),
+        key: Key('profileScrollWidget'),
+        body: InfiniteScrolly<String, String>(
+          getter: (data) async {
+            return await getter(data, ref);
+          },
+          widget: profilePostCardBuilder,
+          header: const _Header(),
+          onRefresh: onRefresh,
+          initialLoadingWidget: FeedLoader(),
+        ),
+      ),
     );
   }
 }
