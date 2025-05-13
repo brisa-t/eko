@@ -2,8 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:untitled_app/custom_widgets/shimmer_loaders.dart'
-    show FeedLoader;
 import 'package:untitled_app/interfaces/post.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
@@ -12,7 +10,9 @@ import 'package:untitled_app/providers/post_provider.dart';
 import 'package:untitled_app/types/post.dart';
 import 'package:untitled_app/utilities/enums.dart';
 import 'package:untitled_app/utilities/locator.dart';
+import 'package:untitled_app/widgets/divider.dart';
 import 'package:untitled_app/widgets/infinite_scrolly.dart';
+import 'package:untitled_app/widgets/post_loader.dart';
 import '../controllers/bottom_nav_bar_controller.dart';
 import '../custom_widgets/profile_page_header.dart';
 import '../utilities/constants.dart' as c;
@@ -50,10 +50,6 @@ class ProfilePage extends ConsumerWidget {
     );
     final onlyPosts = postList.map((item) => item.key).toList();
     ref.read(postPoolProvider).putAll(onlyPosts);
-    // start the providers going a frame early
-    for (final post in onlyPosts) {
-      ref.read(postProvider(post.id));
-    }
     //     .map<Future<Post>>((raw) async {
     //   return Post.fromRaw(raw, AppUser.fromCurrent(locator<CurrentUser>()),
     //       await countComments(raw.postID),
@@ -85,7 +81,9 @@ class ProfilePage extends ConsumerWidget {
           widget: profilePostCardBuilder,
           header: const _Header(),
           onRefresh: onRefresh,
-          initialLoadingWidget: FeedLoader(),
+          initialLoadingWidget: PostLoader(
+            length: 3,
+          ),
         ),
       ),
     );
@@ -208,10 +206,7 @@ class _Header extends ConsumerWidget {
             ],
           ),
         ),
-        Divider(
-          color: Theme.of(context).colorScheme.outline,
-          height: c.dividerWidth,
-        ),
+        StyledDivider(),
       ],
     );
   }

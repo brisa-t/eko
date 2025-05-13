@@ -12,6 +12,7 @@ import 'package:untitled_app/custom_widgets/poll_widget.dart';
 // import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/post_provider.dart';
 import 'package:untitled_app/utilities/enums.dart';
+import 'package:untitled_app/widgets/divider.dart';
 import 'package:untitled_app/widgets/post_loader.dart';
 import 'package:untitled_app/widgets/profile_picture.dart';
 import 'package:untitled_app/widgets/time_stamp.dart';
@@ -27,7 +28,11 @@ import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 
 Widget profilePostCardBuilder(String id) {
-  return PostCard(id: id, isOnProfile: true, showGroup: true, key: Key(id));
+  return PostCard(id: id, isOnProfile: true, showGroup: true);
+}
+
+Widget otherProfilePostCardBuilder(String id) {
+  return PostCard(id: id, isOnProfile: true);
 }
 
 class _Count extends StatelessWidget {
@@ -92,7 +97,7 @@ class _Error extends StatelessWidget {
 class _Loading extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return const ShimmerPost();
+    return const PostLoader();
   }
 }
 
@@ -582,23 +587,14 @@ class _PostCardState extends ConsumerState<PostCard> {
               SizedBox(
                 height: 8,
               ),
-              SizedBox(
-                width: width,
-                child: Divider(
-                  color: Theme.of(context).colorScheme.outline,
-                  height: c.dividerWidth,
-                ),
-              )
+              SizedBox(width: width, child: StyledDivider())
             ],
           ),
         ),
       );
     }, error: (object, stack) {
-      print(object);
-      print(stack);
       return _Error();
     }, loading: () {
-      print('BAD LOADING');
       return _Loading();
     });
   }
