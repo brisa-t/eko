@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:untitled_app/custom_widgets/safe_area.dart';
 import 'package:untitled_app/models/users.dart';
+import 'package:untitled_app/types/user.dart';
 import 'package:untitled_app/views/blocked_users_page.dart';
 import 'package:untitled_app/views/download_page.dart';
 import 'package:untitled_app/views/edit_group_page.dart';
@@ -320,14 +321,14 @@ final goRouter = GoRouter(
                     path: 'followers',
                     name: 'followers',
                     builder: (context, state) {
-                      AppUser user = state.extra as AppUser;
+                      UserModel user = state.extra as UserModel;
                       return Followers(uid: user.uid);
                     }),
                 GoRoute(
                   path: 'following',
                   name: 'following',
                   builder: (context, state) {
-                    AppUser user = state.extra as AppUser;
+                    UserModel user = state.extra as UserModel;
                     return Following(uid: user.uid);
                   },
                 ),

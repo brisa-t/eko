@@ -3,10 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:untitled_app/controllers/blocked_users_page_controller.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
+import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/user_provider.dart';
 import 'package:untitled_app/types/user.dart';
-import '../models/current_user.dart';
-import '../utilities/locator.dart';
 import 'package:provider/provider.dart' as prov;
 import '../custom_widgets/profile_avatar.dart';
 import '../utilities/constants.dart' as c;
@@ -27,7 +26,6 @@ Widget blockedPageBuilder(dynamic uid) {
 class UserCard extends ConsumerStatefulWidget {
   final bool blockedPage;
   final bool? initialBool;
-  //final AppUser user;
   final bool groupSearch;
   final bool tagSearch;
   final String uid;
@@ -35,7 +33,6 @@ class UserCard extends ConsumerStatefulWidget {
   final void Function(dynamic, bool)? adder;
   const UserCard(
       {super.key,
-      //required this.user,
       required this.uid,
       this.blockedPage = false,
       this.groupSearch = false,
@@ -50,14 +47,12 @@ class UserCard extends ConsumerStatefulWidget {
 
 class _UserCardState extends ConsumerState<UserCard> {
   late UserModel? loadedUser;
-  late bool following;
   bool isFollowing = false;
   late bool added;
 
   @override
   void initState() {
     super.initState();
-    final currentUser = locator<CurrentUser>();
     final user = ref.read(userProvider(widget.uid)).maybeWhen(
           data: (u) => u,
           orElse: () => null,
@@ -66,17 +61,15 @@ class _UserCardState extends ConsumerState<UserCard> {
     loadedUser = user;
     if (widget.groupSearch) {
       added = widget.adder != null ? widget.initialBool ?? false : false;
-    } else {
-      following = user != null ? currentUser.checkIsFollowing(user.uid) : false;
     }
   }
 
   bool isBlockedByMe(UserModel user) {
-    return locator<CurrentUser>().blockedUsers.contains(user.uid);
+    return false;
   }
 
   bool blocksMe(UserModel user) {
-    return locator<CurrentUser>().blockedBy.contains(user.uid);
+    return false;
   }
 
   void onCardPressed(UserModel user) {
@@ -92,30 +85,32 @@ class _UserCardState extends ConsumerState<UserCard> {
   }
 
   Future<void> onFollowPressed(UserModel user) async {
-    final currentUser = locator<CurrentUser>();
-    final uid = user.uid;
-    if (uid != currentUser.uid && !isFollowing) {
-      isFollowing = true;
-      if (following) {
-        following = false;
-        user.followers.remove(currentUser.uid);
-        setState(() {});
-        if (!(await currentUser.removeFollower(uid))) {
-          following = true;
-          user.followers.add(currentUser.uid);
-        }
-      } else {
-        following = true;
-        user.followers.add(currentUser.uid);
-        setState(() {});
-        if (!(await currentUser.addFollower(uid))) {
-          following = false;
-          user.followers.remove(currentUser.uid);
-        }
-      }
-      isFollowing = false;
-      setState(() {});
-    }
+    //final currentUser = locator<CurrentUser>();
+    //final uid = user.uid;
+    //if (uid != currentUser.uid && !isFollowing) {
+    //  isFollowing = true;
+    //
+    //  final isCurrentlyFollowing = following;
+    //
+    //  if (isCurrentlyFollowing) {
+    //    setState(() {});
+    //    if (!(await currentUser.removeFollower(uid))) {
+    //      setState(() {});
+    //    } else {
+    //      ref.refresh(userProvider(widget.uid));
+    //    }
+    //  } else {
+    //    setState(() {});
+    //    if (!(await currentUser.addFollower(uid))) {
+    //      setState(() {});
+    //    } else {
+    //      ref.refresh(userProvider(widget.uid));
+    //    }
+    //  }
+    //
+    //  isFollowing = false;
+    //  setState(() {});
+    //}
   }
 
   void onAddPressed(UserModel user) {
@@ -130,6 +125,7 @@ class _UserCardState extends ConsumerState<UserCard> {
     final width = c.widthGetter(context);
     final height = MediaQuery.sizeOf(context).height;
     final userAsync = ref.watch(userProvider(widget.uid));
+    final currentUser = ref.read(currentUserProvider);
 
     return userAsync.when(
       data: (user) {
@@ -194,7 +190,7 @@ class _UserCardState extends ConsumerState<UserCard> {
                     ),
                   ],
                 ),
-                if (user.uid == locator<CurrentUser>().getUID())
+                if (user.uid == currentUser.user.uid)
                   Container()
                 else if (widget.groupSearch)
                   Padding(
@@ -237,12 +233,12 @@ class _UserCardState extends ConsumerState<UserCard> {
                       decoration: BoxDecoration(
                         borderRadius:
                             const BorderRadius.all(Radius.circular(10)),
-                        color: following
+                        color: currentUser.user.following.contains(user.uid)
                             ? Theme.of(context).colorScheme.outlineVariant
                             : Theme.of(context).colorScheme.primaryContainer,
                       ),
                       child: Text(
-                        following
+                        currentUser.user.following.contains(user.uid)
                             ? AppLocalizations.of(context)!.following
                             : AppLocalizations.of(context)!.follow,
                         maxLines: 1,
