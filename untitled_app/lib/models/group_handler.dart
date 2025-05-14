@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../utilities/constants.dart' as c;
 
 class Group {
- String id;
+  String id;
   String name;
   String description;
   String lastActivity;
