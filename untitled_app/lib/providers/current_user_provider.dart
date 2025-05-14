@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:untitled_app/models/post_handler.dart';
 import 'package:untitled_app/providers/auth_provider.dart';
+import 'package:untitled_app/providers/user_provider.dart';
 import 'package:untitled_app/types/current_user.dart';
 import 'package:untitled_app/utilities/enums.dart';
 import 'package:untitled_app/utilities/locator.dart';
@@ -91,10 +92,21 @@ class CurrentUser extends _$CurrentUser {
 
   Future<void> addFollower(String otherUid) async {
     try {
+      // Update state of current user and other user
       final updatedFollowing = [...state.user.following, otherUid];
       state = state.copyWith(
           user: state.user.copyWith(following: updatedFollowing));
+      final userState = ref.read(userProvider(otherUid));
+      userState.whenData((otherUser) {
+        if (!otherUser.followers.contains(state.user.uid)) {
+          final updatedFollowers = [...otherUser.followers, state.user.uid];
+          ref
+              .read(userProvider(otherUid).notifier)
+              .updateFollowers(updatedFollowers);
+        }
+      });
 
+      // Update database
       final firestore = FirebaseFirestore.instance;
       final uid = ref.read(authProvider).uid!;
       await Future.wait([
@@ -104,23 +116,46 @@ class CurrentUser extends _$CurrentUser {
         firestore.collection('users').doc(otherUid).update({
           'profileData.followers': FieldValue.arrayUnion([uid])
         }),
-        // TODO: change this later
         locator<PostsHandling>().addActivty(
             type: 'follow',
             content: 'Someone followed you',
             path: uid,
             user: otherUid)
       ]);
-    } catch (e) {}
+    } catch (e) {
+      // Revert state updates on error
+      final revertedFollowing =
+          state.user.following.where((id) => id != otherUid).toList();
+      state = state.copyWith(
+          user: state.user.copyWith(following: revertedFollowing));
+      final userState = ref.read(userProvider(otherUid));
+      userState.whenData((otherUser) {
+        final revertedFollowers =
+            otherUser.followers.where((id) => id != state.user.uid).toList();
+        ref
+            .read(userProvider(otherUid).notifier)
+            .updateFollowers(revertedFollowers);
+      });
+    }
   }
 
   Future<void> removeFollower(String otherUid) async {
     try {
+      // Update state of current user and other user
       final updatedFollowing =
           state.user.following.where((id) => id != otherUid).toList();
       state = state.copyWith(
           user: state.user.copyWith(following: updatedFollowing));
+      final userState = ref.read(userProvider(otherUid));
+      userState.whenData((otherUser) {
+        final updatedFollowers =
+            otherUser.followers.where((id) => id != state.user.uid).toList();
+        ref
+            .read(userProvider(otherUid).notifier)
+            .updateFollowers(updatedFollowers);
+      });
 
+      // Update database
       final firestore = FirebaseFirestore.instance;
       final uid = ref.read(authProvider).uid!;
       await Future.wait([
@@ -131,7 +166,21 @@ class CurrentUser extends _$CurrentUser {
           'profileData.followers': FieldValue.arrayRemove([uid])
         })
       ]);
-    } catch (e) {}
+    } catch (e) {
+      // Revert state updates on error
+      final revertedFollowing = [...state.user.following, otherUid];
+      state = state.copyWith(
+          user: state.user.copyWith(following: revertedFollowing));
+      final userState = ref.read(userProvider(otherUid));
+      userState.whenData((otherUser) {
+        if (!otherUser.followers.contains(state.user.uid)) {
+          final revertedFollowers = [...otherUser.followers, state.user.uid];
+          ref
+              .read(userProvider(otherUid).notifier)
+              .updateFollowers(revertedFollowers);
+        }
+      });
+    }
   }
 
   LikeState getLikeState(String postId) {

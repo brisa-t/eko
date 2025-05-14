@@ -323,8 +323,6 @@ class _Header extends ConsumerWidget {
     } else {
       await currentUserNotifier.addFollower(user.uid);
     }
-
-    ref.invalidate(userProvider(user.uid));
   }
 
   @override
