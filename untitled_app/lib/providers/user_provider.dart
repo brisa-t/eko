@@ -48,4 +48,10 @@ class User extends _$User {
     final data = await userRef.doc(uid).get();
     return UserModel.fromJson(data.data());
   }
+
+  void updateFollowers(List<String> newFollowers) {
+    state.whenData((user) {
+      state = AsyncData(user.copyWith(followers: newFollowers));
+    });
+  }
 }
