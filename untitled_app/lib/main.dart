@@ -56,9 +56,6 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  FirebaseDatabase.instance
-      .setPersistenceEnabled(false); // FIXME doesnt seem to work :(
-
   setupLocator();
   //protected/dependent services
   await Future.wait([
@@ -69,19 +66,13 @@ Future<void> main() async {
     FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true)
   ]);
 
-  if (kDebugMode) {
-    runApp(ProviderScope(observers: [
-      ProviderDebuggerObserver(),
-    ], child: const MyApp()));
-  } else {
-    ProviderScope(child: const MyApp());
-  }
+  final List<ProviderObserver>? observers =
+      kDebugMode ? [ProviderDebuggerObserver()] : null;
+  runApp(ProviderScope(observers: observers, child: const MyApp()));
 }
 
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(postPoolProvider);

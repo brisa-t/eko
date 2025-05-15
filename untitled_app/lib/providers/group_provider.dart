@@ -44,8 +44,9 @@ class Group extends _$Group {
 
   Future<String> createGroup(Group group) async {
     final firestore = FirebaseFirestore.instance;
-    final snapshot = await firestore.collection('groups').add(group.toMap());
-    return snapshot.id;
+    // final snapshot = await firestore.collection('groups').add(group.toMap());
+    // return snapshot.id;
+    return "";
   }
 
   Future<void> updateGroupMembers(Group group, List<String> members) async {

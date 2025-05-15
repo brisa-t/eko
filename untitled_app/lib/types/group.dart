@@ -28,15 +28,15 @@ abstract class GroupModel with _$GroupModel {
         description: json['description'],
         id: id);
   }
-  Map<String, dynamic> toMap() {
-    Map<String, dynamic> map = {};
-    map['name'] = name;
-    map['lastActivity'] = lastActivity;
+  // Map<String, dynamic> toMap() {
+  //   Map<String, dynamic> map = {};
+  //   map['name'] = name;
+  //   map['lastActivity'] = lastActivity;
 
-    map['members'] = members;
-    map['description'] = description;
-    map['icon'] = icon;
-    map['createdOn'] = createdOn;
-    return map;
-  }
+  //   map['members'] = members;
+  //   map['description'] = description;
+  //   map['icon'] = icon;
+  //   map['createdOn'] = createdOn;
+  //   return map;
+  // }
 }
