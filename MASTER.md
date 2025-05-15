@@ -1,3 +1,4 @@
+1. Randomize Logo
 1. UI & Rivapod
 1. SQL
 1. Audio Messages
@@ -10,3 +11,4 @@
 1. EkoTui
 1. EKode
 1. EkoAI
+1. Ekoin Crypto + In app rewards + microtransactions (ekredit and ekdebt)
