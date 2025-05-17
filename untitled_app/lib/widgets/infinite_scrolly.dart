@@ -56,11 +56,15 @@ class InfiniteScrolly<K, V> extends StatefulWidget {
   /// Optional widget shown when the list is empty and no new data is expected.
   final Widget? emptySetNotice;
 
+  /// Optional controller
+  final ScrollController? controller;
+
   const InfiniteScrolly(
       {super.key,
       required this.getter,
       required this.widget,
       this.appBar,
+      this.controller,
       this.header,
       this.loadingWidget,
       this.initialLoadingWidget,
@@ -72,7 +76,7 @@ class InfiniteScrolly<K, V> extends StatefulWidget {
 }
 
 class _InfiniteScrollyState<K, V> extends State<InfiniteScrolly<K, V>> {
-  final scrollController = ScrollController();
+  late final ScrollController scrollController;
   List<MapEntry<K, V>> objectPairs = [];
   bool isEnd = false;
   bool isLoading = false;
@@ -113,6 +117,7 @@ class _InfiniteScrollyState<K, V> extends State<InfiniteScrolly<K, V>> {
 
   @override
   void initState() {
+    scrollController = widget.controller ?? ScrollController();
     scrollController.addListener(onScroll);
     widget.getter([]).then((returned) => setState(() {
           isEnd = returned.$2;
@@ -125,7 +130,9 @@ class _InfiniteScrollyState<K, V> extends State<InfiniteScrolly<K, V>> {
   @override
   void dispose() {
     scrollController.removeListener(onScroll);
-    scrollController.dispose();
+    if (widget.controller == null) {
+      scrollController.dispose();
+    }
     super.dispose();
   }
 

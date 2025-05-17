@@ -132,12 +132,8 @@ final goRouter = GoRouter(
               path: '/feed',
               name: 'feed',
               pageBuilder: (context, state) {
-                bool reload = false;
-                if (state.extra is bool) reload = state.extra as bool;
                 return NoTransitionPage(
-                  child: FeedPage(
-                    rebuild: reload,
-                  ),
+                  child: FeedPage(),
                 );
               },
               routes: [

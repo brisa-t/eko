@@ -35,6 +35,12 @@ Widget otherProfilePostCardBuilder(String id) {
   return PostCard(id: id, isOnProfile: true);
 }
 
+Widget postCardBuilder(String id) {
+  return PostCard(
+    id: id,
+  );
+}
+
 class _Count extends StatelessWidget {
   final int count;
   final VoidCallback onTap;

@@ -7,6 +7,7 @@ import 'package:untitled_app/custom_widgets/warning_dialog.dart';
 import 'package:untitled_app/interfaces/user.dart' as user;
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/providers/auth_provider.dart';
+import 'package:untitled_app/widgets/icons.dart';
 import '../custom_widgets/login_text_feild.dart';
 import '../utilities/constants.dart' as c;
 
@@ -188,12 +189,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               SizedBox(
                 height: height * .055,
               ),
-              SizedBox(
-                  height: height * .25,
-                  width: width * 0.7,
-                  child: (Theme.of(context).brightness == Brightness.light)
-                      ? Image.asset('images/eko_logo_light.png')
-                      : SvgPicture.asset('images/eko_logo.svg')),
+              SizedBox(height: height * .25, width: width * 0.7, child: Eko()),
               SizedBox(height: height * .05),
               CustomInputField(
                 focus: emailFocus,
