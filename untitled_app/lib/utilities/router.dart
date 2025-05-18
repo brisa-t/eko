@@ -120,12 +120,18 @@ final goRouter = GoRouter(
         ]),
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
-        return NotificationHandler(
-          child: RequireAuth(
-            child:
-                ScaffoldWithNestedNavigation(navigationShell: navigationShell),
-          ),
-        );
+        return PopScope(
+            canPop: navigationShell.currentIndex == 0,
+            onPopInvokedWithResult: (bool didPop, Object? result) {
+              if (didPop) return;
+              navigationShell.goBranch(0);
+            },
+            child: NotificationHandler(
+              child: RequireAuth(
+                child: ScaffoldWithNestedNavigation(
+                    navigationShell: navigationShell),
+              ),
+            ));
       },
       branches: [
         StatefulShellBranch(
@@ -259,7 +265,7 @@ final goRouter = GoRouter(
                 final Group? group = state.extra as Group?;
                 //if (args != null) print(args[0]);
                 return NoTransitionPage(
-                  child: ComposePage(group: group),
+                  child: ComposePage(groupId: group?.id),
                 );
               },
             ),

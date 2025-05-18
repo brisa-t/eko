@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart' as prov;
 import 'package:untitled_app/custom_widgets/download_button_if_web.dart';
 import 'package:untitled_app/custom_widgets/safe_area.dart';
+import 'package:untitled_app/providers/nav_bar_provider.dart';
 import '../models/current_user.dart';
 import '../utilities/locator.dart';
-import '../controllers/bottom_nav_bar_controller.dart';
 import '../utilities/constants.dart' as c;
 
 const List<IconData> _passiveIconList = [
@@ -31,52 +31,45 @@ class ScaffoldWithNestedNavigation extends StatelessWidget {
             key: key ?? const ValueKey<String>('ScaffoldWithNestedNavigation'));
   final StatefulNavigationShell navigationShell;
 
+  void goBranch(int index) {
+    navigationShell.goBranch(
+      index,
+      initialLocation: index == navigationShell.currentIndex,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    locator<NavBarController>().navigationShell = navigationShell;
-    return prov.ChangeNotifierProvider.value(
-      value: locator<NavBarController>(),
-      builder: (context, child) {
-        return LayoutBuilder(
-          builder: (context, constraints) {
-            if (constraints.maxHeight > constraints.maxWidth) {
-              return ScaffoldWithNavigationBar(
-                body:
-                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  SizedBox(
-                      width:
-                          (width < c.indealAppWidth) ? width : c.indealAppWidth,
-                      child: navigationShell)
-                ]),
-                selectedIndex: navigationShell.currentIndex,
-                onDestinationSelected:
-                    prov.Provider.of<NavBarController>(context, listen: false)
-                        .goBranch,
-              );
-            } else {
-              return ScaffoldWithNavigationRail(
-                body:
-                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  SizedBox(
-                      width:
-                          (width < c.indealAppWidth) ? width : c.indealAppWidth,
-                      child: navigationShell)
-                ]),
-                selectedIndex: navigationShell.currentIndex,
-                onDestinationSelected:
-                    prov.Provider.of<NavBarController>(context, listen: false)
-                        .goBranch,
-              );
-            }
-          },
-        );
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxHeight > constraints.maxWidth) {
+          return ScaffoldWithNavigationBar(
+            body: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              SizedBox(
+                  width: (width < c.indealAppWidth) ? width : c.indealAppWidth,
+                  child: navigationShell)
+            ]),
+            selectedIndex: navigationShell.currentIndex,
+            onDestinationSelected: goBranch,
+          );
+        } else {
+          return ScaffoldWithNavigationRail(
+            body: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              SizedBox(
+                  width: (width < c.indealAppWidth) ? width : c.indealAppWidth,
+                  child: navigationShell)
+            ]),
+            selectedIndex: navigationShell.currentIndex,
+            onDestinationSelected: goBranch,
+          );
+        }
       },
     );
   }
 }
 
-class ScaffoldWithNavigationBar extends StatelessWidget {
+class ScaffoldWithNavigationBar extends ConsumerWidget {
   const ScaffoldWithNavigationBar({
     super.key,
     required this.body,
@@ -88,14 +81,12 @@ class ScaffoldWithNavigationBar extends StatelessWidget {
   final ValueChanged<int> onDestinationSelected;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return AppSafeArea(
       child: Scaffold(
         floatingActionButton: downloadButtonIfWeb(),
         body: body,
-        bottomNavigationBar: prov.Provider.of<NavBarController>(context,
-                    listen: true)
-                .enabled
+        bottomNavigationBar: ref.watch(navBarProvider)
             ? Container(
                 height: c.navBarHeight,
                 decoration: BoxDecoration(
@@ -110,8 +101,6 @@ class ScaffoldWithNavigationBar extends StatelessWidget {
                   type: BottomNavigationBarType.fixed,
                   currentIndex: selectedIndex,
                   elevation: 0.0,
-                  // c.navBarIconSize:
-                  //     c.navBarIconSize, //TODO: idk. should these change size based on how big the device is?
                   selectedFontSize: 0.0,
                   unselectedFontSize: 0.0,
                   showUnselectedLabels: false,
@@ -175,7 +164,7 @@ class ScaffoldWithNavigationBar extends StatelessWidget {
   }
 }
 
-class ScaffoldWithNavigationRail extends StatelessWidget {
+class ScaffoldWithNavigationRail extends ConsumerWidget {
   const ScaffoldWithNavigationRail({
     super.key,
     required this.body,
@@ -187,15 +176,14 @@ class ScaffoldWithNavigationRail extends StatelessWidget {
   final ValueChanged<int> onDestinationSelected;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return AppSafeArea(
       child: Scaffold(
         floatingActionButton: downloadButtonIfWeb(),
         body: Row(
           children: [
             // Fixed navigation rail on the left (start)
-            if (prov.Provider.of<NavBarController>(context, listen: true)
-                .enabled)
+            if (ref.watch(navBarProvider))
               NavigationRail(
                 selectedLabelTextStyle: const TextStyle(fontSize: 0),
                 unselectedLabelTextStyle: const TextStyle(fontSize: 0),

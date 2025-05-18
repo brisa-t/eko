@@ -19,12 +19,7 @@ class SearchPage extends StatelessWidget {
     return prov.ChangeNotifierProvider(
       create: (context) => SearchPageController(context: context),
       builder: (context, child) {
-        return PopScope(
-          canPop: false,
-          onPopInvoked: (didPop) =>
-              prov.Provider.of<SearchPageController>(context, listen: false)
-                  .onWillPop(),
-          child: GestureDetector(
+        return  GestureDetector(
             onPanDown: (details) =>
                 prov.Provider.of<SearchPageController>(context, listen: false)
                     .hideKeyboard(),
@@ -79,82 +74,8 @@ class SearchPage extends StatelessWidget {
                 ),
               ),
             ),
-          ),
         );
       },
     );
   }
 }
-
-
-// Padding(
-//                 padding: EdgeInsets.all(height * 0.01),
-//                 child: Column(
-//                   // crossAxisAlignment: CrossAxisAlignment.start,
-//                   children: [
-//                     SizedBox(height: height * 0.008),
-//                     TextField(
-//                       cursorColor: Theme.of(context).colorScheme.onBackground,
-//                       decoration: InputDecoration(
-//                         contentPadding: EdgeInsets.all(height * 0.01),
-//         
-//                         hintText: AppLocalizations.of(context)!.search,
-//                         filled: true,
-//                         fillColor: Theme.of(context).colorScheme.outlineVariant,
-//                         border: OutlineInputBorder(
-//                           borderRadius: BorderRadius.circular(10.0),
-//                           borderSide: BorderSide.none,
-//                         ),
-//                       ),
-//                       onChanged: (s) => prov.Provider.of<SearchPageController>(
-//                               context,
-//                               listen: false)
-//                           .onSearchTextChanged(s),
-//                       controller: prov.Provider.of<SearchPageController>(context,
-//                               listen: false)
-//                           .searchTextController,
-//                       keyboardType: TextInputType.text,
-//                       style: const TextStyle(fontSize: 20),
-//                     ),
-//                     Expanded(
-//                       child: prov.Provider.of<SearchPageController>(context,
-//                                   listen: true)
-//                               .isLoading
-//                           ? const Center(
-//                               child: CircularProgressIndicator(),
-//                             )
-//                           : prov.Provider.of<SearchPageController>(context,
-//                                       listen: true)
-//                                   .hits
-//                                   .isEmpty
-//                               ? Center(
-//                                   child: Text(
-//                                     AppLocalizations.of(context)!
-//                                         .noResultsFound,
-//                                     style: TextStyle(
-//                                         fontSize: 18,
-//                                         color: Theme.of(context)
-//                                             .colorScheme
-//                                             .onBackground),
-//                                   ),
-//                                 )
-//                               : ListView.builder(
-//                                   //keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-//                                   itemCount: prov.Provider.of<SearchPageController>(
-//                                           context,
-//                                           listen: true)
-//                                       .hits
-//                                       .length,
-//                                   itemBuilder:
-//                                       (BuildContext context, int index) {
-//                                     return UserCard(
-//                                         user: prov.Provider.of<SearchPageController>(
-//                                                 context,
-//                                                 listen: true)
-//                                             .hits[index]);
-//                                   },
-//                                 ),
-//                     ),
-//                   ],
-//                 ),
-//               ),

@@ -5,7 +5,6 @@ import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/models/group_handler.dart';
 import 'package:untitled_app/utilities/locator.dart';
 // import '../controllers/groups_page_controller.dart';
-import '../controllers/bottom_nav_bar_controller.dart';
 import '../custom_widgets/controllers/pagination_controller.dart';
 import '../custom_widgets/pagination.dart';
 import '../custom_widgets/group_card.dart';
@@ -35,11 +34,6 @@ class _GroupsPageState extends State<GroupsPage> {
     });
   }
 
-  Future<bool> onWillPop() async {
-    locator<NavBarController>().goBranch(0);
-    return false;
-  }
-
   Future<PaginationGetterReturn> getGroups(dynamic time) {
     return GroupHandler().getGroups(time);
   }
@@ -50,40 +44,36 @@ class _GroupsPageState extends State<GroupsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      onPopInvoked: (didPop) => onWillPop(),
-      child: Scaffold(
-        body: PaginationPage(
-          getter: getGroups,
-          card: groupCardBuilder,
-          startAfterQuery: getTimeFromGroup,
-          appbar: SliverAppBar(
-            title: Text(
-              AppLocalizations.of(context)!.groups,
-              style: TextStyle(fontSize: 20),
+    return Scaffold(
+      body: PaginationPage(
+        getter: getGroups,
+        card: groupCardBuilder,
+        startAfterQuery: getTimeFromGroup,
+        appbar: SliverAppBar(
+          title: Text(
+            AppLocalizations.of(context)!.groups,
+            style: TextStyle(fontSize: 20),
+          ),
+          centerTitle: true,
+          floating: true,
+          pinned: false,
+          scrolledUnderElevation: 0.0,
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          actions: [
+            IconButton(
+              color: Theme.of(context).colorScheme.onSurface,
+              onPressed: () => createGroupPressed(),
+              icon: const Icon(
+                Icons.group_add,
+                size: 20,
+              ),
             ),
-            centerTitle: true,
-            floating: true,
-            pinned: false,
-            scrolledUnderElevation: 0.0,
-            backgroundColor: Theme.of(context).colorScheme.surface,
-            actions: [
-              IconButton(
-                color: Theme.of(context).colorScheme.onSurface,
-                onPressed: () => createGroupPressed(),
-                icon: const Icon(
-                  Icons.group_add,
-                  size: 20,
-                ),
-              ),
-            ],
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(3),
-              child: Divider(
-                color: Theme.of(context).colorScheme.outline,
-                height: c.dividerWidth,
-              ),
+          ],
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(3),
+            child: Divider(
+              color: Theme.of(context).colorScheme.outline,
+              height: c.dividerWidth,
             ),
           ),
         ),

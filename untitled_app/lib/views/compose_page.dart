@@ -7,13 +7,12 @@ import 'package:untitled_app/utilities/locator.dart';
 import '../controllers/compose_controller.dart';
 import '../custom_widgets/searched_user_card.dart';
 import '../utilities/constants.dart' as c;
-import '../models/group_handler.dart' show Group;
 import '../custom_widgets/profile_avatar.dart';
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 
 class ComposePage extends StatefulWidget {
-  const ComposePage({super.key, required this.group});
-  final Group? group;
+  const ComposePage({super.key, this.groupId});
+  final String? groupId;
   @override
   State<ComposePage> createState() => _ComposePageState();
 }
@@ -100,18 +99,13 @@ class _ComposePageState extends State<ComposePage> {
     return prov.ChangeNotifierProvider(
       create: (context) => ComposeController(
         context: context,
-        audience: (widget.group != null) ? widget.group!.name : audiance,
+        audience: audiance,// (widget.group != null) ? widget.group!.name : audiance,
         // groupEndPoint: group,
       ),
       builder: (context, child) {
-        prov.Provider.of<ComposeController>(context, listen: false)
-            .initGroup(widget.group);
-        return PopScope(
-          canPop: false,
-          onPopInvoked: (didPop) =>
-              prov.Provider.of<ComposeController>(context, listen: false)
-                  .onWillPop(),
-          child: GestureDetector(
+        // prov.Provider.of<ComposeController>(context, listen: false)
+        //     .initGroup(widget.group);
+        return  GestureDetector(
             onTap: () =>
                 prov.Provider.of<ComposeController>(context, listen: false)
                     .hideKeyboard(),
@@ -637,7 +631,6 @@ class _ComposePageState extends State<ComposePage> {
                 ],
               ),
             ),
-          ),
         );
       },
     );

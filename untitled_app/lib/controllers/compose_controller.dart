@@ -11,7 +11,6 @@ import '../custom_widgets/error_snack_bar.dart';
 import 'package:giphy_get/giphy_get.dart';
 import '../utilities/locator.dart';
 import '../models/post_handler.dart';
-import 'bottom_nav_bar_controller.dart';
 import '../custom_widgets/post_card.dart';
 import 'package:go_router/go_router.dart';
 import '../models/users.dart' show AppUser;
@@ -85,10 +84,6 @@ class ComposeController extends ChangeNotifier {
       showCount0 = false;
     }
     notifyListeners();
-  }
-
-  void onWillPop() {
-    locator<NavBarController>().goBranch(0);
   }
 
   void onBodyFocusChanged() {
@@ -262,12 +257,12 @@ class ComposeController extends ChangeNotifier {
   }
 
   addPollPressed() async {
-    locator<NavBarController>().disable();
+    // locator<NavBarController>().disable();
     isPoll = true;
     gif = null;
     image = null;
     notifyListeners();
-    locator<NavBarController>().enable();
+    // locator<NavBarController>().enable();
   }
 
   addPollOption() {
@@ -290,7 +285,7 @@ class ComposeController extends ChangeNotifier {
   }
 
   Future<void> addImagePressed() async {
-    locator<NavBarController>().disable();
+    // locator<NavBarController>().disable();
     final ImagePicker picker = ImagePicker();
     final XFile? imageLocal =
         await picker.pickImage(source: ImageSource.gallery);
@@ -305,11 +300,11 @@ class ComposeController extends ChangeNotifier {
       }
       notifyListeners();
     } else {}
-    locator<NavBarController>().enable();
+    // locator<NavBarController>().enable();
   }
 
   addGifPressed() async {
-    locator<NavBarController>().disable();
+    // locator<NavBarController>().disable();
     GiphyGif? newGif = await GiphyGet.getGif(
       context: context,
       apiKey: dotenv.env['GIPHY_API_KEY']!,
@@ -324,7 +319,7 @@ class ComposeController extends ChangeNotifier {
       isPoll = false;
     }
     notifyListeners();
-    locator<NavBarController>().enable();
+    // locator<NavBarController>().enable();
   }
 
   _goToPage({Group? group}) {

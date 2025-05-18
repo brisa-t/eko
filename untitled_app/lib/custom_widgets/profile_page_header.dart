@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/types/user.dart';
 import '../custom_widgets/profile_avatar.dart';
-import '../controllers/bottom_nav_bar_controller.dart';
 import '../utilities/locator.dart';
 import '../utilities/constants.dart' as c;
 
@@ -32,10 +31,10 @@ class ProfileHeader extends StatelessWidget {
                 child: IconButton(
                   onPressed: () async {
                     if (loggedIn) {
-                      locator<NavBarController>().disable();
+                      // locator<NavBarController>().disable();
                       await context.pushNamed('profile_picture_detail',
                           extra: user.profilePicture);
-                      locator<NavBarController>().enable();
+                      // locator<NavBarController>().enable();
                     }
                   },
                   icon: ProfileAvatar(
