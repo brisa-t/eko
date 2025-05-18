@@ -1,5 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:untitled_app/utilities/enums.dart';
+import 'package:untitled_app/interfaces/post.dart';
 part '../generated/types/post.freezed.dart';
 part '../generated/types/post.g.dart';
 
@@ -50,22 +51,19 @@ abstract class PostModel with _$PostModel {
     required int likes,
     required int dislikes,
     required int commentCount,
-    required DateTime createdAt,
+    required String createdAt,
     required bool isPoll,
     List<String>? pollOptions,
     Map<String, int>? pollVoteCounts,
-    required LikeState likeState,
   }) = _PostModel;
 
-  factory PostModel.fromJson(Map<String, dynamic> json, LikeState likeState) {
-    final time =
-        DateTime.tryParse(json['time'] ?? '')?.toLocal() ?? DateTime.now();
+  factory PostModel.fromJson(Map<String, dynamic> json) {
     return PostModel(
       //MANUALLY ADD THESE TO THE MAP FOR NOW.//
       commentCount: json['commentCount'] ?? 0,
       id: json['id'] ?? '',
       // ***** //
-      createdAt: time,
+      createdAt: json['time'],
       isPoll: json['isPoll'] ?? false,
       uid: json['author'] ?? '',
       likes: json['likes'] ?? 0,
@@ -84,7 +82,18 @@ abstract class PostModel with _$PostModel {
       //broken
       title: _parseText(json['title']),
       body: _parseText(json['body']),
-      likeState: likeState,
     );
+  }
+
+  DateTime getDateTime() {
+    return DateTime.tryParse(createdAt) ?? DateTime.now();
+  }
+
+  static Future<PostModel> fromFireStoreDoc(
+      QueryDocumentSnapshot<Map<String, dynamic>> doc) async {
+    final json = doc.data();
+    json['id'] = doc.id;
+    json['commentCount'] = await countComments(doc.id);
+    return PostModel.fromJson(json);
   }
 }

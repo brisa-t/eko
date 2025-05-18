@@ -1,68 +1,22 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:untitled_app/custom_widgets/warning_dialog.dart';
-import 'package:untitled_app/interfaces/post.dart';
+import 'package:untitled_app/interfaces/post_queries.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/user_provider.dart';
-import 'package:untitled_app/types/current_user.dart';
-import 'package:untitled_app/types/post.dart';
 import 'package:untitled_app/types/user.dart';
-import 'package:untitled_app/utilities/enums.dart';
 import 'package:untitled_app/widgets/infinite_scrolly.dart';
 import 'package:untitled_app/widgets/loading_spinner.dart';
 import 'package:untitled_app/custom_widgets/profile_page_header.dart';
 import 'package:untitled_app/widgets/post_loader.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
-import '../providers/post_pool_provider.dart';
 import '../utilities/constants.dart' as c;
 import '../widgets/post_card.dart';
 
 class OtherProfile extends ConsumerWidget {
   final String uid;
   const OtherProfile({super.key, required this.uid});
-
-  Future<(List<MapEntry<String, String>>, bool)> getter(
-      List<MapEntry<String, String>> list, WidgetRef ref) async {
-    final baseQuery = FirebaseFirestore.instance
-        .collection('posts')
-        .where('author', isEqualTo: uid)
-        .orderBy('time', descending: true)
-        .limit(c.postsOnRefresh);
-    final query =
-        list.isEmpty ? baseQuery : baseQuery.startAfter([list.last.value]);
-    final postList = await Future.wait(
-      await query.get().then(
-            (data) => data.docs.map(
-              (raw) async {
-                final json = raw.data();
-                json['id'] = raw.id;
-                json['commentCount'] =
-                    await countComments(raw.id); // commentCount;
-                final post = PostModel.fromJson(json, LikeState.neutral);
-                final likeState =
-                    ref.read(currentUserProvider.notifier).getLikeState(raw.id);
-                return MapEntry(post.copyWith(likeState: likeState),
-                    json['time'] as String);
-              },
-            ),
-          ),
-    );
-    final onlyPosts = postList.map((item) => item.key).toList();
-    ref.read(postPoolProvider).putAll(onlyPosts);
-    //     .map<Future<Post>>((raw) async {
-    //   return Post.fromRaw(raw, AppUser.fromCurrent(locator<CurrentUser>()),
-    //       await countComments(raw.postID),
-    //       group: (raw.tags.contains('public'))
-    //           ? null
-    //           : await GroupHandler().getGroupFromId(raw.tags.first),
-    //       hasCache: true);
-    // }).toList();
-    final retList =
-        postList.map((item) => MapEntry(item.key.id, item.value)).toList();
-    return (retList, retList.length < c.postsOnRefresh);
-  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -181,7 +135,7 @@ class OtherProfile extends ConsumerWidget {
               }
               return InfiniteScrolly<String, String>(
                 getter: (data) async {
-                  return await getter(data, ref);
+                  return await otherProfilePageGetter(data, ref, uid);
                 },
                 widget: otherProfilePostCardBuilder,
                 onRefresh: onRefresh,

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:untitled_app/custom_widgets/download_button_if_web.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
+import 'package:untitled_app/widgets/icons.dart';
 import '../utilities/constants.dart' as c;
 
 class WelcomePage extends StatelessWidget {
@@ -31,7 +31,7 @@ class WelcomePage extends StatelessWidget {
             ),
             SizedBox(
               width: width * 0.7,
-              child: SvgPicture.asset('images/eko_logo.svg'),
+              child: Eko(),
             ),
             SizedBox(
               height: height * .28,
