@@ -5,7 +5,6 @@ import 'package:untitled_app/models/current_user.dart';
 import 'package:untitled_app/models/shared_pref_model.dart';
 import 'package:untitled_app/utilities/locator.dart';
 import '../utilities/themes/dark_theme_provider.dart';
-import '../controllers/bottom_nav_bar_controller.dart';
 import 'package:go_router/go_router.dart';
 import '../custom_widgets/warning_dialog.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
@@ -43,7 +42,7 @@ class SettingsController extends ChangeNotifier {
     _popDialog();
     try {
       await locator<CurrentUser>().deleteAccount();
-      locator<NavBarController>().enable();
+      // locator<NavBarController>().enable();
     } on FirebaseAuthException catch (e) {
       if (e.code == 'requires-recent-login') {
         context.pushNamed('re_auth');
@@ -70,7 +69,7 @@ class SettingsController extends ChangeNotifier {
 
   signOut() async {
     await locator<CurrentUser>().signOut();
-    locator<NavBarController>().enable();
+    // locator<NavBarController>().enable();
   }
 
   deleteAccount() {

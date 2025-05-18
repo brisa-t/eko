@@ -15,7 +15,6 @@ import '../models/post_handler.dart';
 import 'package:go_router/go_router.dart';
 import '../custom_widgets/controllers/pagination_controller.dart'
     show Cache, PaginationGetterReturn;
-import 'bottom_nav_bar_controller.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class PostPageController extends ChangeNotifier {
@@ -88,7 +87,7 @@ class PostPageController extends ChangeNotifier {
       notifyListeners();
     }
     if (!isLoggedIn()) {
-      locator<NavBarController>().disable();
+      // locator<NavBarController>().disable();
     }
   }
 
@@ -428,7 +427,7 @@ class PostPageController extends ChangeNotifier {
   }
 
   addGifPressed() async {
-    locator<NavBarController>().disable();
+    // locator<NavBarController>().disable();
     GiphyGif? newGif = await GiphyGet.getGif(
       context: context,
       apiKey: dotenv.env['GIPHY_API_KEY']!,
@@ -443,6 +442,6 @@ class PostPageController extends ChangeNotifier {
       postCommentPressed();
     }
     notifyListeners();
-    locator<NavBarController>().enable();
+    // locator<NavBarController>().enable();
   }
 }
