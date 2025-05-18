@@ -56,7 +56,7 @@ Future<void> main() async {
     _checkFirstInstall(),
     _buildVersion(),
     LogoService.init(),
-    FirebaseHelper.setupNotifications(),
+    NotificationHelper.setupNotifications(),
     FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true)
   ]);
 
