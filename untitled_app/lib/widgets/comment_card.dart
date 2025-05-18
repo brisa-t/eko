@@ -1,38 +1,38 @@
+import 'dart:async';
+
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:untitled_app/custom_widgets/controllers/pagination_controller.dart';
+import 'package:untitled_app/controllers/view_post_page_controller.dart';
+import 'package:untitled_app/custom_widgets/count_down_timer.dart';
 import 'package:untitled_app/custom_widgets/gif_widget.dart';
-import 'package:untitled_app/custom_widgets/image_widget.dart';
-import 'package:untitled_app/custom_widgets/poll_widget.dart';
+import 'package:untitled_app/custom_widgets/time_stamp.dart';
+import 'package:untitled_app/custom_widgets/warning_dialog.dart';
+import 'package:untitled_app/models/current_user.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
-// import 'package:untitled_app/interfaces/user.dart';
-// import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/post_provider.dart';
-import 'package:untitled_app/widgets/divider.dart';
+import 'package:untitled_app/providers/user_provider.dart';
+import 'package:untitled_app/types/post.dart';
+import 'package:untitled_app/utilities/locator.dart';
 import 'package:untitled_app/widgets/like_buttons.dart';
-import 'package:untitled_app/widgets/post_loader.dart';
 import 'package:untitled_app/widgets/profile_picture.dart';
-import 'package:untitled_app/widgets/time_stamp.dart';
 import 'package:untitled_app/widgets/user_tag.dart';
+import '../localization/generated/app_localizations.dart';
 import '../utilities/constants.dart' as c;
-import 'package:provider/provider.dart' as prov;
-import 'dart:io' show Platform;
-import 'package:untitled_app/localization/generated/app_localizations.dart';
+import '../custom_widgets/profile_avatar.dart';
+import 'package:like_button/like_button.dart';
+import 'package:flutter/cupertino.dart';
 
 Widget commentCardBuilder(String id) {
-  return CommentCard(
-    id: id,
-  );
+  return CommentCard(id: id);
 }
 
 class CommentCard extends ConsumerStatefulWidget {
   final String id;
-
   const CommentCard({super.key, required this.id});
-
   @override
   ConsumerState<CommentCard> createState() => _CommentCardState();
 }
@@ -47,245 +47,306 @@ class _Error extends StatelessWidget {
 class _Loading extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return const PostLoader();
+    return const Center(
+      child: CircularProgressIndicator(),
+    );
   }
 }
 
 class _CommentCardState extends ConsumerState<CommentCard> {
-  bool sharing = false;
-  bool isSelf = false;
+  final scrollController = ScrollController();
 
-  @override
-  void initState() {
-    super.initState();
+  Future<void> scrollToStart() async {
+    if (scrollController.offset != 0) {
+      await scrollController.animateTo(0,
+          duration: const Duration(milliseconds: 80), curve: Curves.linear);
+    }
+  }
+
+  Future<void> scrollToEnd() async {
+    await scrollController.animateTo(scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 80), curve: Curves.linear);
+  }
+
+  void onScrollEnd(WidgetRef ref, PostModel comment) async {
+    Timer(
+      const Duration(milliseconds: 1),
+      () {
+        final scrollPercentage = scrollController.position.pixels /
+            scrollController.position.maxScrollExtent;
+        if (comment.uid == ref.watch(currentUserProvider).user.uid) {
+          if (scrollPercentage >= 0.8) {
+            scrollToEnd();
+          } else {
+            scrollToStart();
+          }
+        } else {
+          if (scrollPercentage >= 0.9) {
+            scrollToStart();
+            // TODO: reply to comment
+            // replyPressed(ref.watch(userProvider(comment.uid)).value!.username);
+          } else {
+            scrollToStart();
+          }
+        }
+      },
+    );
+  }
+
+  void _popDialog() {
+    Navigator.of(context, rootNavigator: true).pop();
+  }
+
+// TODO: delete comment
+  void _deletePostFromDialog() async {
+    _popDialog();
+    // await locator<PostsHandling>()
+    //     .deleteData('posts/${post.rootPostId}/comments/${post.postId}');
+
+    // prov.Provider.of<PostPageController>(context, listen: false)
+    //     .removeComment(post.postId);
+  }
+
+  void deletePressed(PostModel comment) {
+    scrollToStart();
+    if (DateTime.parse(comment.createdAt)
+        .toLocal()
+        .add(const Duration(hours: 48))
+        .difference(DateTime.now())
+        .isNegative) {
+      //delete
+      showMyDialog(
+          AppLocalizations.of(context)!.deleteCommentWarningTitle,
+          AppLocalizations.of(context)!.deletePostWarningBody,
+          [
+            AppLocalizations.of(context)!.cancel,
+            AppLocalizations.of(context)!.delete
+          ],
+          [_popDialog, _deletePostFromDialog],
+          context);
+    } else {
+      //too early
+      showMyDialog(
+          AppLocalizations.of(context)!.tooEarlyDeleteTitle,
+          AppLocalizations.of(context)!.tooEarlyDeleteBody,
+          [AppLocalizations.of(context)!.ok],
+          [_popDialog],
+          context);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final width = c.widthGetter(context);
-    final asyncPost = ref.watch(postProvider(widget.id));
+    final asyncComment = ref.watch(postProvider(widget.id));
+    final currentUser = ref.watch(currentUserProvider);
 
-    return asyncPost.when(data: (post) {
-      return Padding(
-        padding: const EdgeInsets.only(top: 5, bottom: 0, right: 0),
-        child: InkWell(
-          onTap: () => context
-              .push('/feed/post/${post.id}', extra: post)
-              .then((v) async {}),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: c.postPaddingHoriz,
-                ),
+    return asyncComment.when(
+      data: (comment) {
+        return TapRegion(
+          onTapOutside: (v) => scrollToStart(),
+          child: NotificationListener<ScrollEndNotification>(
+            onNotification: (notification) {
+              onScrollEnd(ref, comment);
+              return true;
+            },
+            child: SingleChildScrollView(
+              controller: scrollController,
+              physics: ClampingScrollPhysics(),
+              scrollDirection: Axis.horizontal,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                    color: (comment.uid == currentUser.user.uid)
+                        ? Colors.red
+                        : Theme.of(context).colorScheme.outlineVariant),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Display the profile picture as a CircleAvatar
-                    ProfilePicture(
-                      onPressed: () {
-                        if (post.uid !=
-                            ref.read(currentUserProvider).user.uid) {
-                          context.push('/feed/sub_profile/${post.uid}');
-                        } else {
-                          context.go('/profile');
-                        }
-                      },
-                      uid: post.uid,
-                      size: width * 0.115,
-                      padding: const EdgeInsets.symmetric(horizontal: 5),
-                    ),
-                    const SizedBox(width: 5),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                    GestureDetector(
+                        onTapDown: (v) => scrollToStart(),
+                        child: Container(
+                            decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.surface),
+                            width: width,
+                            child: _Card(comment: comment))),
+                    SizedBox(
+                      width: width * 0.2,
+                      //color: Colors.red,
+                      child: (comment.uid == currentUser.user.uid)
+                          ? GestureDetector(
+                              onTap: () => deletePressed(comment),
+                              child: Column(
+                                children: [
+                                  const Icon(
+                                    CupertinoIcons.delete_simple,
+                                    size: 32,
+                                  ),
+                                  CountDownTimer(
+                                    dateTime: DateTime.parse(comment.createdAt)
+                                        .toLocal()
+                                        .add(const Duration(hours: 48)),
+                                    textStyle: const TextStyle(fontSize: 13),
+                                  )
+                                ],
+                              ))
+                          : const Icon(
+                              CupertinoIcons.arrow_turn_up_left,
+                              size: 32,
+                            ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+      error: (error, stackTrace) {
+        return _Error();
+      },
+      loading: () {
+        return _Loading();
+      },
+    );
+  }
+}
+
+class _Card extends ConsumerWidget {
+  final PostModel comment;
+  const _Card({required this.comment});
+
+  avatarPressed(BuildContext context, WidgetRef ref, PostModel comment) async {
+    if (comment.uid == ref.watch(currentUserProvider).user.uid) {
+      await context.push('/feed/sub_profile/${comment.uid}');
+    } else {
+      context.go('/profile');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final width = c.widthGetter(context);
+    return Padding(
+      padding: const EdgeInsets.only(top: 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: c.postPaddingHoriz,
+              vertical: c.postPaddingVert,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Display the profile picture as a CircleAvatar
+                ProfilePicture(
+                  onPressed: () {
+                    if (comment.uid != ref.read(currentUserProvider).user.uid) {
+                      context.push('/feed/sub_profile/${comment.uid}');
+                    } else {
+                      context.go('/profile');
+                    }
+                  },
+                  uid: comment.uid,
+                  size: width * 0.115,
+                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                ),
+                const SizedBox(width: 5),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                  child: UserTag(
-                                onPressed: () {
-                                  if (post.uid !=
-                                      ref.read(currentUserProvider).user.uid) {
-                                    context
-                                        .push('/feed/sub_profile/${post.uid}');
-                                  } else {
-                                    context.go('/profile');
-                                  }
-                                },
-                                uid: post.uid,
-                              )),
-                              TimeStamp(time: post.getDateTime()),
-                            ],
+                          UserTag(
+                            onPressed: () {
+                              if (comment.uid !=
+                                  ref.read(currentUserProvider).user.uid) {
+                                context
+                                    .push('/feed/sub_profile/${comment.uid}');
+                              } else {
+                                context.go('/profile');
+                              }
+                            },
+                            uid: comment.uid,
                           ),
-                          const SizedBox(height: 6.0),
-                          if (post.title?.isNotEmpty ?? false)
-                            RichText(
-                              text: TextSpan(
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontFamily: DefaultTextStyle.of(context)
-                                      .style
-                                      .fontFamily,
-                                ),
-                                children: post.title!.map((chunk) {
-                                  if (chunk.startsWith('@')) {
-                                    // This is a username, create a hyperlink
-                                    return TextSpan(
-                                      text: chunk,
-                                      style: TextStyle(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .surfaceTint),
-                                      recognizer: TapGestureRecognizer()
-                                        ..onTap = () async {
-                                          // tagPressed(chunk.substring(1));
-                                        },
-                                    );
-                                  } else {
-                                    // This is a normal text, create a TextSpan
-                                    return TextSpan(
-                                      text: chunk,
-                                      style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurface,
-                                      ),
-                                    );
-                                  }
-                                }).toList(),
-                              ),
-                            ),
-                          const SizedBox(height: 6.0),
-                          if (post.isPoll)
-                            PollWidget(
-                              postId: post.id,
-                              options: post.pollOptions!,
-                              pollVoteCounts: post.pollVoteCounts!,
-                            ),
-                          if (post.gifUrl != null) GifWidget(url: post.gifUrl!),
-                          if (post.imageString != null)
-                            ImageWidget(text: post.imageString!),
-                          if (post.gifUrl != null ||
-                              post.imageString != null ||
-                              post.isPoll)
-                            const SizedBox(height: 6.0),
-                          if (post.body?.isNotEmpty ?? false)
-                            RichText(
-                              text: TextSpan(
-                                style: TextStyle(
-                                  fontFamily: DefaultTextStyle.of(context)
-                                      .style
-                                      .fontFamily,
-                                ),
-                                children: post.body!.map((chunk) {
-                                  if (chunk.startsWith('@')) {
-                                    // This is a username, create a hyperlink
-                                    return TextSpan(
-                                      text: chunk,
-                                      style: TextStyle(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .surfaceTint),
-                                      recognizer: TapGestureRecognizer()
-                                        ..onTap = () {
-                                          // tagPressed(chunk.substring(1));
-                                        },
-                                    );
-                                  } else {
-                                    // This is a normal text, create a TextSpan
-                                    return TextSpan(
-                                      text: chunk,
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurface,
-                                      ),
-                                    );
-                                  }
-                                }).toList(),
-                              ),
-                            ),
+                          const SizedBox(width: 8.0),
                         ],
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: c.postPaddingHoriz,
-                  //vertical: c.postPaddingVert-8,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    SizedBox(width: width * 0.115 + 8),
-                    LikeButtons(post: post),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    InkWell(
-                      onTap: () {
-                        context
-                            .push('/feed/post/${post.id}', extra: post)
-                            .then((v) async {
-                          prov.Provider.of<PaginationController>(context,
-                                  listen: false)
-                              .rebuildFunction();
-                        });
-                      },
-                      child: SvgPicture.string(
-                        '''<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#${Theme.of(context).colorScheme.onSurface.toARGB32().toRadixString(16).substring(2)}"  stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-circle"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>''',
-                        width: c.postIconSize,
-                        height: c.postIconSize,
+                      const SizedBox(height: 8.0),
+                      if (comment.body != null)
+                        RichText(
+                          text: TextSpan(
+                            style: TextStyle(
+                              fontFamily:
+                                  DefaultTextStyle.of(context).style.fontFamily,
+                            ),
+                            children: comment.body!.map((chunk) {
+                              if (chunk.startsWith('@')) {
+                                // This is a username, create a hyperlink
+                                return TextSpan(
+                                    text: chunk,
+                                    style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .surfaceTint),
+                                    recognizer: TapGestureRecognizer()
+                                    // ..onTap = () => tagPressed(chunk.substring(1)),
+                                    );
+                              } else {
+                                // This is a normal text, create a TextSpan
+                                return TextSpan(
+                                  text: chunk,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
+                                  ),
+                                );
+                              }
+                            }).toList(),
+                          ),
+                        ),
+                      if (comment.gifUrl != null)
+                        GifWidget(url: comment.gifUrl!),
+                      const SizedBox(height: 4.0),
+                      TextButton(
+                        onPressed: () {
+                          // replyPressed(comment.uid);
+                        },
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          minimumSize: const Size(0, 0),
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: Text(
+                          AppLocalizations.of(context)!.reply,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w300,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                        ),
                       ),
-                    ),
-                    SizedBox(
-                      width: 3,
-                    ),
-                    Count(
-                      count: post.commentCount,
-                      onTap: () {
-                        context
-                            .push('/feed/post/${post.id}', extra: post)
-                            .then((v) async {
-                          prov.Provider.of<PaginationController>(context,
-                                  listen: false)
-                              .rebuildFunction();
-                        });
-                      },
-                    ),
-                    const SizedBox(width: 5),
-                    InkWell(
-                      child: SvgPicture.string(
-                        Platform.isIOS
-                            ? '''<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#${Theme.of(context).colorScheme.onSurface.toARGB32().toRadixString(16).substring(2)}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-share"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/></svg>'''
-                            : '''<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#${Theme.of(context).colorScheme.onSurface.toARGB32().toRadixString(16).substring(2)}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-share-2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>''',
-                        width: c.postIconSize,
-                        height: c.postIconSize,
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              SizedBox(
-                height: 8,
-              ),
-              SizedBox(width: width, child: StyledDivider())
-            ],
+
+                Column(children: [
+                  TimeStamp(time: comment.createdAt),
+                  LikeButtons(post: comment),
+                ])
+              ],
+            ),
           ),
-        ),
-      );
-    }, error: (object, stack) {
-      return _Error();
-    }, loading: () {
-      return _Loading();
-    });
+          Divider(
+            color: Theme.of(context).colorScheme.outline,
+            height: c.dividerWidth,
+          ),
+        ],
+      ),
+    );
   }
 }

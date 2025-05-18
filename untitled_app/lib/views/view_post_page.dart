@@ -11,6 +11,7 @@ import 'package:untitled_app/widgets/divider.dart';
 import 'package:untitled_app/widgets/loading_spinner.dart';
 
 import 'package:untitled_app/localization/generated/app_localizations.dart';
+import 'package:untitled_app/widgets/post_card.dart';
 
 // import '../controllers/view_post_page_controller.dart';
 import '../utilities/constants.dart' as c;
@@ -497,7 +498,7 @@ class _Header extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        CommentCard(
+        PostCard(
           id: id,
         ),
       ],
