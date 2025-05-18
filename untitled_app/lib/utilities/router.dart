@@ -121,7 +121,11 @@ final goRouter = GoRouter(
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
         return PopScope(
-            canPop: false,
+            canPop: navigationShell.currentIndex == 0,
+            onPopInvokedWithResult: (bool didPop, Object? result) {
+              if (didPop) return;
+              navigationShell.goBranch(0);
+            },
             child: NotificationHandler(
               child: RequireAuth(
                 child: ScaffoldWithNestedNavigation(
