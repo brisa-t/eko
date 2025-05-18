@@ -1,31 +1,21 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 // import 'package:provider/provider.dart' as prov;
 import 'package:untitled_app/custom_widgets/count_down_timer.dart';
-import 'package:untitled_app/interfaces/post.dart';
+import 'package:untitled_app/interfaces/post_queries.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
-import 'package:untitled_app/providers/post_pool_provider.dart';
 import 'package:untitled_app/providers/post_provider.dart';
-import 'package:untitled_app/types/post.dart';
-import 'package:untitled_app/utilities/enums.dart';
-import 'package:untitled_app/views/profile_page.dart';
 import 'package:untitled_app/widgets/divider.dart';
 
 import 'package:untitled_app/widgets/loading_spinner.dart';
 import 'package:untitled_app/widgets/post_card.dart';
 
 import 'package:untitled_app/localization/generated/app_localizations.dart';
-import 'package:untitled_app/custom_widgets/comment_card.dart';
-import 'package:untitled_app/utilities/locator.dart';
 
-import '../custom_widgets/searched_user_card.dart';
 // import '../controllers/view_post_page_controller.dart';
-import '../custom_widgets/pagination.dart';
 import '../utilities/constants.dart' as c;
 import '../widgets/infinite_scrolly.dart';
-import '../widgets/post_loader.dart';
 
 class ViewPostPage extends ConsumerStatefulWidget {
   final String id;
@@ -265,49 +255,6 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
     // notifyListeners();
   }
 
-  Future<(List<MapEntry<String, String>>, bool)> getter(
-      List<MapEntry<String, String>> list, WidgetRef ref) async {
-    // final uid = ref.read(currentUserProvider).user.uid;
-    final baseQuery = FirebaseFirestore.instance
-        .collection('posts')
-        .doc(widget.id)
-        .collection('comments')
-        .orderBy('time', descending: false)
-        .limit(c.postsOnRefresh);
-    final query =
-        list.isEmpty ? baseQuery : baseQuery.startAfter([list.last.value]);
-    final commentList = await Future.wait(
-      await query.get().then(
-            (data) => data.docs.map(
-              (raw) async {
-                final json = raw.data();
-                json['id'] = raw.id;
-                json['commentCount'] =
-                    await countComments(raw.id); // commentCount;
-                final post = PostModel.fromJson(json, LikeState.neutral);
-                final likeState =
-                    ref.read(currentUserProvider.notifier).getLikeState(raw.id);
-                return MapEntry(post.copyWith(likeState: likeState),
-                    json['time'] as String);
-              },
-            ),
-          ),
-    );
-    final onlyPosts = commentList.map((item) => item.key).toList();
-    ref.read(postPoolProvider).putAll(onlyPosts);
-    //     .map<Future<Post>>((raw) async {
-    //   return Post.fromRaw(raw, AppUser.fromCurrent(locator<CurrentUser>()),
-    //       await countComments(raw.postID),
-    //       group: (raw.tags.contains('public'))
-    //           ? null
-    //           : await GroupHandler().getGroupFromId(raw.tags.first),
-    //       hasCache: true);
-    // }).toList();
-    final retList =
-        commentList.map((item) => MapEntry(item.key.id, item.value)).toList();
-    return (retList, retList.length < c.postsOnRefresh);
-  }
-
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.sizeOf(context).height;
@@ -352,7 +299,7 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
                             children: [
                               Text(AppLocalizations.of(context)!.delete),
                               CountDownTimer(
-                                dateTime: post.createdAt
+                                dateTime: DateTime.parse(post.createdAt)
                                     .toLocal()
                                     .add(const Duration(hours: 48)),
                                 textStyle: TextStyle(
@@ -403,7 +350,9 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
                       //             listen: false)
                       //         .getTimeFromPost),
                       InfiniteScrolly<String, String>(
-                        getter: (data) => getter(data, ref),
+                        getter: (data) async {
+                          return await commentsGetter(data, ref, widget.id);
+                        },
                         widget: profilePostCardBuilder,
                         header: _Header(id: widget.id),
                         onRefresh: onRefresh,
