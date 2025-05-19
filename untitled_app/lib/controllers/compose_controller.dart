@@ -21,6 +21,7 @@ import '../custom_widgets/pagination.dart';
 import '../custom_widgets/group_card.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:image_to_ascii/image_to_ascii.dart';
 
 class ComposeController extends ChangeNotifier {
   final BuildContext context;
@@ -292,12 +293,11 @@ class ComposeController extends ChangeNotifier {
 
     if (imageLocal != null) {
       File imageFile = File(imageLocal.path);
-      String? ascii = await uploadImage(File(imageFile.path));
-      if (ascii != null) {
-        image = ascii;
-        gif = null;
-        isPoll = false;
-      }
+      String ascii = convertImageToAscii(imageFile.path);
+      // String? ascii = await uploadImage(File(imageFile.path));
+      image = ascii;
+      gif = null;
+      isPoll = false;
       notifyListeners();
     } else {}
     // locator<NavBarController>().enable();
