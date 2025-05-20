@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:nativewrappers/_internal/vm/lib/ffi_patch.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -8,11 +9,13 @@ import 'package:http/http.dart' as http;
 import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 import 'package:image_to_ascii/image_to_ascii.dart';
+import 'package:untitled_app/custom_widgets/error_snack_bar.dart';
 import 'package:untitled_app/custom_widgets/image_widget.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 // import 'package:untitled_app/models/current_user.dart';
 import 'package:untitled_app/providers/nav_bar_provider.dart';
+import 'package:untitled_app/types/post.dart';
 import 'package:untitled_app/widgets/infinite_scrolly.dart';
 import 'package:untitled_app/widgets/poll_creator.dart';
 import 'package:untitled_app/widgets/profile_picture.dart';
@@ -38,28 +41,27 @@ class _ComposePageState extends ConsumerState<ComposePage> {
   final bodyController = TextEditingController();
   final bodyFocus = FocusNode();
   final titleFocus = FocusNode();
-  int titleChars = 0;
-  int bodyChars = 0;
   int bodyNewLines = 0;
-  bool showBodyCount = false;
-  bool showTitleCount = false;
-  bool hideFAB = false;
+
+  void _setState() {
+    setState(() {});
+  }
 
   @override
   void initState() {
     super.initState();
-    titleController.addListener(_onTitleChanged);
     bodyController.addListener(_onBodyChanged);
-    bodyFocus.addListener(_onBodyFocusChanged);
-    titleFocus.addListener(_onTitleFocusChanged);
+    titleController.addListener(_setState);
+    titleFocus.addListener(_setState);
+    bodyFocus.addListener(_setState);
   }
 
   @override
   void dispose() {
-    titleController.removeListener(_onTitleChanged);
     bodyController.removeListener(_onBodyChanged);
-    bodyFocus.removeListener(_onBodyFocusChanged);
-    titleFocus.removeListener(_onTitleFocusChanged);
+    titleController.removeListener(_setState);
+    titleFocus.removeListener(_setState);
+    bodyFocus.removeListener(_setState);
     titleController.dispose();
     bodyController.dispose();
     titleFocus.dispose();
@@ -67,48 +69,20 @@ class _ComposePageState extends ConsumerState<ComposePage> {
     super.dispose();
   }
 
-  void _onTitleChanged() {
-    setState(() {
-      titleChars = titleController.text.length;
-      showBodyCount = false;
-      showTitleCount = true;
-    });
-  }
-
-  void _onBodyChanged() {
+  int _countNewLines(String str) {
     int count = 0;
-    for (int i = 0; i < bodyController.text.length; i++) {
-      if (bodyController.text[i] == '\n') {
+    for (int i = 0; i < str.length; i++) {
+      if (str[i] == '\n') {
         count++;
       }
     }
+    return count;
+  }
+
+  void _onBodyChanged() {
+    final count = _countNewLines(bodyController.text.trim());
     setState(() {
-      bodyChars = bodyController.text.length;
       bodyNewLines = count;
-      showBodyCount = true;
-      showTitleCount = false;
-    });
-  }
-
-  void _onTitleFocusChanged() {
-    setState(() {
-      if (titleFocus.hasPrimaryFocus) {
-        showTitleCount = true;
-      } else {
-        showTitleCount = false;
-      }
-    });
-  }
-
-  void _onBodyFocusChanged() {
-    setState(() {
-      if (bodyFocus.hasPrimaryFocus) {
-        showBodyCount = true;
-        hideFAB = true;
-      } else {
-        showBodyCount = false;
-        hideFAB = false;
-      }
     });
   }
 
@@ -177,10 +151,6 @@ class _ComposePageState extends ConsumerState<ComposePage> {
       gif = null;
       image = null;
       bodyNewLines = 0;
-      bodyChars = 0;
-      titleChars = 0;
-      showBodyCount = false;
-      showTitleCount = false;
       bodyController.clear();
       titleController.clear();
     });
@@ -192,6 +162,139 @@ class _ComposePageState extends ConsumerState<ComposePage> {
       gif = null;
       image = null;
     });
+  }
+
+  Future<void> _postPressed() async {
+    final title = titleController.text.trim();
+    final body = bodyController.text.trim();
+    if (title == '' && body == '' && gif == null && image == null && !isPoll) {
+      titleFocus.requestFocus();
+      showSnackBar(
+          text: AppLocalizations.of(context)!.emptyFieldError,
+          context: context);
+      return;
+    }
+    if (title.length > c.maxTitleChars) {
+      titleFocus.requestFocus();
+      showSnackBar(
+          text: AppLocalizations.of(context)!.tooManyChar, context: context);
+      return;
+    }
+    if (body.length > c.maxPostChars) {
+      bodyFocus.requestFocus();
+      showSnackBar(
+          text: AppLocalizations.of(context)!.tooManyChar, context: context);
+      return;
+    }
+    if (_countNewLines(body) > c.maxPostLines) {
+      bodyFocus.requestFocus();
+      showSnackBar(
+          text: AppLocalizations.of(context)!.tooManyLine, context: context);
+      return;
+    }
+    if (isPoll &&
+        pollOptions.where((option) => option.trim().isNotEmpty).length < 2) {
+      showSnackBar(
+          text: AppLocalizations.of(context)!.needTwoOptions, context: context);
+      return;
+    }
+    if (isPoll && pollOptions.any((option) => option.length > c.maxPollChars)) {
+      showSnackBar(
+          text: AppLocalizations.of(context)!.tooManyChar, context: context);
+      return;
+    }
+    final post = PostModel(
+      uid: ref.watch(currentUserProvider).user.uid,
+      id: '',
+      tags: [],
+      likes: 0,
+      dislikes: 0,
+      commentCount: 0,
+      createdAt: DateTime.now().toUtc().toIso8601String(),
+      isPoll: isPoll,
+      pollOptions: pollOptions,
+      imageString: image,
+      gifUrl: gif?.images?.fixedWidth.url,
+    );
+    // showDialog(
+    //   context: context,
+    //   builder: (BuildContext context) {
+    //     return AlertDialog(
+    //       backgroundColor: Theme.of(context).colorScheme.outlineVariant,
+    //       title: Text(AppLocalizations.of(context)!.confirmation),
+    //       content: SingleChildScrollView(
+    //         child: PostCard(
+    //             post: Post(
+    //                 tags: tags,
+    //                 gifSource: post['gifSource'],
+    //                 gifURL: post['gifUrl'],
+    //                 postId: 'postId',
+    //                 time: '', //DateTime.now().toUtc().toIso8601String(),
+    //                 title: Post.parseText(post['title']),
+    //                 author: AppUser.fromCurrent(locator<CurrentUser>()),
+    //                 body: Post.parseText(post['body']),
+    //                 image: post['image'],
+    //                 likes: 0,
+    //                 dislikes: 0,
+    //                 isPoll: post['isPoll'] ?? false,
+    //                 pollOptions: post['pollOptions'],
+    //                 pollVoteCounts: post['pollVoteCounts']),
+    //             isPreview: true),
+    //       ),
+    //       actions: <Widget>[
+    //         TextButton(
+    //           child: Text(AppLocalizations.of(context)!.cancel),
+    //           onPressed: () {
+    //             context.pop();
+    //           },
+    //         ),
+    //         TextButton(
+    //           child: Text(AppLocalizations.of(context)!.post),
+    //           onPressed: () async {
+    //             titleController.text = '';
+    //             bodyController.text = '';
+    //             gif = null;
+    //             image = null;
+    //             isPoll = false;
+    //             pollOptions = ['', ''];
+    //             context.pop();
+    //
+    //             final postID =
+    //                 await locator<PostsHandling>().createPost(post);
+    //             if (tags.contains('public')) {
+    //               // locator<FeedPostCache>().addPost(
+    //               //   0,
+    //               //   Post(
+    //               //     tags: tags,
+    //               //     gifSource: post['gifSource'],
+    //               //     gifURL: post['gifUrl'],
+    //               //     postId: postID,
+    //               //     time: DateTime.now().toUtc().toIso8601String(),
+    //               //     image: post['image'],
+    //               //     title: Post.parseText(post['title']),
+    //               //     author: AppUser.fromCurrent(locator<CurrentUser>()),
+    //               //     body: Post.parseText(post['body']),
+    //               //     likes: 0,
+    //               //     dislikes: 0,
+    //               //     isPoll: post['isPoll'] ?? false,
+    //               //     pollOptions: post['pollOptions'],
+    //               //     pollVoteCounts: post['pollVoteCounts'],
+    //               //   ),
+    //               // );
+    //
+    //               _goToPage();
+    //             } else {
+    //               _goToPage(group: groupEndPoint);
+    //               //refine cases later for more complicated tag system
+    //             }
+    //
+    //             notifyListeners();
+    //           },
+    //         ),
+    //       ],
+    //     );
+    //   },
+    // );
   }
 
   @override
@@ -206,7 +309,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
         //
         floatingActionButtonLocation: ExpandableFab.location,
         floatingActionButton: Visibility(
-          visible: !hideFAB,
+          visible: !bodyFocus.hasPrimaryFocus,
           child: ExpandableFab(
             onOpen: () => FocusManager.instance.primaryFocus?.unfocus(),
             key: _key,
@@ -382,9 +485,10 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                     ),
                     // ),
                   ),
-                  (showTitleCount && titleChars != 0)
+                  (titleFocus.hasPrimaryFocus &&
+                          titleController.text.isNotEmpty)
                       ? Text(
-                          '$titleChars/${c.maxTitleChars} ${AppLocalizations.of(context)!.characters}')
+                          '${titleController.text.length}/${c.maxTitleChars} ${AppLocalizations.of(context)!.characters}')
                       : Container(),
                   if (gif != null || image != null || isPoll || _isLoadingImage)
                     FittedBox(
@@ -488,11 +592,11 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                       ),
                     ),
                   ),
-                  (showBodyCount && bodyChars != 0)
+                  (bodyFocus.hasPrimaryFocus && bodyController.text.isNotEmpty)
                       ? Row(
                           children: [
                             Text(
-                                '$bodyChars/${c.maxPostChars} ${AppLocalizations.of(context)!.characters}'),
+                                '${bodyController.text.length}/${c.maxPostChars} ${AppLocalizations.of(context)!.characters}'),
                             const Spacer(),
                             if (bodyNewLines != 0 || true)
                               Text(
