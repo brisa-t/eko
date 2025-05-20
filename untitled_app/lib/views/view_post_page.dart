@@ -4,7 +4,9 @@ import 'package:giphy_get/giphy_get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:untitled_app/custom_widgets/count_down_timer.dart';
 import 'package:untitled_app/custom_widgets/error_snack_bar.dart';
+import 'package:untitled_app/custom_widgets/warning_dialog.dart';
 import 'package:untitled_app/interfaces/post_queries.dart';
+import 'package:untitled_app/interfaces/report.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/post_provider.dart';
 
@@ -30,6 +32,10 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
   GiphyGif? gif;
   final reportFocus = FocusNode();
   final reportController = TextEditingController();
+
+  void _popDialog() {
+    Navigator.of(context, rootNavigator: true).pop();
+  }
 
   void reportPressed() {
     showDialog(
@@ -81,9 +87,7 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
                 final message = reportController.text.trim();
                 if (message != '') {
                   reportController.text = '';
-                  await ref
-                      .read(postProvider(widget.id).notifier)
-                      .addReport(widget.id, message);
+                  await addReport(ref, widget.id, message);
                   _popDialog();
                 } else {
                   showSnackBar(
@@ -98,35 +102,36 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
     );
   }
 
-  void _popDialog() {
-    Navigator.of(context, rootNavigator: true).pop();
+  void _deletePostFromDialog() {
+    context.pop();
+    // TODO: delete post (after sql) didnt want to do now since appcheck wasnt working
   }
 
-  void deletePressed() {
-    // if (DateTime.parse(post!.time)
-    //     .toLocal()
-    //     .add(const Duration(hours: 48))
-    //     .difference(DateTime.now())
-    //     .isNegative) {
-    //   //delete
-    //   showMyDialog(
-    //       AppLocalizations.of(context)!.deletePostWarningTitle,
-    //       AppLocalizations.of(context)!.deletePostWarningBody,
-    //       [
-    //         AppLocalizations.of(context)!.cancel,
-    //         AppLocalizations.of(context)!.delete
-    //       ],
-    //       [_popDialog, _deletePostFromDialog],
-    //       context);
-    // } else {
-    //   //too early
-    //   showMyDialog(
-    //       AppLocalizations.of(context)!.tooEarlyDeleteTitle,
-    //       AppLocalizations.of(context)!.tooEarlyDeleteBody,
-    //       [AppLocalizations.of(context)!.ok],
-    //       [_popDialog],
-    //       context);
-    // }
+  void deletePressed(String createdAt) {
+    if (DateTime.parse(createdAt)
+        .toLocal()
+        .add(const Duration(hours: 48))
+        .difference(DateTime.now())
+        .isNegative) {
+      //delete
+      showMyDialog(
+          AppLocalizations.of(context)!.deletePostWarningTitle,
+          AppLocalizations.of(context)!.deletePostWarningBody,
+          [
+            AppLocalizations.of(context)!.cancel,
+            AppLocalizations.of(context)!.delete
+          ],
+          [_popDialog, _deletePostFromDialog],
+          context);
+    } else {
+      //too early
+      showMyDialog(
+          AppLocalizations.of(context)!.tooEarlyDeleteTitle,
+          AppLocalizations.of(context)!.tooEarlyDeleteBody,
+          [AppLocalizations.of(context)!.ok],
+          [_popDialog],
+          context);
+    }
   }
 
   void checkAtSymbol(String text) {
@@ -269,7 +274,7 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
                       else
                         PopupMenuItem(
                           height: 25,
-                          value: () => deletePressed(),
+                          value: () => deletePressed(post.createdAt),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
