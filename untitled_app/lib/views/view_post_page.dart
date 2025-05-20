@@ -7,6 +7,7 @@ import 'package:untitled_app/custom_widgets/error_snack_bar.dart';
 import 'package:untitled_app/interfaces/post_queries.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/post_provider.dart';
+
 import 'package:untitled_app/widgets/loading_spinner.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/widgets/post_card.dart';
