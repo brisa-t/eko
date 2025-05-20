@@ -217,9 +217,8 @@ final goRouter = GoRouter(
                     path: 'sub_group/:id',
                     name: 'sub_group',
                     builder: (context, state) {
-                      Group? group = state.extra as Group?;
                       String id = state.pathParameters['id']!;
-                      return SubGroupPage(group: group, id: id);
+                      return SubGroupPage(group: null, id: id);
                     },
                     routes: [
                       GoRoute(

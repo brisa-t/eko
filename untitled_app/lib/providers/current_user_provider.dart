@@ -45,6 +45,16 @@ class CurrentUser extends _$CurrentUser {
     state = state.copyWith(dislikedPosts: dislikes);
   }
 
+  Future<void> setUnreadGroup(bool toggle) async {
+    final firestore = FirebaseFirestore.instance;
+    final uid = ref.read(authProvider).uid!;
+    await firestore
+        .collection('users')
+        .doc(uid)
+        .update({'unreadGroup': toggle});
+    state = state.copyWith(unreadGroup: toggle);
+  }
+
   Future<List<String>> _getPeopleWhoBlockedMe() async {
     try {
       final firestore = FirebaseFirestore.instance;

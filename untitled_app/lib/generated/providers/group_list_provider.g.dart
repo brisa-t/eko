@@ -1,25 +1,25 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of '../../providers/current_user_provider.dart';
+part of '../../providers/group_list_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$currentUserHash() => r'52d2b9316ca8d28e13efdec52067c21b0e1ef7c2';
+String _$groupListHash() => r'13c3b3a63a2a925813178e22891eaa87fcbc63a4';
 
-/// See also [CurrentUser].
-@ProviderFor(CurrentUser)
-final currentUserProvider =
-    NotifierProvider<CurrentUser, CurrentUserModel>.internal(
-  CurrentUser.new,
-  name: r'currentUserProvider',
+/// See also [GroupList].
+@ProviderFor(GroupList)
+final groupListProvider =
+    AutoDisposeNotifierProvider<GroupList, (List<String>, bool)>.internal(
+  GroupList.new,
+  name: r'groupListProvider',
   debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$currentUserHash,
+      const bool.fromEnvironment('dart.vm.product') ? null : _$groupListHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$CurrentUser = Notifier<CurrentUserModel>;
+typedef _$GroupList = AutoDisposeNotifier<(List<String>, bool)>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
