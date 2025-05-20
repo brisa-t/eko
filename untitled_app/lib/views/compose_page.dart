@@ -5,7 +5,9 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:giphy_get/giphy_get.dart';
 import 'package:http/http.dart' as http;
+import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
+import 'package:image_to_ascii/image_to_ascii.dart';
 import 'package:untitled_app/custom_widgets/image_widget.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
@@ -133,25 +135,6 @@ class _ComposePageState extends ConsumerState<ComposePage> {
   }
 
   Future<void> _addImagePressed() async {
-    Future<String?> uploadImage(File imageFile) async {
-      var url =
-          Uri.parse('https://createimage-146952619766.us-central1.run.app/');
-      var request = http.MultipartRequest('POST', url);
-
-      request.files
-          .add(await http.MultipartFile.fromPath('image', imageFile.path));
-
-      var response = await request.send();
-
-      if (response.statusCode == 200) {
-        String responseText = await response.stream.bytesToString();
-        return responseText;
-      } else {
-        return null;
-      }
-    }
-
-    // ref.read(navBarProvider.notifier).disable();
     setState(() {
       _isLoadingImage = true;
     });
@@ -161,19 +144,20 @@ class _ComposePageState extends ConsumerState<ComposePage> {
 
     if (imageLocal != null) {
       File imageFile = File(imageLocal.path);
-      String? ascii = await uploadImage(File(imageFile.path));
-      if (ascii != null) {
-        setState(() {
-          image = ascii;
-          gif = null;
-          isPoll = false;
-        });
-      }
-    } else {}
+      final bytes = await imageFile.readAsBytes();
+      final img.Image? decodedImage = img.decodeImage(bytes);
+      if (decodedImage == null) throw Exception('Image decode failed');
+      final ascii = ImageToAscii().convertImageToAscii(decodedImage);
+      // String? ascii = await uploadImage(File(imageFile.path));
+      setState(() {
+        image = ascii;
+        gif = null;
+        isPoll = false;
+      });
+    }
     setState(() {
       _isLoadingImage = false;
     });
-    // ref.read(navBarProvider.notifier).enable();
   }
 
   void _addPollPressed() {
