@@ -1,161 +1,144 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:untitled_app/models/current_user.dart';
-import '../models/group_handler.dart';
+import 'package:untitled_app/providers/current_user_provider.dart';
+import 'package:untitled_app/providers/group_provider.dart';
 import '../custom_widgets/time_stamp.dart';
 import '../utilities/constants.dart' as c;
-import '../utilities/locator.dart';
-// import 'package:provider/provider.dart' as prov;
-// import '../controllers/groups_page_controller.dart';
 
-Widget groupCardBuilder(dynamic group) {
+Widget groupCardBuilder(String groupId) {
   return GroupCard(
-    group: group,
+    groupId: groupId,
   );
 }
 
-class GroupCard extends StatefulWidget {
-  final Group group;
-  final void Function(Group)? onPressedSearched;
-  const GroupCard({super.key, required this.group, this.onPressedSearched});
+class GroupCard extends ConsumerWidget {
+  final String groupId;
+  final void Function(String)? onPressedSearched;
+  const GroupCard({super.key, required this.groupId, this.onPressedSearched});
 
   @override
-  State<GroupCard> createState() => _GroupCardState();
-}
-
-class _GroupCardState extends State<GroupCard> {
-  late bool unseen;
-
-  @override
-  void initState() {
-    super.initState();
-    _updateUnseenStatus();
-  }
-
-  void _updateUnseenStatus() {
-    String currentUserId = locator<CurrentUser>().uid;
-    unseen = widget.group.notSeen.contains(currentUserId);
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final double width = c.widthGetter(context);
-
-    return InkWell(
-        onTap: () async {
-          if (widget.onPressedSearched == null) {
-            context.push('/groups/sub_group/${widget.group.id}',
-                extra: widget.group);
-            if (unseen) {
-              await locator<CurrentUser>().setUnreadGroup(false);
-              setState(() {
-                _updateUnseenStatus();
-              });
-            }
-          } else {
-            //if in compose page
-            widget.onPressedSearched!(widget.group);
-          }
-        },
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: Row(
+    final group = ref.watch(groupProvider(groupId));
+    final uid = ref.read(currentUserProvider).user.uid;
+    bool unseen = group.when(
+        data: (data) => (data.notSeen.contains(uid)),
+        error: (_, __) => false,
+        loading: () => false);
+    return group.when(
+        data: (group) => InkWell(
+              onTap: () async {
+                if (onPressedSearched == null) {
+                  context.push('/groups/sub_group/$groupId', extra: group);
+                  if (unseen) {
+                    ref
+                        .read(currentUserProvider.notifier)
+                        .setUnreadGroup(false);
+                    ref
+                        .read(groupProvider(groupId).notifier)
+                        .toggleUnread(false);
+                  }
+                } else {
+                  //if in compose page
+                  onPressedSearched!(groupId);
+                }
+              },
+              child: Column(
                 children: [
-                  SizedBox(
-                    width: width * 0.05,
-                  ),
-                  (widget.group.icon != '')
-                      ? SizedBox(
-                          width: width * 0.17,
-                          height: width * 0.17,
-                          child: FittedBox(
-                              fit: BoxFit.contain,
-                              child: Text(widget.group.icon,
-                                  style: TextStyle(fontSize: width * 0.15))),
-                        )
-                      : Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Theme.of(context).colorScheme.outlineVariant,
-                          ),
-                          width: width * 0.17,
-                          height: width * 0.17,
-                          child: FittedBox(
-                            fit: BoxFit.contain,
-                            child: Text(
-                              widget.group.name[0],
-                              style: TextStyle(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  fontSize: width * 0.15),
-                            ),
-                          ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          width: width * 0.05,
                         ),
-                  SizedBox(
-                    width: width * 0.05,
-                  ),
-                  SizedBox(
-                      width: width * 0.45,
-                      child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              widget.group.name,
-                              style: TextStyle(
-                                fontSize: 17,
-                                fontWeight: unseen
-                                    ? FontWeight.bold
-                                    : FontWeight.normal,
+                        (group.icon != '')
+                            ? SizedBox(
+                                width: width * 0.17,
+                                height: width * 0.17,
+                                child: FittedBox(
+                                    fit: BoxFit.contain,
+                                    child: Text(group.icon,
+                                        style:
+                                            TextStyle(fontSize: width * 0.15))),
+                              )
+                            : Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .outlineVariant,
+                                ),
+                                width: width * 0.17,
+                                height: width * 0.17,
+                                child: FittedBox(
+                                  fit: BoxFit.contain,
+                                  child: Text(
+                                    group.name[0],
+                                    style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                        fontSize: width * 0.15),
+                                  ),
+                                ),
                               ),
-                            ),
-                            Text(
-                              widget.group.description,
-                              style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: unseen
-                                      ? FontWeight.bold
-                                      : FontWeight.w300),
-                            ),
-                          ])),
-
-                  // RichText(
-                  //   text: TextSpan(
-                  //     style: TextStyle(fontSize: 19),
-                  //     text: group.name,
-                  //     children: [
-                  //       TextSpan(
-                  //           style: TextStyle(fontSize: 15),
-                  //           text: "\n${group.description}"),
-                  //     ],
-                  //   ),
-                  // ),
-                  const Spacer(),
-                  unseen
-                      ? const Icon(
-                          Icons.circle,
-                          size: 10,
-                          color: Color(0xFF0095f6),
-                        )
-                      : Container(),
-                  SizedBox(
-                    width: width * 0.02,
-                  ),
-                  if (widget.onPressedSearched == null)
-                    TimeStamp(
-                      time: widget.group.lastActivity,
+                        SizedBox(
+                          width: width * 0.05,
+                        ),
+                        SizedBox(
+                            width: width * 0.45,
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    group.name,
+                                    style: TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: unseen
+                                          ? FontWeight.bold
+                                          : FontWeight.normal,
+                                    ),
+                                  ),
+                                  Text(
+                                    group.description,
+                                    style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: unseen
+                                            ? FontWeight.bold
+                                            : FontWeight.w300),
+                                  ),
+                                ])),
+                        const Spacer(),
+                        unseen
+                            ? const Icon(
+                                Icons.circle,
+                                size: 10,
+                                color: Color(0xFF0095f6),
+                              )
+                            : Container(),
+                        SizedBox(
+                          width: width * 0.02,
+                        ),
+                        if (onPressedSearched == null)
+                          TimeStamp(
+                            time: group.lastActivity,
+                          ),
+                        SizedBox(
+                          width: width * 0.05,
+                        ),
+                      ],
                     ),
-                  SizedBox(
-                    width: width * 0.05,
+                  ),
+                  Divider(
+                    color: Theme.of(context).colorScheme.outline,
+                    height: c.dividerWidth,
                   ),
                 ],
               ),
             ),
-            Divider(
-              color: Theme.of(context).colorScheme.outline,
-              height: c.dividerWidth,
-            ),
-          ],
-        ));
+        error: (a, b) => SizedBox(),
+        loading: () => SizedBox());
   }
 }

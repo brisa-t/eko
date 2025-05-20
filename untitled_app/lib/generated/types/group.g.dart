@@ -15,8 +15,10 @@ _GroupModel _$GroupModelFromJson(Map<String, dynamic> json) => _GroupModel(
       icon: json['icon'] as String,
       members:
           (json['members'] as List<dynamic>).map((e) => e as String).toList(),
-      notSeen:
-          (json['notSeen'] as List<dynamic>).map((e) => e as String).toList(),
+      notSeen: (json['notSeen'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
     );
 
 Map<String, dynamic> _$GroupModelToJson(_GroupModel instance) =>

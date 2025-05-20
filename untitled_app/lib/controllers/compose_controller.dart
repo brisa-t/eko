@@ -161,10 +161,10 @@ class ComposeController extends ChangeNotifier {
   }
 
   Widget _groupCardSearchBuilder(dynamic group) {
-    return GroupCard(
-      group: group,
-      onPressedSearched: _onAudienceGroupCardPressed,
-    );
+    return GroupCard(groupId: "nut"
+        // group: group,
+        // onPressedSearched: _onAudienceGroupCardPressed,
+        );
   }
 
   void audianceButtonPressed() {

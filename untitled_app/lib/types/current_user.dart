@@ -12,6 +12,7 @@ abstract class CurrentUserModel with _$CurrentUserModel {
     required Set<String> blockedUsers,
     required Set<String> blockedBy,
     required Map<String, int> pollVotes,
+    required bool unreadGroup,
   }) = _CurrentUserModel;
   factory CurrentUserModel.fromJson(Map<String, dynamic> json) {
     return CurrentUserModel(
@@ -22,6 +23,7 @@ abstract class CurrentUserModel with _$CurrentUserModel {
       pollVotes: Map<String, int>.from(json['profileData']['pollVotes'] ?? {}),
       blockedBy: Set<String>.from(json['blockedBy'] ?? []),
       blockedUsers: Set<String>.from(json['blockedUsers'] ?? []),
+      unreadGroup: json['unreadGroup'] ?? false,
     );
   }
   // this is the initial state of the current user. It is only to make the current user not nullable
@@ -33,6 +35,7 @@ abstract class CurrentUserModel with _$CurrentUserModel {
       blockedUsers: {},
       blockedBy: {},
       pollVotes: {},
+      unreadGroup: false,
     );
   }
 }

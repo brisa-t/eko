@@ -172,7 +172,7 @@ class _GroupModel with DiagnosticableTreeMixin implements GroupModel {
       required this.createdOn,
       required this.icon,
       required final List<String> members,
-      required final List<String> notSeen})
+      final List<String> notSeen = const []})
       : _members = members,
         _notSeen = notSeen;
   factory _GroupModel.fromJson(Map<String, dynamic> json) =>
@@ -201,6 +201,7 @@ class _GroupModel with DiagnosticableTreeMixin implements GroupModel {
 
   final List<String> _notSeen;
   @override
+  @JsonKey()
   List<String> get notSeen {
     if (_notSeen is EqualUnmodifiableListView) return _notSeen;
     // ignore: implicit_dynamic_type
