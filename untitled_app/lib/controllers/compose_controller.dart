@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:extended_image/extended_image.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:image/image.dart' as img;
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/models/current_user.dart';
 import '../models/search_model.dart';
@@ -21,6 +22,7 @@ import '../custom_widgets/pagination.dart';
 import '../custom_widgets/group_card.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:image_to_ascii/image_to_ascii.dart';
 
 class ComposeController extends ChangeNotifier {
   final BuildContext context;
@@ -290,12 +292,14 @@ class ComposeController extends ChangeNotifier {
 
     if (imageLocal != null) {
       File imageFile = File(imageLocal.path);
-      String? ascii = await uploadImage(File(imageFile.path));
-      if (ascii != null) {
-        image = ascii;
-        gif = null;
-        isPoll = false;
-      }
+      final bytes = await imageFile.readAsBytes();
+      final img.Image? decodedImage = img.decodeImage(bytes);
+      if (decodedImage == null) throw Exception('Image decode failed');
+      final ascii = ImageToAscii().convertImageToAscii(decodedImage);
+      // String? ascii = await uploadImage(File(imageFile.path));
+      image = ascii;
+      gif = null;
+      isPoll = false;
       notifyListeners();
     } else {}
     // locator<NavBarController>().enable();
