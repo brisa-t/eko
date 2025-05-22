@@ -5,15 +5,17 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:giphy_get/giphy_get.dart';
 import 'package:go_router/go_router.dart';
-import 'package:http/http.dart' as http;
 import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 import 'package:image_to_ascii/image_to_ascii.dart';
 import 'package:untitled_app/custom_widgets/error_snack_bar.dart';
+import 'package:untitled_app/custom_widgets/group_card.dart';
 import 'package:untitled_app/custom_widgets/image_widget.dart';
 import 'package:untitled_app/interfaces/post.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
+import 'package:untitled_app/providers/group_list_provider.dart';
+import 'package:untitled_app/providers/group_provider.dart';
 // import 'package:untitled_app/models/current_user.dart';
 import 'package:untitled_app/providers/nav_bar_provider.dart';
 import 'package:untitled_app/types/post.dart';
@@ -35,6 +37,7 @@ class ComposePage extends ConsumerStatefulWidget {
 class _ComposePageState extends ConsumerState<ComposePage> {
   final _key = GlobalKey<ExpandableFabState>();
   bool _isLoadingImage = false;
+  String? audiance;
   GiphyGif? gif;
   String? image;
   bool isPoll = false;
@@ -52,6 +55,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
   @override
   void initState() {
     super.initState();
+    audiance = widget.groupId;
     bodyController.addListener(_onBodyChanged);
     titleController.addListener(_setState);
     titleFocus.addListener(_setState);
@@ -169,10 +173,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
   Future<void> _postPressed() async {
     final title = titleController.text.trim();
     final body = bodyController.text.trim();
-    final List<String> tags = [
-      'public'
-      // (groupEndPoint != null) ? groupEndPoint!.id : 'public'
-    ];
+    final List<String> tags = [audiance ?? 'public'];
     if (title == '' && body == '' && gif == null && image == null && !isPoll) {
       titleFocus.requestFocus();
       showSnackBar(
@@ -224,6 +225,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
       title: parseTextToTags(title),
       body: parseTextToTags(body),
     );
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -243,20 +245,24 @@ class _ComposePageState extends ConsumerState<ComposePage> {
             TextButton(
               child: Text(AppLocalizations.of(context)!.post),
               onPressed: () async {
-                await uploadPost(post);
-                // _clear();
-                context.pop();
+                _clear();
+                await uploadPost(post, ref);
+                if (context.mounted) {
+                  context.pop();
+                  if (post.tags.contains('public')) {
+                    context.go('/feed');
+                  }
+                }
               },
             ),
           ],
         );
       },
-    );
+    ).then((_) => FocusManager.instance.primaryFocus?.unfocus());
   }
 
   @override
   Widget build(BuildContext context) {
-    final audiance = AppLocalizations.of(context)!.public;
     final width = c.widthGetter(context);
     final height = MediaQuery.sizeOf(context).height;
 
@@ -403,15 +409,15 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                             style: BorderStyle.solid,
                           ),
                         ),
-                        onPressed: () {},
+                        onPressed: () => _audianceButtonPressed(
+                            context,
+                            (id) => setState(() {
+                                  audiance = id;
+                                })),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text(audiance,
-                                style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface)),
+                            _AudianceText(id: audiance),
                             Icon(Icons.expand_more_rounded,
                                 color: Theme.of(context).colorScheme.onSurface),
                           ],
@@ -688,72 +694,126 @@ class _ComposePageState extends ConsumerState<ComposePage> {
   }
 }
 
-// void _audianceButtonPressed(BuildContext context) {
-//   showModalBottomSheet(
-//     showDragHandle: true,
-//     backgroundColor: Theme.of(context).colorScheme.outlineVariant,
-//     isScrollControlled: true,
-//     context: context,
-//     builder: (BuildContext context) {
-//       final double width = c.widthGetter(context);
-//       return SizedBox(
-//           child: InfiniteScrolly<String, String>(
-//               header: Column(
-//                 mainAxisSize: MainAxisSize.min,
-//                 children: [
-//                   Container(
-//                       padding: const EdgeInsets.only(bottom: 5),
-//                       child: Text(
-//                         AppLocalizations.of(context)!.selectAudience,
-//                         style: const TextStyle(fontSize: 24),
-//                       )),
-//                   Divider(
-//                     color: Theme.of(context).colorScheme.outline,
-//                     height: c.dividerWidth,
-//                   ),
-//                   InkWell(
-//                     onTap: () {
-//                       groupEndPoint = null;
-//                       audience = AppLocalizations.of(context)!.public;
-//                       context.pop();
-//                       notifyListeners();
-//                     },
-//                     child: Padding(
-//                       padding: const EdgeInsets.symmetric(vertical: 12),
-//                       child: Row(
-//                         children: [
-//                           SizedBox(
-//                             width: width * 0.05,
-//                           ),
-//                           Icon(Icons.public, size: width * 0.18),
-//                           SizedBox(
-//                             width: width * 0.05,
-//                           ),
-//                           Text(
-//                             AppLocalizations.of(context)!.public,
-//                             style: const TextStyle(fontSize: 19),
-//                           )
-//                         ],
-//                       ),
-//                     ),
-//                   ),
-//                   Divider(
-//                     color: Theme.of(context).colorScheme.outline,
-//                     height: c.dividerWidth,
-//                   ),
-//                   Container(
-//                       alignment: Alignment.centerLeft,
-//                       padding:
-//                           const EdgeInsets.only(left: 7, top: 12, bottom: 12),
-//                       child: Text(
-//                         AppLocalizations.of(context)!.myGroups,
-//                         style: const TextStyle(fontSize: 18),
-//                       ))
-//                 ],
-//               ),
-//               getter: _getGroups,
-//               widget: _groupCardSearchBuilder,
-//               startAfterQuery: _getTimeFromGroup));
-//     },
-//   );
-// }
+class _AudianceText extends ConsumerWidget {
+  final String? id;
+  const _AudianceText({required this.id});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (id == null) {
+      return Text(AppLocalizations.of(context)!.public,
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface));
+    }
+    final asyncGroup = ref.watch(groupProvider(id!));
+    return asyncGroup.when(
+        data: (group) => Text(group.name,
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+        error: (_, __) => SizedBox.shrink(),
+        loading: () => SizedBox.shrink());
+  }
+}
+
+class _GroupListHeader extends StatelessWidget {
+  final void Function() onPopularPressed;
+  const _GroupListHeader({required this.onPopularPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    final double width = c.widthGetter(context);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+            padding: const EdgeInsets.only(bottom: 5),
+            child: Text(
+              AppLocalizations.of(context)!.selectAudience,
+              style: const TextStyle(fontSize: 24),
+            )),
+        Divider(
+          color: Theme.of(context).colorScheme.outline,
+          height: c.dividerWidth,
+        ),
+        InkWell(
+          onTap: () {
+            // groupEndPoint = null;
+            // audience = AppLocalizations.of(context)!.public;
+            // context.pop();
+            // notifyListeners();
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Row(
+              children: [
+                SizedBox(
+                  width: width * 0.05,
+                ),
+                Icon(Icons.public, size: width * 0.18),
+                SizedBox(
+                  width: width * 0.05,
+                ),
+                Text(
+                  AppLocalizations.of(context)!.public,
+                  style: const TextStyle(fontSize: 19),
+                )
+              ],
+            ),
+          ),
+        ),
+        Divider(
+          color: Theme.of(context).colorScheme.outline,
+          height: c.dividerWidth,
+        ),
+        Container(
+          alignment: Alignment.centerLeft,
+          padding: const EdgeInsets.only(left: 7, top: 12, bottom: 12),
+          child: Text(
+            AppLocalizations.of(context)!.myGroups,
+            style: const TextStyle(fontSize: 18),
+          ),
+        )
+      ],
+    );
+  }
+}
+
+class _GroupList extends ConsumerWidget {
+  final void Function(String?) onItemPressed;
+  const _GroupList({required this.onItemPressed});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final groupsData = ref.watch(groupListProvider);
+    return InfiniteScrollyShell<String>(
+        header: _GroupListHeader(
+          onPopularPressed: () {
+            onItemPressed(null);
+            context.pop();
+          },
+        ),
+        getter: ref.read(groupListProvider.notifier).getter,
+        onRefresh: ref.read(groupListProvider.notifier).refresh,
+        widget: (id) => GroupCard(
+            groupId: id,
+            onPressed: (id) {
+              onItemPressed(id);
+              context.pop();
+            }),
+        list: groupsData.$1,
+        isEnd: groupsData.$2);
+  }
+}
+
+void _audianceButtonPressed(
+    BuildContext context, void Function(String?) onItemPressed) {
+  showModalBottomSheet(
+    showDragHandle: true,
+    backgroundColor: Theme.of(context).colorScheme.outlineVariant,
+    isScrollControlled: true,
+    context: context,
+    builder: (BuildContext context) {
+      return _GroupList(
+        onItemPressed: onItemPressed,
+      );
+    },
+  );
+}

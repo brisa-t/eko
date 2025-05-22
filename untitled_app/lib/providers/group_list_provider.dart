@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -9,8 +11,28 @@ part '../generated/providers/group_list_provider.g.dart';
 @riverpod
 class GroupList extends _$GroupList {
   final List<String> _timestamps = [];
+  Timer? _disposeTimer;
   @override
   (List<String>, bool) build() {
+    // keeping this alive for a little make the compose page feel better
+    // *** This block is for lifecycle management *** //
+    // Keep provider alive
+    final link = ref.keepAlive();
+    ref.onCancel(() {
+      // Start a 3-minute countdown when the last listener goes away
+      _disposeTimer = Timer(const Duration(minutes: 1), () {
+        link.close();
+      });
+    });
+    ref.onResume(() {
+      // Cancel the timer if a listener starts again
+      _disposeTimer?.cancel();
+    });
+    ref.onDispose(() {
+      // ckean up if the provider is somehow disposed
+      _disposeTimer?.cancel();
+    });
+    // ********************************************* //
     return ([], false);
   }
 
