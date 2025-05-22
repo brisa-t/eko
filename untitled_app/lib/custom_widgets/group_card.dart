@@ -14,8 +14,8 @@ Widget groupCardBuilder(String groupId) {
 
 class GroupCard extends ConsumerWidget {
   final String groupId;
-  final void Function(String)? onPressedSearched;
-  const GroupCard({super.key, required this.groupId, this.onPressedSearched});
+  final void Function(String)? onPressed;
+  const GroupCard({super.key, required this.groupId, this.onPressed});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -29,7 +29,7 @@ class GroupCard extends ConsumerWidget {
     return group.when(
         data: (group) => InkWell(
               onTap: () async {
-                if (onPressedSearched == null) {
+                if (onPressed == null) {
                   context.push('/groups/sub_group/$groupId', extra: group);
                   if (unseen) {
                     ref
@@ -41,7 +41,7 @@ class GroupCard extends ConsumerWidget {
                   }
                 } else {
                   //if in compose page
-                  onPressedSearched!(groupId);
+                  onPressed!(groupId);
                 }
               },
               child: Column(
@@ -121,7 +121,7 @@ class GroupCard extends ConsumerWidget {
                         SizedBox(
                           width: width * 0.02,
                         ),
-                        if (onPressedSearched == null)
+                        if (onPressed == null)
                           TimeStamp(
                             time: group.lastActivity,
                           ),
