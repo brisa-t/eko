@@ -8,24 +8,26 @@ part of '../../types/comment.dart';
 
 _CommentModel _$CommentModelFromJson(Map<String, dynamic> json) =>
     _CommentModel(
-      uid: json['uid'] as String,
+      uid: json['author'] as String,
       id: json['id'] as String,
       postId: json['postId'] as String,
       gifUrl: json['gifUrl'] as String?,
-      body: (json['body'] as List<dynamic>?)?.map((e) => e as String).toList(),
-      likes: (json['likes'] as num).toInt(),
-      dislikes: (json['dislikes'] as num).toInt(),
-      createdAt: json['createdAt'] as String,
+      body: json['body'] == null
+          ? const <String>[]
+          : parseTextToTags(json['body'] as String?),
+      likes: (json['likes'] as num?)?.toInt() ?? 0,
+      dislikes: (json['dislikes'] as num?)?.toInt() ?? 0,
+      createdAt: json['time'] as String,
     );
 
 Map<String, dynamic> _$CommentModelToJson(_CommentModel instance) =>
     <String, dynamic>{
-      'uid': instance.uid,
+      'author': instance.uid,
       'id': instance.id,
       'postId': instance.postId,
       'gifUrl': instance.gifUrl,
-      'body': instance.body,
+      'body': _joinList(instance.body),
       'likes': instance.likes,
       'dislikes': instance.dislikes,
-      'createdAt': instance.createdAt,
+      'time': instance.createdAt,
     };

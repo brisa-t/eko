@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:giphy_get/giphy_get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:untitled_app/custom_widgets/count_down_timer.dart';
 import 'package:untitled_app/custom_widgets/error_snack_bar.dart';
 import 'package:untitled_app/custom_widgets/warning_dialog.dart';
+import 'package:untitled_app/interfaces/post.dart';
 import 'package:untitled_app/interfaces/post_queries.dart';
 import 'package:untitled_app/interfaces/report.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
+import 'package:untitled_app/providers/nav_bar_provider.dart';
 import 'package:untitled_app/providers/post_provider.dart';
+import 'package:untitled_app/types/comment.dart';
 
 import 'package:untitled_app/widgets/loading_spinner.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
@@ -160,79 +164,61 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
   }
 
   addGifPressed() async {
-    // locator<NavBarController>().disable();
-    // GiphyGif? newGif = await GiphyGet.getGif(
-    //   context: context,
-    //   apiKey: dotenv.env['GIPHY_API_KEY']!,
-    //   lang: GiphyLanguage.english,
-    //   //randomID: "abcd", // Optional - An ID/proxy for a specific user.
-    //   tabColor: Colors.teal,
-    //   debounceTimeInMilliseconds: 350,
-    // );
-    // //only update gif a gif was selected
-    // if (newGif != null) {
-    //   gif = newGif;
-    //   postCommentPressed();
-    // }
-    // notifyListeners();
-    // locator<NavBarController>().enable();
+    ref.read(navBarProvider.notifier).disable();
+    GiphyGif? newGif = await GiphyGet.getGif(
+      context: context,
+      apiKey: dotenv.env['GIPHY_API_KEY']!,
+      lang: GiphyLanguage.english,
+      tabColor: Colors.teal,
+      debounceTimeInMilliseconds: 350,
+    );
+    //only update gif a gif was selected
+    if (newGif != null) {
+      gif = newGif;
+      postCommentPressed();
+    }
+    ref.read(navBarProvider.notifier).enable();
   }
 
   Future<void> postCommentPressed() async {
-    // if (gif == null) {
-    //   commentField.text = commentField.text.trim();
-    //   if (commentField.text.length > c.maxCommentChars) {
-    //     showSnackBar(
-    //         text: AppLocalizations.of(context)!.tooManyChar, context: context);
-    //   } else if (commentField.text == '') {
-    //     commentFieldFocus.requestFocus();
-    //     showSnackBar(
-    //         text: AppLocalizations.of(context)!.emptyFieldError,
-    //         context: context);
-    //   } else {
-    //     String comment = commentField.text;
-    //     commentField.text = '';
-    //     FocusManager.instance.primaryFocus?.unfocus();
-    //     final returnedId = await locator<PostsHandling>().createComment(
-    //         {'body': comment}, post!.postId, post!.author.uid, post!.postId);
-
-    //     final newComment = RawPostObject(
-    //       image: null,
-    //       tags: ['public'],
-    //       author: locator<CurrentUser>().getUID(),
-    //       likes: 0,
-    //       time: DateTime.now().toUtc().toIso8601String(),
-    //       body: comment,
-    //       postID: returnedId,
-    //       gifSource: null,
-    //       gifUrl: null,
-    //       title: null,
-    //       dislikes: 0,
-    //     );
-    //     data.items.add(Post.fromRaw(
-    //         newComment, AppUser.fromCurrent(locator<CurrentUser>()), 0,
-    //         rootPostId: post!.postId));
-    //   }
-    // } else {
-    //   final returnedId = await locator<PostsHandling>().createComment(
-    //       {'gifUrl': gif!.images!.fixedWidth.url, 'gifSource': gif!.url},
-    //       post!.postId,
-    //       post!.author.uid,
-    //       post!.postId);
-    //   final newComment = Post(
-    //       tags: ['public'],
-    //       author: AppUser.fromCurrent(locator<CurrentUser>()),
-    //       likes: 0,
-    //       time: DateTime.now().toUtc().toIso8601String(),
-    //       gifSource: gif!.url,
-    //       gifURL: gif!.images!.fixedWidth.url,
-    //       rootPostId: post!.postId,
-    //       postId: returnedId,
-    //       commentCount: 0,
-    //       dislikes: 0);
-    //   data.items.add(newComment);
-    //   gif = null;
-    // }
+    if (gif == null) {
+      commentField.text = commentField.text.trim();
+      if (commentField.text.length > c.maxCommentChars) {
+        showSnackBar(
+            text: AppLocalizations.of(context)!.tooManyChar, context: context);
+      } else if (commentField.text == '') {
+        commentFieldFocus.requestFocus();
+        showSnackBar(
+            text: AppLocalizations.of(context)!.emptyFieldError,
+            context: context);
+      } else {
+        String body = commentField.text;
+        commentField.text = '';
+        FocusManager.instance.primaryFocus?.unfocus();
+        final comment = CommentModel(
+          uid: ref.watch(currentUserProvider).user.uid,
+          id: '',
+          postId: widget.id,
+          createdAt: DateTime.now().toUtc().toIso8601String(),
+          body: parseTextToTags(body),
+        );
+        await uploadComment(comment);
+        // data.items.add(Post.fromRaw(
+        //     newComment, AppUser.fromCurrent(locator<CurrentUser>()), 0,
+        //     rootPostId: post!.postId));
+      }
+    } else {
+      final comment = CommentModel(
+        uid: ref.watch(currentUserProvider).user.uid,
+        id: '',
+        postId: widget.id,
+        createdAt: DateTime.now().toUtc().toIso8601String(),
+        gifUrl: gif!.images!.fixedWidth.url,
+      );
+      await uploadComment(comment);
+      // data.items.add(newComment);
+      // gif = null;
+    }
     // postMap[post!.postId]!.post.commentCount++;
   }
 
@@ -314,11 +300,8 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
                           return await commentsGetter(data, ref, widget.id);
                         },
                         widget: commentCardBuilder,
-                        header: PostCard(id: widget.id),
+                        header: PostCard(id: widget.id, isPostPage: true),
                         onRefresh: onRefresh,
-                        // initialLoadingWidget: PostLoader(
-                        //   length: 3,
-                        // ),
                       ),
                       // prov.Provider.of<PostPageController>(context,
                       //             listen: true)

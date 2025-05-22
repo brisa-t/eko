@@ -15,13 +15,16 @@ T _$identity<T>(T value) => value;
 
 /// @nodoc
 mixin _$CommentModel {
+  @JsonKey(name: 'author')
   String get uid;
   String get id;
   String get postId;
   String? get gifUrl;
-  List<String>? get body;
+  @JsonKey(fromJson: parseTextToTags, toJson: _joinList)
+  List<String> get body;
   int get likes;
   int get dislikes;
+  @JsonKey(name: 'time')
   String get createdAt;
 
   /// Create a copy of CommentModel
@@ -31,6 +34,9 @@ mixin _$CommentModel {
   $CommentModelCopyWith<CommentModel> get copyWith =>
       _$CommentModelCopyWithImpl<CommentModel>(
           this as CommentModel, _$identity);
+
+  /// Serializes this CommentModel to a JSON map.
+  Map<String, dynamic> toJson();
 
   @override
   bool operator ==(Object other) {
@@ -49,6 +55,7 @@ mixin _$CommentModel {
                 other.createdAt == createdAt));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, uid, id, postId, gifUrl,
       const DeepCollectionEquality().hash(body), likes, dislikes, createdAt);
@@ -66,14 +73,14 @@ abstract mixin class $CommentModelCopyWith<$Res> {
       _$CommentModelCopyWithImpl;
   @useResult
   $Res call(
-      {String uid,
+      {@JsonKey(name: 'author') String uid,
       String id,
       String postId,
       String? gifUrl,
-      List<String>? body,
+      @JsonKey(fromJson: parseTextToTags, toJson: _joinList) List<String> body,
       int likes,
       int dislikes,
-      String createdAt});
+      @JsonKey(name: 'time') String createdAt});
 }
 
 /// @nodoc
@@ -92,7 +99,7 @@ class _$CommentModelCopyWithImpl<$Res> implements $CommentModelCopyWith<$Res> {
     Object? id = null,
     Object? postId = null,
     Object? gifUrl = freezed,
-    Object? body = freezed,
+    Object? body = null,
     Object? likes = null,
     Object? dislikes = null,
     Object? createdAt = null,
@@ -114,10 +121,10 @@ class _$CommentModelCopyWithImpl<$Res> implements $CommentModelCopyWith<$Res> {
           ? _self.gifUrl
           : gifUrl // ignore: cast_nullable_to_non_nullable
               as String?,
-      body: freezed == body
+      body: null == body
           ? _self.body
           : body // ignore: cast_nullable_to_non_nullable
-              as List<String>?,
+              as List<String>,
       likes: null == likes
           ? _self.likes
           : likes // ignore: cast_nullable_to_non_nullable
@@ -135,22 +142,25 @@ class _$CommentModelCopyWithImpl<$Res> implements $CommentModelCopyWith<$Res> {
 }
 
 /// @nodoc
-
-@JsonSerializable(explicitToJson: true)
+@JsonSerializable()
 class _CommentModel extends CommentModel {
   const _CommentModel(
-      {required this.uid,
+      {@JsonKey(name: 'author') required this.uid,
       required this.id,
       required this.postId,
       this.gifUrl,
-      final List<String>? body,
-      required this.likes,
-      required this.dislikes,
-      required this.createdAt})
+      @JsonKey(fromJson: parseTextToTags, toJson: _joinList)
+      final List<String> body = const <String>[],
+      this.likes = 0,
+      this.dislikes = 0,
+      @JsonKey(name: 'time') required this.createdAt})
       : _body = body,
         super._();
+  factory _CommentModel.fromJson(Map<String, dynamic> json) =>
+      _$CommentModelFromJson(json);
 
   @override
+  @JsonKey(name: 'author')
   final String uid;
   @override
   final String id;
@@ -158,21 +168,23 @@ class _CommentModel extends CommentModel {
   final String postId;
   @override
   final String? gifUrl;
-  final List<String>? _body;
+  final List<String> _body;
   @override
-  List<String>? get body {
-    final value = _body;
-    if (value == null) return null;
+  @JsonKey(fromJson: parseTextToTags, toJson: _joinList)
+  List<String> get body {
     if (_body is EqualUnmodifiableListView) return _body;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(value);
+    return EqualUnmodifiableListView(_body);
   }
 
   @override
+  @JsonKey()
   final int likes;
   @override
+  @JsonKey()
   final int dislikes;
   @override
+  @JsonKey(name: 'time')
   final String createdAt;
 
   /// Create a copy of CommentModel
@@ -182,6 +194,13 @@ class _CommentModel extends CommentModel {
   @pragma('vm:prefer-inline')
   _$CommentModelCopyWith<_CommentModel> get copyWith =>
       __$CommentModelCopyWithImpl<_CommentModel>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$CommentModelToJson(
+      this,
+    );
+  }
 
   @override
   bool operator ==(Object other) {
@@ -200,6 +219,7 @@ class _CommentModel extends CommentModel {
                 other.createdAt == createdAt));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, uid, id, postId, gifUrl,
       const DeepCollectionEquality().hash(_body), likes, dislikes, createdAt);
@@ -219,14 +239,14 @@ abstract mixin class _$CommentModelCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String uid,
+      {@JsonKey(name: 'author') String uid,
       String id,
       String postId,
       String? gifUrl,
-      List<String>? body,
+      @JsonKey(fromJson: parseTextToTags, toJson: _joinList) List<String> body,
       int likes,
       int dislikes,
-      String createdAt});
+      @JsonKey(name: 'time') String createdAt});
 }
 
 /// @nodoc
@@ -246,7 +266,7 @@ class __$CommentModelCopyWithImpl<$Res>
     Object? id = null,
     Object? postId = null,
     Object? gifUrl = freezed,
-    Object? body = freezed,
+    Object? body = null,
     Object? likes = null,
     Object? dislikes = null,
     Object? createdAt = null,
@@ -268,10 +288,10 @@ class __$CommentModelCopyWithImpl<$Res>
           ? _self.gifUrl
           : gifUrl // ignore: cast_nullable_to_non_nullable
               as String?,
-      body: freezed == body
+      body: null == body
           ? _self._body
           : body // ignore: cast_nullable_to_non_nullable
-              as List<String>?,
+              as List<String>,
       likes: null == likes
           ? _self.likes
           : likes // ignore: cast_nullable_to_non_nullable

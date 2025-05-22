@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:untitled_app/types/comment.dart';
 import 'package:untitled_app/types/post.dart';
 
 Future<int> countComments(String postId) {
@@ -55,4 +56,20 @@ Future<String> uploadPost(PostModel post) async {
       .add(json)
       .then((documentSnapshot) => documentSnapshot.id);
   return postId;
+}
+
+Future<String> uploadComment(CommentModel comment) async {
+  final firestore = FirebaseFirestore.instance;
+  final json = comment.toJson();
+
+  //don't put these in firebase
+  json.remove('id');
+  json.remove('postId');
+  final commentId = await firestore
+      .collection('posts')
+      .doc(comment.postId)
+      .collection('comments')
+      .add(json)
+      .then((documentSnapshot) => documentSnapshot.id);
+  return commentId;
 }
