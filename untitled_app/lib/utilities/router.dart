@@ -199,17 +199,8 @@ final goRouter = GoRouter(
               path: '/groups',
               name: 'groups',
               pageBuilder: (context, state) {
-                //return const NoTransitionPage(child: GroupsPage());
-                bool? reload;
-                if (state.extra is bool) {
-                  reload = state.extra as bool?;
-                }
                 return NoTransitionPage(
-                  child: reload == null
-                      ? const GroupsPage()
-                      : GroupsPage(
-                          reload: reload,
-                        ),
+                  child: GroupsPage(),
                 );
               },
               routes: [
@@ -218,7 +209,7 @@ final goRouter = GoRouter(
                     name: 'sub_group',
                     builder: (context, state) {
                       String id = state.pathParameters['id']!;
-                      return SubGroupPage(group: null, id: id);
+                      return SubGroupPage(id: id);
                     },
                     routes: [
                       GoRoute(

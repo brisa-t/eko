@@ -12,16 +12,14 @@ import '../custom_widgets/post_card.dart';
 import '../utilities/constants.dart' as c;
 
 class SubGroupPage extends StatelessWidget {
-  final Group? group;
   final String id;
-  const SubGroupPage({super.key, required this.group, required this.id});
+  const SubGroupPage({super.key, required this.id});
 
   @override
   Widget build(BuildContext context) {
     final width = c.widthGetter(context);
     return prov.ChangeNotifierProvider(
-      create: (context) =>
-          SubGroupController(passedGroup: group, context: context, id: id),
+      create: (context) => SubGroupController(context: context, id: id),
       builder: (context, child) {
         return Scaffold(
           floatingActionButton: SizedBox(
