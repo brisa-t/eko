@@ -224,6 +224,18 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
     ref.read(commentPoolProvider).putAll([completeComment]);
   }
 
+  void replyPressed(String username) {
+    commentFieldFocus.requestFocus();
+    commentField.text = '@$username ';
+  }
+
+  Widget commentCardBuilder(String id) {
+    return CommentCard(
+      id: id,
+      onReply: (username) => replyPressed(username),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.sizeOf(context).height;
