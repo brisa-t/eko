@@ -295,8 +295,8 @@ class ComposeController extends ChangeNotifier {
       final bytes = await imageFile.readAsBytes();
       final img.Image? decodedImage = img.decodeImage(bytes);
       if (decodedImage == null) throw Exception('Image decode failed');
-      final ascii = ImageToAscii().convertImageToAscii(decodedImage);
-      // String? ascii = await uploadImage(File(imageFile.path));
+      // final ascii = ImageToAscii().convertImageToAscii(decodedImage);
+      String? ascii = await uploadImage(File(imageFile.path));
       image = ascii;
       gif = null;
       isPoll = false;

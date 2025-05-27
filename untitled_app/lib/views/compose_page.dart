@@ -5,7 +5,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:giphy_get/giphy_get.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 import 'package:image_to_ascii/image_to_ascii.dart';
 import 'package:untitled_app/custom_widgets/error_snack_bar.dart';
@@ -119,27 +118,18 @@ class _ComposePageState extends ConsumerState<ComposePage> {
   }
 
   Future<void> _addImagePressed() async {
-    setState(() {
-      _isLoadingImage = true;
-    });
     final ImagePicker picker = ImagePicker();
     final XFile? imageLocal =
         await picker.pickImage(source: ImageSource.gallery);
+    if (imageLocal == null) return;
 
-    if (imageLocal != null) {
-      File imageFile = File(imageLocal.path);
-      final bytes = await imageFile.readAsBytes();
-      final img.Image? decodedImage = img.decodeImage(bytes);
-      if (decodedImage == null) throw Exception('Image decode failed');
-      final ascii = ImageToAscii().convertImageToAscii(decodedImage);
-      // String? ascii = await uploadImage(File(imageFile.path));
-      setState(() {
-        image = ascii;
-        gif = null;
-        isPoll = false;
-      });
-    }
+    setState(() => _isLoadingImage = true);
+
+    final ascii = await ImageToAscii().convertImageToAscii(imageLocal.path);
     setState(() {
+      image = ascii;
+      gif = null;
+      isPoll = false;
       _isLoadingImage = false;
     });
   }
