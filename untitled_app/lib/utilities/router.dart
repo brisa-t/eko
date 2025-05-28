@@ -257,6 +257,13 @@ final goRouter = GoRouter(
                   child: ComposePage(groupId: id),
                 );
               },
+              routes: [
+                GoRoute(
+                  path: 'camera',
+                  name: 'camera',
+                  builder: (context, state) => const CameraPage(),
+                ),
+              ],
             ),
           ],
         ),
@@ -271,35 +278,30 @@ final goRouter = GoRouter(
               ),
               routes: [
                 GoRoute(
-                  path: 'camera',
-                  name: 'camera',
-                  builder: (context, state) => const CameraPage(),
+                  path: '/gif',
+                  name: 'gif',
+                  pageBuilder: (context, state) {
+                    return CustomTransitionPage(
+                      key: state.pageKey,
+                      child: GifSearchSection(),
+                      transitionsBuilder:
+                          (context, animation, secondaryAnimation, child) {
+                        const begin = Offset(0.0, 1.0);
+                        const end = Offset.zero;
+                        const curve = Curves.easeOut;
+
+                        final tween = Tween(begin: begin, end: end)
+                            .chain(CurveTween(curve: curve));
+                        final offsetAnimation = animation.drive(tween);
+
+                        return SlideTransition(
+                          position: offsetAnimation,
+                          child: child,
+                        );
+                      },
+                    );
+                  },
                 ),
-                GoRoute(
-                    path: '/gif',
-                    name: 'gif',
-                    pageBuilder: (context, state) {
-                      return CustomTransitionPage(
-                        key: state.pageKey,
-                        child: GifSearchSection(),
-                        transitionsBuilder:
-                            (context, animation, secondaryAnimation, child) {
-                          const begin = Offset(0.0, 1.0);
-                          const end = Offset.zero;
-                          const curve = Curves.easeOut;
-
-                          final tween = Tween(begin: begin, end: end)
-                              .chain(CurveTween(curve: curve));
-                          final offsetAnimation = animation.drive(tween);
-
-                          return SlideTransition(
-                            position: offsetAnimation,
-                            child: child,
-                          );
-                        },
-                      );
-                    },
-                  ),
               ],
             ),
           ],
