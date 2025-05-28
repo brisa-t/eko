@@ -5,6 +5,8 @@ import 'package:untitled_app/providers/auth_provider.dart';
 import 'package:untitled_app/providers/user_provider.dart';
 import 'package:untitled_app/types/current_user.dart';
 import 'package:untitled_app/utilities/locator.dart';
+import 'package:untitled_app/views/followers.dart';
+import 'package:untitled_app/views/following.dart';
 // Necessary for code-generation to work
 part '../generated/providers/current_user_provider.g.dart';
 
@@ -21,6 +23,29 @@ class CurrentUser extends _$CurrentUser {
     return CurrentUserModel.loading();
   }
 
+  Future<void> editProfile({String? name, String? bio}) async {
+    final prev = state.user;
+    state = state.copyWith(
+        user:
+            state.user.copyWith(name: name ?? prev.name, bio: bio ?? prev.bio));
+    try {
+      final Map<String, dynamic> json = {};
+      if (name != null) {
+        json['name'] = name;
+      }
+      if (bio != null) {
+        json['profileData.bio'] = bio;
+      }
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(state.user.uid)
+          .update(json);
+    } catch (e) {
+      state = state.copyWith(user: prev);
+    }
+  }
+
+  // LIKES //
   void addIdToLiked(String id) {
     final likes = Set<String>.from(state.likedPosts);
     likes.add(id);
@@ -44,6 +69,8 @@ class CurrentUser extends _$CurrentUser {
     dislikes.remove(id);
     state = state.copyWith(dislikedPosts: dislikes);
   }
+
+  // END LIKES //
 
   Future<void> setUnreadGroup(bool toggle) async {
     final firestore = FirebaseFirestore.instance;
