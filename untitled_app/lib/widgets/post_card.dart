@@ -224,6 +224,7 @@ class _PostCardState extends ConsumerState<PostCard> {
           isPreview: widget.isPreview,
           isPostPage: widget.isPostPage,
           isLoggedIn: isLoggedIn(),
+          showGroup: widget.showGroup,
           post: post);
     }, error: (object, stack) {
       return _Error();
@@ -320,7 +321,7 @@ class PostCardFromPost extends ConsumerWidget {
                           ],
                         ),
                         const SizedBox(height: 6.0),
-                        if (post.title?.isNotEmpty ?? false)
+                        if (post.title.isNotEmpty)
                           RichText(
                             text: TextSpan(
                               style: TextStyle(
@@ -329,7 +330,7 @@ class PostCardFromPost extends ConsumerWidget {
                                     .style
                                     .fontFamily,
                               ),
-                              children: post.title!.map((chunk) {
+                              children: post.title.map((chunk) {
                                 if (chunk.startsWith('@')) {
                                   // This is a username, create a hyperlink
                                   return TextSpan(
@@ -374,7 +375,7 @@ class PostCardFromPost extends ConsumerWidget {
                             post.imageString != null ||
                             post.isPoll)
                           const SizedBox(height: 6.0),
-                        if (post.body?.isNotEmpty ?? false)
+                        if (post.body.isNotEmpty)
                           RichText(
                             text: TextSpan(
                               style: TextStyle(
@@ -382,7 +383,7 @@ class PostCardFromPost extends ConsumerWidget {
                                     .style
                                     .fontFamily,
                               ),
-                              children: post.body!.map((chunk) {
+                              children: post.body.map((chunk) {
                                 if (chunk.startsWith('@')) {
                                   // This is a username, create a hyperlink
                                   return TextSpan(
