@@ -560,4 +560,13 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get birthdayExplanation =>
       'We use this to ensure you are old enough to use the app.';
+
+  @override
+  String get noImageSelected => 'No image selected';
+
+  @override
+  String get changeImage => 'Change Image';
+
+  @override
+  String get pickImage => 'Pick Image';
 }

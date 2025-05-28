@@ -30,8 +30,8 @@ class _CameraPageState extends State<CameraPage> {
     });
 
     // Convert to ASCII
-    final ascii = await ImageToAscii()
-        .convertImageToAscii(imageLocal.path, darkMode: true);
+    //FIXME update ascii_to_image first
+    final ascii = await ImageToAscii().convertImageToAscii(imageLocal.path);
 
     setState(() {
       asciiImage = ascii;
