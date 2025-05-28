@@ -36,6 +36,7 @@ import 'package:untitled_app/views/auth_action_interface.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:untitled_app/views/view_likes_page.dart';
 import 'package:untitled_app/views/update_required_page.dart';
+import 'package:untitled_app/widgets/gifs.dart';
 import 'package:untitled_app/widgets/require_auth.dart';
 import 'package:untitled_app/widgets/require_no_auth.dart';
 
@@ -256,13 +257,6 @@ final goRouter = GoRouter(
                   child: ComposePage(groupId: id),
                 );
               },
-              routes: [
-                GoRoute(
-                  path: 'camera',
-                  name: 'camera',
-                  builder: (context, state) => const CameraPage(),
-                ),
-              ],
             ),
           ],
         ),
@@ -275,6 +269,38 @@ final goRouter = GoRouter(
               pageBuilder: (context, state) => const NoTransitionPage(
                 child: SearchPage(),
               ),
+              routes: [
+                GoRoute(
+                  path: 'camera',
+                  name: 'camera',
+                  builder: (context, state) => const CameraPage(),
+                ),
+                GoRoute(
+                    path: '/gif',
+                    name: 'gif',
+                    pageBuilder: (context, state) {
+                      return CustomTransitionPage(
+                        key: state.pageKey,
+                        child: GifSearchSection(),
+                        transitionsBuilder:
+                            (context, animation, secondaryAnimation, child) {
+                          const begin = Offset(0.0, 1.0);
+                          const end = Offset.zero;
+                          const curve = Curves.easeOut;
+
+                          final tween = Tween(begin: begin, end: end)
+                              .chain(CurveTween(curve: curve));
+                          final offsetAnimation = animation.drive(tween);
+
+                          return SlideTransition(
+                            position: offsetAnimation,
+                            child: child,
+                          );
+                        },
+                      );
+                    },
+                  ),
+              ],
             ),
           ],
         ),

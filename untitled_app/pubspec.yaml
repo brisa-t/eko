@@ -58,7 +58,7 @@ dependencies:
   go_router: ^15.1.2
   shimmer: ^3.0.0
   collection: ^1.17.1
-  shared_preferences: ^2.2.0
+  shared_preferences: ^2.5.3
   eraser: ^3.0.0
   firebase_messaging: ^15.2.5
   extended_image: ^8.2.0
@@ -86,6 +86,7 @@ dependencies:
       url: https://github.com/ericbreh/image_to_ascii.git
       ref: 9fd7d35789167cb8ef6828325ae212744ef10b2b
   image: ^3.3.0
+  flutter_staggered_grid_view: ^0.7.0
 
 dev_dependencies:
   # flutter_test:
