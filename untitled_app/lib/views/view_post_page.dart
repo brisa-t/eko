@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:giphy_get/giphy_get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:untitled_app/custom_widgets/count_down_timer.dart';
 import 'package:untitled_app/custom_widgets/error_snack_bar.dart';
@@ -34,7 +33,7 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
   bool isAtSymbolTyped = false;
   FocusNode commentFieldFocus = FocusNode();
   final TextEditingController commentField = TextEditingController();
-  GiphyGif? gif;
+  String? gif;
   final reportFocus = FocusNode();
   final reportController = TextEditingController();
 
@@ -165,20 +164,11 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
   }
 
   addGifPressed() async {
-    ref.read(navBarProvider.notifier).disable();
-    GiphyGif? newGif = await GiphyGet.getGif(
-      context: context,
-      apiKey: dotenv.env['GIPHY_API_KEY']!,
-      lang: GiphyLanguage.english,
-      tabColor: Colors.teal,
-      debounceTimeInMilliseconds: 350,
-    );
-    //only update gif a gif was selected
-    if (newGif != null) {
-      gif = newGif;
+    String? url = await context.pushNamed('gif');
+    if (url != null) {
+      gif = url;
       postCommentPressed();
     }
-    ref.read(navBarProvider.notifier).enable();
   }
 
   Future<void> postCommentPressed() async {
@@ -214,7 +204,7 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
         id: '',
         postId: widget.id,
         createdAt: DateTime.now().toUtc().toIso8601String(),
-        gifUrl: gif!.images!.fixedWidth.url,
+        gifUrl: gif,
       );
       gif = null;
     }
