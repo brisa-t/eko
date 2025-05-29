@@ -259,24 +259,10 @@ final goRouter = GoRouter(
               },
               routes: [
                 GoRoute(
-                  path: 'camera',
+                  path: '/camera',
                   name: 'camera',
                   builder: (context, state) => const CameraPage(),
                 ),
-              ],
-            ),
-          ],
-        ),
-        StatefulShellBranch(
-          navigatorKey: _shellNavigatorSearchKey,
-          routes: [
-            GoRoute(
-              path: '/search',
-              name: 'search',
-              pageBuilder: (context, state) => const NoTransitionPage(
-                child: SearchPage(),
-              ),
-              routes: [
                 GoRoute(
                   path: '/gif',
                   name: 'gif',
@@ -303,6 +289,18 @@ final goRouter = GoRouter(
                   },
                 ),
               ],
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          navigatorKey: _shellNavigatorSearchKey,
+          routes: [
+            GoRoute(
+              path: '/search',
+              name: 'search',
+              pageBuilder: (context, state) => const NoTransitionPage(
+                child: SearchPage(),
+              ),
             ),
           ],
         ),

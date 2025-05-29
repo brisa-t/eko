@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:giphy_get/giphy_get.dart';
 import 'package:untitled_app/custom_widgets/warning_dialog.dart';
 import 'package:untitled_app/models/current_user.dart';
 import 'package:untitled_app/models/group_handler.dart';
@@ -33,7 +32,7 @@ class PostPageController extends ChangeNotifier {
   bool postNotFound = false;
   List<AppUser> hits = [];
   Timer? _debounce;
-  GiphyGif? gif;
+  String? gif;
   final reportFocus = FocusNode();
   final reportController = TextEditingController();
 
@@ -155,8 +154,7 @@ class PostPageController extends ChangeNotifier {
     //notifyListeners();j
   }
 
-  void reduceComments() {
-  }
+  void reduceComments() {}
 
   void _deletePostFromDialog() {
     _pop();
@@ -393,7 +391,7 @@ class PostPageController extends ChangeNotifier {
       }
     } else {
       final returnedId = await locator<PostsHandling>().createComment(
-          {'gifUrl': gif!.images!.fixedWidth.url, 'gifSource': gif!.url},
+          {'gifUrl': gif, 'gifSource': gif},
           post!.postId,
           post!.author.uid,
           post!.postId);
@@ -402,8 +400,8 @@ class PostPageController extends ChangeNotifier {
           author: AppUser.fromCurrent(locator<CurrentUser>()),
           likes: 0,
           time: DateTime.now().toUtc().toIso8601String(),
-          gifSource: gif!.url,
-          gifURL: gif!.images!.fixedWidth.url,
+          gifSource: gif,
+          gifURL: gif,
           rootPostId: post!.postId,
           postId: returnedId,
           commentCount: 0,
@@ -426,19 +424,7 @@ class PostPageController extends ChangeNotifier {
 
   addGifPressed() async {
     // locator<NavBarController>().disable();
-    GiphyGif? newGif = await GiphyGet.getGif(
-      context: context,
-      apiKey: dotenv.env['GIPHY_API_KEY']!,
-      lang: GiphyLanguage.english,
-      //randomID: "abcd", // Optional - An ID/proxy for a specific user.
-      tabColor: Colors.teal,
-      debounceTimeInMilliseconds: 350,
-    );
     //only update gif a gif was selected
-    if (newGif != null) {
-      gif = newGif;
-      postCommentPressed();
-    }
     notifyListeners();
     // locator<NavBarController>().enable();
   }
