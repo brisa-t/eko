@@ -226,12 +226,10 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
         .addToBack(completeComment);
     ref.read(commentPoolProvider).putAll([completeComment]);
 
-    // Get the current post and create an updated version with incremented comment count
+    // Increment comment count
     final post = ref.read(postProvider(widget.id)).value;
     if (post != null) {
       final updatedPost = post.copyWith(commentCount: post.commentCount + 1);
-
-      // Update the post in the post pool
       ref.read(postPoolProvider).putAll([updatedPost]);
     }
 
@@ -331,7 +329,8 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
             body: Column(
               children: [
                 Expanded(
-                  child: IndexedStack(
+                  child: 
+                  IndexedStack(
                     index: isAtSymbolTyped ? 1 : 0,
                     children: [
                       InfiniteScrollyShell<String>(
