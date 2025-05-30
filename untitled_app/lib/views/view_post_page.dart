@@ -37,6 +37,13 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
   String? gif;
   final reportFocus = FocusNode();
   final reportController = TextEditingController();
+  final ScrollController commentsScrollController = ScrollController();
+
+  @override
+  void dispose() {
+    commentsScrollController.dispose();
+    super.dispose();
+  }
 
   void _popDialog() {
     Navigator.of(context, rootNavigator: true).pop();
@@ -212,10 +219,29 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
 
     final id = await uploadComment(comment, ref);
     final completeComment = comment.copyWith(id: id);
+
+    // Add comment to the comment list
     ref
         .read(commentListProvider(widget.id).notifier)
         .addToBack(completeComment);
     ref.read(commentPoolProvider).putAll([completeComment]);
+
+    // Get the current post and create an updated version with incremented comment count
+    final post = ref.read(postProvider(widget.id)).value;
+    if (post != null) {
+      final updatedPost = post.copyWith(commentCount: post.commentCount + 1);
+
+      // Update the post in the post pool
+      ref.read(postPoolProvider).putAll([updatedPost]);
+    }
+
+    if (commentsScrollController.hasClients) {
+      commentsScrollController.animateTo(
+        commentsScrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
   }
 
   void replyPressed(String username) {
@@ -317,6 +343,8 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
                             .getter(widget.id),
                         onRefresh: onRefresh,
                         widget: commentCardBuilder,
+                        // Add the controller here
+                        controller: commentsScrollController,
                       ),
                       // prov.Provider.of<PostPageController>(context,
                       //             listen: true)
