@@ -10,9 +10,9 @@ import 'package:provider/provider.dart' as prov;
 import '../custom_widgets/profile_avatar.dart';
 import '../utilities/constants.dart' as c;
 
-Widget searchPageBuilder(dynamic uid) {
+Widget searchPageBuilder(String uid) {
   return UserCard(
-    uid: uid.uid,
+    uid: uid,
   );
 }
 

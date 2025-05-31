@@ -43,7 +43,7 @@ class InfiniteScrolly<K, V> extends StatefulWidget {
   final Future<void> Function()? onRefresh;
 
   /// Optional SliverAppBar to display at the top of the scroll view.
-  final SliverAppBar? appBar;
+  final Widget? appBar;
 
   /// Optional widget displayed above the list (but below the app bar).
   final Widget? header;
@@ -136,7 +136,7 @@ class InfiniteScrollyShell<T> extends StatefulWidget {
   final Future<void> Function()? onRefresh;
 
   /// Optional SliverAppBar to display at the top of the scroll view.
-  final SliverAppBar? appBar;
+  final Widget? appBar;
 
   /// Optional widget displayed above the list (but below the app bar).
   final Widget? header;
@@ -264,6 +264,10 @@ class _InfiniteScrollyShell<T> extends State<InfiniteScrollyShell<T>> {
                       ),
                     );
               }),
+          const SliverFillRemaining(
+            hasScrollBody: false,
+            child: SizedBox(),
+          ),
         ],
       ),
     );
