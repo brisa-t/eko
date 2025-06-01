@@ -2,10 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:provider/provider.dart' as prov;
-import 'package:untitled_app/custom_widgets/pagination.dart';
-import 'package:untitled_app/custom_widgets/shimmer_loaders.dart'
-    show SearchLoader;
 import 'package:untitled_app/interfaces/search.dart';
 import 'package:untitled_app/widgets/infinite_scrolly.dart';
 import '../custom_widgets/searched_user_card.dart';
@@ -120,46 +116,33 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.sizeOf(context).height;
-
     return GestureDetector(
-          onPanDown: (details) => FocusManager.instance.primaryFocus?.unfocus(),
-          onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-          child: Scaffold(
-            body: ValueListenableBuilder(
-              valueListenable: controller,
-              child: _SearchBar(controller: controller),
-              builder: (context, value, child) => InfiniteScrollyShell<String>(
-                onRefresh: () async {
-                  if (debounce?.isActive ?? false) debounce!.cancel();
-                  final res =
-                      await SearchInterface.getter([], ref, controller.text);
-                  setState(() {
-                    data = res.$1;
-                    isEnd = res.$2;
-                  });
-                },
-                list: data.map((item) => item.key).toList(),
-                isEnd: isEnd,
-                getter: () async {
-                  final res =
-                      await SearchInterface.getter(data, ref, controller.text);
-                  setState(() {
-                    data.addAll(res.$1);
-                    isEnd = res.$2;
-                  });
-                },
-                widget: searchPageBuilder,
-                appBar: SliverPersistentHeader(
-                  floating: true,
-                  delegate: FloatingSearchBar(
-                    child: child ?? SizedBox(),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-
+      onPanDown: (details) => FocusManager.instance.primaryFocus?.unfocus(),
+      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+      child: Scaffold(
+        body: InfiniteScrollyShell<String>(
+          onRefresh: () async {
+            if (debounce?.isActive ?? false) debounce!.cancel();
+            final res = await SearchInterface.getter([], ref, controller.text);
+            setState(() {
+              data = res.$1;
+              isEnd = res.$2;
+            });
+          },
+          list: data.map((item) => item.key).toList(),
+          isEnd: isEnd,
+          getter: () async {
+            final res =
+                await SearchInterface.getter(data, ref, controller.text);
+            setState(() {
+              data.addAll(res.$1);
+              isEnd = res.$2;
+            });
+          },
+          widget: searchPageBuilder,
+          header: _SearchBar(controller: controller),
+        ),
+      ),
+    );
   }
 }
