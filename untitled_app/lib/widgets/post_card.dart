@@ -15,7 +15,7 @@ import 'package:untitled_app/providers/post_provider.dart';
 import 'package:untitled_app/types/post.dart';
 import 'package:untitled_app/widgets/divider.dart';
 import 'package:untitled_app/widgets/like_buttons.dart';
-import 'package:untitled_app/widgets/post_loader.dart';
+import 'package:untitled_app/widgets/shimmer_loaders.dart';
 import 'package:untitled_app/widgets/profile_picture.dart';
 import 'package:untitled_app/widgets/time_stamp.dart';
 import 'package:untitled_app/widgets/user_tag.dart';

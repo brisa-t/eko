@@ -95,7 +95,7 @@ class FollowingFeed extends _$FollowingFeed {
         newList.add(post.id);
       }
     }
-    state = (newList, true);
+    state = (newList, false);
   }
 
   void insertAtIndex(int index, PostModel post) {

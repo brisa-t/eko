@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:untitled_app/interfaces/search.dart';
 import 'package:untitled_app/widgets/infinite_scrolly.dart';
-import '../custom_widgets/searched_user_card.dart';
+import 'package:untitled_app/widgets/shimmer_loaders.dart';
+import '../widgets/searched_user_card.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import '../utilities/constants.dart' as c;
 
@@ -139,6 +140,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               isEnd = res.$2;
             });
           },
+          initialLoadingWidget: UserLoader(
+            length: 12,
+          ),
           widget: searchPageBuilder,
           header: _SearchBar(controller: controller),
         ),

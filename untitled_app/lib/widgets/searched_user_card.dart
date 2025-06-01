@@ -7,6 +7,7 @@ import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/providers/user_provider.dart';
 import 'package:untitled_app/types/user.dart';
 import 'package:provider/provider.dart' as prov;
+import 'package:untitled_app/widgets/shimmer_loaders.dart';
 import '../custom_widgets/profile_avatar.dart';
 import '../utilities/constants.dart' as c;
 
@@ -46,19 +47,11 @@ class UserCard extends ConsumerStatefulWidget {
 }
 
 class _UserCardState extends ConsumerState<UserCard> {
-  late UserModel? loadedUser;
-  bool isFollowing = false;
   late bool added;
 
   @override
   void initState() {
     super.initState();
-    final user = ref.read(userProvider(widget.uid)).maybeWhen(
-          data: (u) => u,
-          orElse: () => null,
-        );
-
-    loadedUser = user;
     if (widget.groupSearch) {
       added = widget.adder != null ? widget.initialBool ?? false : false;
     }
@@ -237,7 +230,7 @@ class _UserCardState extends ConsumerState<UserCard> {
         );
       },
       error: (err, _) => Text('Oops $err'),
-      loading: () => const CircularProgressIndicator(),
+      loading: () => const UserLoader(),
     );
   }
 }

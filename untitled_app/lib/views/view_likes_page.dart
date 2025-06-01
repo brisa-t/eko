@@ -4,7 +4,7 @@ import 'package:untitled_app/controllers/view_likes_page_controller.dart';
 import 'package:untitled_app/custom_widgets/pagination.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:go_router/go_router.dart';
-import '../custom_widgets/searched_user_card.dart';
+import '../widgets/searched_user_card.dart';
 
 class ViewLikesPage extends StatelessWidget {
   final String postId;
