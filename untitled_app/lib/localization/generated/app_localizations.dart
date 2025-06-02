@@ -398,13 +398,13 @@ abstract class AppLocalizations {
   /// No description provided for @likes.
   ///
   /// In en, this message translates to:
-  /// **'Likes'**
+  /// **'Up-Ekos'**
   String get likes;
 
   /// No description provided for @dislikes.
   ///
   /// In en, this message translates to:
-  /// **'Dislikes'**
+  /// **'Down-Ekos'**
   String get dislikes;
 
   /// No description provided for @like.
@@ -884,13 +884,13 @@ abstract class AppLocalizations {
   /// No description provided for @viewLikes.
   ///
   /// In en, this message translates to:
-  /// **'See Likes'**
+  /// **'See Up-Ekos'**
   String get viewLikes;
 
   /// No description provided for @viewDislikes.
   ///
   /// In en, this message translates to:
-  /// **'See Dislikes'**
+  /// **'See Down-Ekos'**
   String get viewDislikes;
 
   /// No description provided for @updateRequiredTitle.
