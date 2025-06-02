@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:untitled_app/controllers/blocked_users_page_controller.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
+import 'package:untitled_app/providers/online_provider.dart';
 import 'package:untitled_app/providers/user_provider.dart';
 import 'package:untitled_app/types/user.dart';
 import 'package:provider/provider.dart' as prov;
@@ -101,6 +102,7 @@ class _UserCardState extends ConsumerState<UserCard> {
     final height = MediaQuery.sizeOf(context).height;
     final userAsync = ref.watch(userProvider(widget.uid));
     final currentUser = ref.read(currentUserProvider);
+    final online = ref.watch(onlineProvider(widget.uid));
 
     return userAsync.when(
       data: (user) {
@@ -127,7 +129,10 @@ class _UserCardState extends ConsumerState<UserCard> {
                 Row(
                   children: [
                     ProfileAvatar(
-                        url: user.profilePicture, size: width * 0.115),
+                      url: user.profilePicture,
+                      size: width * 0.115,
+                      online: online.online,
+                    ),
                     Padding(
                       padding: EdgeInsets.all(width * 0.02),
                       child: SizedBox(
