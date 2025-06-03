@@ -46,21 +46,17 @@ class _ComposePageState extends ConsumerState<ComposePage> {
   String? partialTag;
 
   @override
-  void initState() {
-    super.initState();
-    audiance = widget.groupId;
-    // bodyController.addListener(_onBodyChanged);
-    // titleController.addListener(_setState);
-    // titleFocus.addListener(_setState);
-    // bodyFocus.addListener(_setState);
+  void didUpdateWidget(covariant ComposePage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.groupId != widget.groupId) {
+      setState(() {
+        audiance = widget.groupId;
+      });
+    }
   }
 
   @override
   void dispose() {
-    // bodyController.removeListener(_onBodyChanged);
-    // titleController.removeListener(_setState);
-    // titleFocus.removeListener(_setState);
-    // bodyFocus.removeListener(_setState);
     scrollController.dispose();
     titleController.dispose();
     bodyController.dispose();
@@ -259,7 +255,6 @@ class _ComposePageState extends ConsumerState<ComposePage> {
   Widget build(BuildContext context) {
     final width = c.widthGetter(context);
     final height = MediaQuery.sizeOf(context).height;
-
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
