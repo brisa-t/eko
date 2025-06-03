@@ -15,7 +15,6 @@ import 'package:untitled_app/types/comment.dart';
 import 'package:untitled_app/widgets/loading_spinner.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/widgets/post_card.dart';
-import 'package:untitled_app/widgets/shimmer_loaders.dart';
 import 'package:untitled_app/widgets/tag_search.dart';
 import '../utilities/constants.dart' as c;
 import '../widgets/comment_card.dart';
