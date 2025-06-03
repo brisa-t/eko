@@ -576,12 +576,10 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                         builder: (context, _) {
                           final text = searchText(bodyController);
                           if (text != null && bodyFocus.hasFocus) {
-                            Future.delayed(
-                              Duration(milliseconds: 0),
-                              () => scrollController.jumpTo(
+                            WidgetsBinding.instance.addPostFrameCallback(
+                              (_) => scrollController.jumpTo(
                                   scrollController.position.maxScrollExtent),
                             );
-
                             return TagSearch(
                               onCardTap: (username) =>
                                   onCardTap(username, bodyController),

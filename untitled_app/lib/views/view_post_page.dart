@@ -40,6 +40,9 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
   @override
   void dispose() {
     commentsScrollController.dispose();
+    commentFieldFocus.dispose();
+    commentField.dispose();
+    reportController.dispose();
     super.dispose();
   }
 
@@ -194,10 +197,10 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
     final completeComment = comment.copyWith(id: id);
 
     // Add comment to the comment list
+    ref.read(commentPoolProvider).putAll([completeComment]);
     ref
         .read(commentListProvider(widget.id).notifier)
         .addToBack(completeComment);
-    ref.read(commentPoolProvider).putAll([completeComment]);
 
     // Increment comment count
     final post = ref.read(postProvider(widget.id)).value;
@@ -206,13 +209,15 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
       ref.read(postPoolProvider).putAll([updatedPost]);
     }
 
-    if (commentsScrollController.hasClients) {
-      commentsScrollController.animateTo(
-        commentsScrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (commentsScrollController.hasClients) {
+        commentsScrollController.animateTo(
+          commentsScrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 
   void replyPressed(String username) {
