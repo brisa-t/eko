@@ -507,7 +507,7 @@ class _PostCardState extends State<PostCard> {
                                           style: TextStyle(
                                               color: Theme.of(context)
                                                   .colorScheme
-                                                  .surfaceTint),
+                                                  .error),
                                           recognizer: TapGestureRecognizer()
                                             ..onTap = () {
                                               if (!widget.isPreview) {

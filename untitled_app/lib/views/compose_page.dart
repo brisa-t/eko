@@ -20,6 +20,7 @@ import 'package:untitled_app/widgets/infinite_scrolly.dart';
 import 'package:untitled_app/widgets/poll_creator.dart';
 import 'package:untitled_app/widgets/post_card.dart';
 import 'package:untitled_app/widgets/profile_picture.dart';
+import 'package:untitled_app/widgets/tag_search.dart';
 import '../utilities/constants.dart' as c;
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 
@@ -32,7 +33,6 @@ class ComposePage extends ConsumerStatefulWidget {
 
 class _ComposePageState extends ConsumerState<ComposePage> {
   final _key = GlobalKey<ExpandableFabState>();
-  bool _isLoadingImage = false;
   String? audiance;
   String? gif;
   String? image;
@@ -40,31 +40,30 @@ class _ComposePageState extends ConsumerState<ComposePage> {
   List<String> pollOptions = ['', ''];
   final titleController = TextEditingController();
   final bodyController = TextEditingController();
+  final scrollController = ScrollController();
   final bodyFocus = FocusNode();
   final titleFocus = FocusNode();
   int bodyNewLines = 0;
   bool isPosting = false;
-
-  void _setState() {
-    setState(() {});
-  }
+  String? partialTag;
 
   @override
   void initState() {
     super.initState();
     audiance = widget.groupId;
-    bodyController.addListener(_onBodyChanged);
-    titleController.addListener(_setState);
-    titleFocus.addListener(_setState);
-    bodyFocus.addListener(_setState);
+    // bodyController.addListener(_onBodyChanged);
+    // titleController.addListener(_setState);
+    // titleFocus.addListener(_setState);
+    // bodyFocus.addListener(_setState);
   }
 
   @override
   void dispose() {
-    bodyController.removeListener(_onBodyChanged);
-    titleController.removeListener(_setState);
-    titleFocus.removeListener(_setState);
-    bodyFocus.removeListener(_setState);
+    // bodyController.removeListener(_onBodyChanged);
+    // titleController.removeListener(_setState);
+    // titleFocus.removeListener(_setState);
+    // bodyFocus.removeListener(_setState);
+    scrollController.dispose();
     titleController.dispose();
     bodyController.dispose();
     titleFocus.dispose();
@@ -80,13 +79,6 @@ class _ComposePageState extends ConsumerState<ComposePage> {
       }
     }
     return count;
-  }
-
-  void _onBodyChanged() {
-    final count = _countNewLines(bodyController.text.trim());
-    setState(() {
-      bodyNewLines = count;
-    });
   }
 
   void _addGifPressed() async {
@@ -381,103 +373,99 @@ class _ComposePageState extends ConsumerState<ComposePage> {
           ),
           backgroundColor: Theme.of(context).colorScheme.surface,
         ),
-        body: IndexedStack(
-          index: 0,
-          // !prov.Provider.of<ComposeController>(context, listen: false)
-          //         .isAtSymbolTyped
-          //     ? 0
-          //     : 1,
-          children: [
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: width * 0.04),
-              child: ListView(
-                keyboardDismissBehavior:
-                    ScrollViewKeyboardDismissBehavior.onDrag,
+        body: Padding(
+          padding: EdgeInsets.symmetric(horizontal: width * 0.04),
+          child: ListView(
+            controller: scrollController,
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            children: [
+              SizedBox(height: height * 0.01),
+              Row(
                 children: [
-                  SizedBox(height: height * 0.01),
-                  Row(
-                    children: [
-                      ProfilePicture(
-                          uid: ref.watch(currentUserProvider).user.uid,
-                          size: width * 0.115),
-                      const SizedBox(width: 9),
-                      OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          backgroundColor:
-                              Theme.of(context).colorScheme.outline,
-                          side: BorderSide(
-                            width: 0.5,
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
-                            style: BorderStyle.solid,
-                          ),
-                        ),
-                        onPressed: () => _audianceButtonPressed(
-                            context,
-                            (id) => setState(() {
-                                  audiance = id;
-                                })),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            _AudianceText(id: audiance),
-                            Icon(Icons.expand_more_rounded,
-                                color: Theme.of(context).colorScheme.onSurface),
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                  SizedBox(height: height * 0.01),
-                  // ConstrainedBox(
-                  //   constraints: BoxConstraints(maxHeight: height * 0.5),
-                  //   child:
-                  TextField(
-                    textCapitalization: TextCapitalization.sentences,
-                    focusNode: titleFocus,
-                    controller: titleController,
-                    maxLines: null,
-                    cursorColor: Theme.of(context).colorScheme.onSurface,
-                    keyboardType: TextInputType.text,
-                    style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.onSurface),
-                    decoration: InputDecoration(
-                      contentPadding: EdgeInsets.all(height * 0.01),
-                      hintText: AppLocalizations.of(context)!.postTitle,
-                      hintStyle: TextStyle(
-                          fontSize: 22,
-                          color:
-                              Theme.of(context).colorScheme.onSurfaceVariant),
-                      border: InputBorder.none,
+                  ProfilePicture(
+                      uid: ref.watch(currentUserProvider).user.uid,
+                      size: width * 0.115),
+                  const SizedBox(width: 9),
+                  OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.outline,
+                      side: BorderSide(
+                        width: 0.5,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        style: BorderStyle.solid,
+                      ),
                     ),
-                    // ),
-                  ),
-                  (titleFocus.hasPrimaryFocus &&
-                          titleController.text.isNotEmpty)
-                      ? Text(
-                          '${titleController.text.length}/${c.maxTitleChars} ${AppLocalizations.of(context)!.characters}')
-                      : Container(),
-                  if (gif != null || image != null || isPoll || _isLoadingImage)
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Stack(
-                        alignment: Alignment.topRight,
-                        children: [
-                          Container(
-                            alignment: Alignment.center,
-                            padding: EdgeInsets.symmetric(
-                                vertical: height * 0.025,
-                                horizontal: height * 0.025),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: _isLoadingImage
-                                  ? SizedBox(
-                                      child: Padding(
-                                          padding: EdgeInsets.all(10),
-                                          child: CircularProgressIndicator()))
-                                  : isPoll
+                    onPressed: () => _audianceButtonPressed(
+                        context,
+                        (id) => setState(() {
+                              audiance = id;
+                            })),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _AudianceText(id: audiance),
+                        Icon(Icons.expand_more_rounded,
+                            color: Theme.of(context).colorScheme.onSurface),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+              SizedBox(height: height * 0.01),
+              // ConstrainedBox(
+              //   constraints: BoxConstraints(maxHeight: height * 0.5),
+              //   child:
+              TextField(
+                textCapitalization: TextCapitalization.sentences,
+                focusNode: titleFocus,
+                controller: titleController,
+                maxLines: null,
+                cursorColor: Theme.of(context).colorScheme.onSurface,
+                keyboardType: TextInputType.text,
+                style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurface),
+                decoration: InputDecoration(
+                  contentPadding: EdgeInsets.all(height * 0.01),
+                  hintText: AppLocalizations.of(context)!.postTitle,
+                  hintStyle: TextStyle(
+                      fontSize: 22,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant),
+                  border: InputBorder.none,
+                ),
+                // ),
+              ),
+              Stack(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      AnimatedBuilder(
+                          animation:
+                              Listenable.merge([titleController, titleFocus]),
+                          builder: (context, _) {
+                            if (titleFocus.hasPrimaryFocus &&
+                                titleController.text.isNotEmpty) {
+                              return Text(
+                                  '${titleController.text.length}/${c.maxTitleChars} ${AppLocalizations.of(context)!.characters}');
+                            }
+                            return SizedBox();
+                          }),
+                      if (gif != null || image != null || isPoll)
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Stack(
+                            alignment: Alignment.topRight,
+                            children: [
+                              Container(
+                                alignment: Alignment.center,
+                                padding: EdgeInsets.symmetric(
+                                    vertical: height * 0.025,
+                                    horizontal: height * 0.025),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: isPoll
                                       ? PollCreator(
                                           height: height,
                                           width: width,
@@ -517,67 +505,116 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                                                 );
                                               },
                                             ),
-                            ),
-                          ),
-                          IconButton(
-                            iconSize: image != null && _isLoadingImage == false
-                                ? 150
-                                : 30,
-                            onPressed: () => _removeMedia(),
-                            icon: DecoratedBox(
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Theme.of(context).colorScheme.surface),
-                              child: Icon(
-                                Icons.cancel,
-                                color: Theme.of(context).colorScheme.onSurface,
+                                ),
                               ),
-                            ),
-                          )
-                        ],
+                              IconButton(
+                                iconSize: image != null ? 150 : 30,
+                                onPressed: () => _removeMedia(),
+                                icon: DecoratedBox(
+                                  decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .surface),
+                                  child: Icon(
+                                    Icons.cancel,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ConstrainedBox(
+                        constraints: BoxConstraints(),
+                        child: TextField(
+                          textCapitalization: TextCapitalization.sentences,
+                          focusNode: bodyFocus,
+                          controller: bodyController,
+                          maxLines: null,
+                          cursorColor: Theme.of(context).colorScheme.onSurface,
+                          keyboardType: TextInputType.multiline,
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.normal,
+                              color: Theme.of(context).colorScheme.onSurface),
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.all(height * 0.01),
+                            hintText: AppLocalizations.of(context)!.addText,
+                            hintStyle: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.normal,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant),
+                            border: InputBorder.none,
+                          ),
+                        ),
                       ),
-                    ),
-                  ConstrainedBox(
-                    constraints: BoxConstraints(),
-                    child: TextField(
-                      textCapitalization: TextCapitalization.sentences,
-                      focusNode: bodyFocus,
-                      controller: bodyController,
-                      maxLines: null,
-                      cursorColor: Theme.of(context).colorScheme.onSurface,
-                      keyboardType: TextInputType.multiline,
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.normal,
-                          color: Theme.of(context).colorScheme.onSurface),
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.all(height * 0.01),
-                        hintText: AppLocalizations.of(context)!.addText,
-                        hintStyle: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.normal,
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant),
-                        border: InputBorder.none,
+                      AnimatedBuilder(
+                        animation:
+                            Listenable.merge([bodyController, bodyFocus]),
+                        builder: (context, _) {
+                          if (bodyFocus.hasPrimaryFocus &&
+                              bodyController.text.isNotEmpty) {
+                            return Row(
+                              children: [
+                                Text(
+                                    '${bodyController.text.length}/${c.maxPostChars} ${AppLocalizations.of(context)!.characters}'),
+                                const Spacer(),
+                                if (bodyNewLines != 0 || true)
+                                  Text(
+                                      '${_countNewLines(bodyController.text.trim())}/${c.maxPostLines} ${AppLocalizations.of(context)!.newLines}'),
+                              ],
+                            );
+                          }
+                          return SizedBox();
+                        },
                       ),
-                    ),
+                      AnimatedBuilder(
+                        animation:
+                            Listenable.merge([bodyController, bodyFocus]),
+                        builder: (context, _) {
+                          final text = searchText(bodyController);
+                          if (text != null && bodyFocus.hasFocus) {
+                            Future.delayed(
+                              Duration(milliseconds: 0),
+                              () => scrollController.jumpTo(
+                                  scrollController.position.maxScrollExtent),
+                            );
+
+                            return TagSearch(
+                              onCardTap: (username) =>
+                                  onCardTap(username, bodyController),
+                              searchText: text,
+                              height: MediaQuery.sizeOf(context).height * 0.4,
+                            );
+                          }
+                          return SizedBox();
+                        },
+                      ),
+                    ],
                   ),
-                  (bodyFocus.hasPrimaryFocus && bodyController.text.isNotEmpty)
-                      ? Row(
-                          children: [
-                            Text(
-                                '${bodyController.text.length}/${c.maxPostChars} ${AppLocalizations.of(context)!.characters}'),
-                            const Spacer(),
-                            if (bodyNewLines != 0 || true)
-                              Text(
-                                  '$bodyNewLines/${c.maxPostLines} ${AppLocalizations.of(context)!.newLines}'),
-                          ],
-                        )
-                      : Container(),
+                  AnimatedBuilder(
+                    animation: Listenable.merge([titleController, titleFocus]),
+                    builder: (context, _) {
+                      final text = searchText(titleController);
+                      if (text != null && titleFocus.hasFocus) {
+                        return TagSearch(
+                          onCardTap: (username) =>
+                              onCardTap(username, titleController),
+                          searchText: text,
+                          height: MediaQuery.sizeOf(context).height * 0.4,
+                        );
+                      }
+                      return SizedBox();
+                    },
+                  ),
                 ],
-              ),
-            ),
-          ],
+              )
+            ],
+          ),
         ),
       ),
     );

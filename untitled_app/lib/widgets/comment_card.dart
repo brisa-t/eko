@@ -13,6 +13,7 @@ import 'package:untitled_app/providers/user_provider.dart';
 import 'package:untitled_app/types/comment.dart';
 import 'package:untitled_app/widgets/comment_like_buttons.dart';
 import 'package:untitled_app/widgets/profile_picture.dart';
+import 'package:untitled_app/widgets/text_with_tags.dart';
 import 'package:untitled_app/widgets/user_tag.dart';
 import '../localization/generated/app_localizations.dart';
 import '../utilities/constants.dart' as c;
@@ -273,38 +274,7 @@ class _Card extends ConsumerWidget {
                         ],
                       ),
                       const SizedBox(height: 8.0),
-                      RichText(
-                        text: TextSpan(
-                          style: TextStyle(
-                            fontFamily:
-                                DefaultTextStyle.of(context).style.fontFamily,
-                          ),
-                          children: comment.body.map((chunk) {
-                            if (chunk.startsWith('@')) {
-                              // This is a username, create a hyperlink
-                              return TextSpan(
-                                  text: chunk,
-                                  style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .surfaceTint),
-                                  recognizer: TapGestureRecognizer()
-                                  // ..onTap = () => tagPressed(chunk.substring(1)),
-                                  );
-                            } else {
-                              // This is a normal text, create a TextSpan
-                              return TextSpan(
-                                text: chunk,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface,
-                                ),
-                              );
-                            }
-                          }).toList(),
-                        ),
-                      ),
+                      TextWithTags(text: comment.body),
                       if (comment.gifUrl != null)
                         GifWidget(url: comment.gifUrl!),
                       const SizedBox(height: 4.0),

@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:untitled_app/custom_widgets/count_down_timer.dart';
 import 'package:untitled_app/custom_widgets/error_snack_bar.dart';
 import 'package:untitled_app/custom_widgets/warning_dialog.dart';
 import 'package:untitled_app/interfaces/post.dart';
-import 'package:untitled_app/interfaces/post_queries.dart';
 import 'package:untitled_app/interfaces/report.dart';
 import 'package:untitled_app/providers/comment_list_provider.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
-import 'package:untitled_app/providers/nav_bar_provider.dart';
 import 'package:untitled_app/providers/pool_providers.dart';
 import 'package:untitled_app/providers/post_provider.dart';
 import 'package:untitled_app/types/comment.dart';
@@ -18,6 +15,7 @@ import 'package:untitled_app/types/comment.dart';
 import 'package:untitled_app/widgets/loading_spinner.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/widgets/post_card.dart';
+import 'package:untitled_app/widgets/tag_search.dart';
 import '../utilities/constants.dart' as c;
 import '../widgets/comment_card.dart';
 import '../widgets/infinite_scrolly.dart';
@@ -144,31 +142,6 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
           [_popDialog],
           context);
     }
-  }
-
-  void checkAtSymbol(String text) {
-    // bool wasAtSymbolTyped = isAtSymbolTyped;
-    // int start = text.lastIndexOf('@');
-    // if (start != -1 && start < text.length - 1) {
-    //   int end = text.indexOf(' ', start);
-    //   if (end == -1) {
-    //     // No space found after '@'
-    //     isAtSymbolTyped = true;
-    //     onSearchTextChanged(text.substring(start + 1));
-    //   } else if (text.substring(end).contains('@')) {
-    //     // Another '@' found after space
-    //     isAtSymbolTyped = true;
-    //     onSearchTextChanged(text.substring(start + 1, end));
-    //   } else {
-    //     // Space found after '@' and no other '@' found
-    //     isAtSymbolTyped = false;
-    //   }
-    // } else {
-    //   isAtSymbolTyped = false;
-    // }
-    // if (wasAtSymbolTyped != isAtSymbolTyped) {
-    //   notifyListeners();
-    // }
   }
 
   addGifPressed() async {
@@ -338,8 +311,7 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
             body: Column(
               children: [
                 Expanded(
-                  child: IndexedStack(
-                    index: isAtSymbolTyped ? 1 : 0,
+                  child: Stack(
                     children: [
                       InfiniteScrollyShell<String>(
                         isEnd: provider.$2,
@@ -353,64 +325,21 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
                         // Add the controller here
                         controller: commentsScrollController,
                       ),
-                      // prov.Provider.of<PostPageController>(context,
-                      //             listen: true)
-                      //         .isLoading
-                      //     ? const Center(
-                      //         child: CircularProgressIndicator(),
-                      //       )
-                      //     : prov.Provider.of<PostPageController>(context,
-                      //                 listen: true)
-                      //             .hits
-                      //             .isEmpty
-                      //         ? Center(
-                      //             child: Text(
-                      //               AppLocalizations.of(context)!
-                      //                   .noResultsFound,
-                      //               style: TextStyle(
-                      //                   fontSize: 18,
-                      //                   color: Theme.of(context)
-                      //                       .colorScheme
-                      //                       .onSurface),
-                      //             ),
-                      //           )
-                      //         : ListView.builder(
-                      //             shrinkWrap: true,
-                      //             itemCount:
-                      //                 prov.Provider.of<PostPageController>(
-                      //                         context,
-                      //                         listen: true)
-                      //                     .hits
-                      //                     .length,
-                      //             itemBuilder:
-                      //                 (BuildContext context, int index) {
-                      //               return UserCard(
-                      //                 tagSearch: true,
-                      //                 onCardTap: (username) {
-                      //                   prov.Provider.of<PostPageController>(
-                      //                           context,
-                      //                           listen: false)
-                      //                       .updateTextField(
-                      //                           username,
-                      //                           prov.Provider.of<
-                      //                                       PostPageController>(
-                      //                                   context,
-                      //                                   listen: false)
-                      //                               .commentField,
-                      //                           prov.Provider.of<
-                      //                                       PostPageController>(
-                      //                                   context,
-                      //                                   listen: false)
-                      //                               .commentFieldFocus);
-                      //                 },
-                      //                 uid: prov.Provider.of<PostPageController>(
-                      //                         context,
-                      //                         listen: true)
-                      //                     .hits[index]
-                      //                     .uid,
-                      //               );
-                      //             },
-                      //           ),
+                      AnimatedBuilder(
+                        animation:
+                            Listenable.merge([commentFieldFocus, commentField]),
+                        builder: (context, _) {
+                          final text = searchText(commentField);
+                          if (text != null && commentFieldFocus.hasFocus) {
+                            return TagSearch(
+                              onCardTap: (username) =>
+                                  onCardTap(username, commentField),
+                              searchText: text,
+                            );
+                          }
+                          return SizedBox();
+                        },
+                      )
                     ],
                   ),
                 ),
@@ -426,9 +355,6 @@ class _ViewPostPageState extends ConsumerState<ViewPostPage> {
                           textCapitalization: TextCapitalization.sentences,
                           cursorColor: Theme.of(context).colorScheme.onSurface,
                           focusNode: commentFieldFocus,
-                          onChanged: (s) {
-                            checkAtSymbol(s);
-                          },
                           maxLines: null,
                           controller: commentField,
                           keyboardType: TextInputType.text,

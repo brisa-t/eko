@@ -17,6 +17,7 @@ import 'package:untitled_app/widgets/divider.dart';
 import 'package:untitled_app/widgets/like_buttons.dart';
 import 'package:untitled_app/widgets/shimmer_loaders.dart';
 import 'package:untitled_app/widgets/profile_picture.dart';
+import 'package:untitled_app/widgets/text_with_tags.dart';
 import 'package:untitled_app/widgets/time_stamp.dart';
 import 'package:untitled_app/widgets/user_tag.dart';
 import '../utilities/constants.dart' as c;
@@ -190,16 +191,6 @@ class _PostCardState extends ConsumerState<PostCard> {
     }
   }
 
-  // Future<void> tagPressed(String username) async {
-  //   String? uid = await getUidFromUsername(username);
-  //   if (!mounted) return;
-  //   if (ref.read(currentUserProvider).user.uid == uid) {
-  //     context.go('/profile');
-  //   } else {
-  //     context.push('/feed/sub_profile/$uid');
-  //   }
-  // }
-
   @override
   Widget build(BuildContext context) {
     if (!widget.visible) {
@@ -318,42 +309,12 @@ class PostCardFromPost extends ConsumerWidget {
                         ),
                         const SizedBox(height: 6.0),
                         if (post.title.isNotEmpty)
-                          RichText(
-                            text: TextSpan(
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontFamily: DefaultTextStyle.of(context)
-                                    .style
-                                    .fontFamily,
-                              ),
-                              children: post.title.map((chunk) {
-                                if (chunk.startsWith('@')) {
-                                  // This is a username, create a hyperlink
-                                  return TextSpan(
-                                    text: chunk,
-                                    style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .surfaceTint),
-                                    recognizer: TapGestureRecognizer()
-                                      ..onTap = () async {
-                                        if (!isPreview) {
-                                          // tagPressed(chunk.substring(1));
-                                        }
-                                      },
-                                  );
-                                } else {
-                                  // This is a normal text, create a TextSpan
-                                  return TextSpan(
-                                    text: chunk,
-                                    style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface,
-                                    ),
-                                  );
-                                }
-                              }).toList(),
+                          TextWithTags(
+                            text: post.title,
+                            baseTextStyle: TextStyle(
+                              fontSize: 15,
+                              fontFamily:
+                                  DefaultTextStyle.of(context).style.fontFamily,
                             ),
                           ),
                         const SizedBox(height: 6.0),
@@ -375,45 +336,7 @@ class PostCardFromPost extends ConsumerWidget {
                             post.imageString != null ||
                             post.isPoll)
                           const SizedBox(height: 6.0),
-                        if (post.body.isNotEmpty)
-                          RichText(
-                            text: TextSpan(
-                              style: TextStyle(
-                                fontFamily: DefaultTextStyle.of(context)
-                                    .style
-                                    .fontFamily,
-                              ),
-                              children: post.body.map((chunk) {
-                                if (chunk.startsWith('@')) {
-                                  // This is a username, create a hyperlink
-                                  return TextSpan(
-                                    text: chunk,
-                                    style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .surfaceTint),
-                                    recognizer: TapGestureRecognizer()
-                                      ..onTap = () {
-                                        if (!isPreview) {
-                                          // tagPressed(chunk.substring(1));
-                                        }
-                                      },
-                                  );
-                                } else {
-                                  // This is a normal text, create a TextSpan
-                                  return TextSpan(
-                                    text: chunk,
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface,
-                                    ),
-                                  );
-                                }
-                              }).toList(),
-                            ),
-                          ),
+                        if (post.body.isNotEmpty) TextWithTags(text: post.body),
                       ],
                     ),
                   ),
