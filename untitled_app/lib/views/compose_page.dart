@@ -42,7 +42,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
   final bodyFocus = FocusNode();
   final titleFocus = FocusNode();
   int bodyNewLines = 0;
-  bool isPosting = false;
+  bool isUploading = false;
   String? partialTag;
 
   @override
@@ -167,14 +167,6 @@ class _ComposePageState extends ConsumerState<ComposePage> {
       return;
     }
 
-    if (isPosting) {
-      return;
-    }
-
-    setState(() {
-      isPosting = true;
-    });
-
     final post = PostModel(
       uid: ref.watch(currentUserProvider).user.uid,
       id: '',
@@ -192,7 +184,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
     );
 
     showDialog(
-      barrierDismissible: !isPosting,
+      barrierDismissible: true,
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -206,14 +198,14 @@ class _ComposePageState extends ConsumerState<ComposePage> {
             TextButton(
               child: Text(AppLocalizations.of(context)!.cancel),
               onPressed: () {
-                if (!isPosting) {
-                  context.pop();
-                }
+                context.pop();
               },
             ),
             TextButton(
               child: Text(AppLocalizations.of(context)!.post),
               onPressed: () async {
+                if (isUploading) return;
+                isUploading = true;
                 final postToUpload = post.copyWith(
                     createdAt: DateTime.now().toUtc().toIso8601String());
                 final id = await uploadPost(postToUpload, ref);
@@ -236,16 +228,13 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                     context.go('/groups/sub_group/${post.tags.first}');
                   }
                 }
+                isUploading = false;
               },
             ),
           ],
         );
       },
     ).then((_) => FocusManager.instance.primaryFocus?.unfocus());
-
-    setState(() {
-      isPosting = false;
-    });
   }
 
   @override
