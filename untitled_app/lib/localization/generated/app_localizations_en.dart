@@ -159,10 +159,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get close => 'Close';
 
   @override
-  String get likes => 'Likes';
+  String get likes => 'Up-Ekos';
 
   @override
-  String get dislikes => 'Dislikes';
+  String get dislikes => 'Down-Ekos';
 
   @override
   String get like => 'Like';
@@ -402,10 +402,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gifLoadingError => 'Failed to load';
 
   @override
-  String get viewLikes => 'See Likes';
+  String get viewLikes => 'See Up-Ekos';
 
   @override
-  String get viewDislikes => 'See Dislikes';
+  String get viewDislikes => 'See Down-Ekos';
 
   @override
   String get updateRequiredTitle => 'Update Required';
