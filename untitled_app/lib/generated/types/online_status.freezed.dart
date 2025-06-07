@@ -19,6 +19,7 @@ OnlineStatus _$OnlineStatusFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$OnlineStatus implements DiagnosticableTreeMixin {
   bool get online;
+  @JsonKey(includeFromJson: false)
   bool get valid;
   String? get id;
   @JsonKey(name: 'last_changed')
@@ -75,7 +76,7 @@ abstract mixin class $OnlineStatusCopyWith<$Res> {
   @useResult
   $Res call(
       {bool online,
-      bool valid,
+      @JsonKey(includeFromJson: false) bool valid,
       String? id,
       @JsonKey(name: 'last_changed') int lastChanged});
 }
@@ -123,15 +124,17 @@ class _$OnlineStatusCopyWithImpl<$Res> implements $OnlineStatusCopyWith<$Res> {
 @JsonSerializable(explicitToJson: true)
 class _ with DiagnosticableTreeMixin implements OnlineStatus {
   const _(
-      {required this.online,
-      required this.valid,
+      {this.online = false,
+      @JsonKey(includeFromJson: false) this.valid = true,
       required this.id,
       @JsonKey(name: 'last_changed') required this.lastChanged});
   factory _.fromJson(Map<String, dynamic> json) => _$FromJson(json);
 
   @override
+  @JsonKey()
   final bool online;
   @override
+  @JsonKey(includeFromJson: false)
   final bool valid;
   @override
   final String? id;
@@ -192,7 +195,7 @@ abstract mixin class _$CopyWith<$Res> implements $OnlineStatusCopyWith<$Res> {
   @useResult
   $Res call(
       {bool online,
-      bool valid,
+      @JsonKey(includeFromJson: false) bool valid,
       String? id,
       @JsonKey(name: 'last_changed') int lastChanged});
 }
