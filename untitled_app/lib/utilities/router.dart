@@ -87,7 +87,6 @@ final goRouter = GoRouter(
             name: 'auth',
             builder: (context, state) {
               final url = state.uri.queryParameters;
-
               return AppSafeArea(child: AuthActionInterface(urlData: url));
             },
           ),

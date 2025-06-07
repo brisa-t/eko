@@ -10,7 +10,9 @@ import 'package:untitled_app/custom_widgets/warning_dialog.dart';
 import 'package:untitled_app/interfaces/user.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/providers/auth_provider.dart';
+import 'package:untitled_app/providers/nav_bar_provider.dart';
 import 'package:untitled_app/providers/theme_provider.dart';
+import 'package:untitled_app/widgets/create_password.dart';
 import 'package:untitled_app/widgets/username_check_display.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../custom_widgets/login_text_feild.dart';
@@ -157,6 +159,8 @@ class _SignUpState extends ConsumerState<SignUp> {
   }
 
   Future<bool> signUp() async {
+    //make sure this is true since user could be coming from settings
+    ref.read(navBarProvider.notifier).enable();
     if (await isUsernameAvailable(usernameController.text.trim())) {
       if (_handleError(await ref.read(authProvider.notifier).signUp(
           email: emailController.text.trim(),
@@ -442,6 +446,7 @@ class _GetInfoState extends State<GetInfo> {
             height: height * 0.03,
           ),
           CustomInputField(
+            autofillHints: [AutofillHints.name],
             focus: widget.nameFocus,
             label: AppLocalizations.of(context)!.name,
             controller: widget.nameController,
@@ -450,6 +455,7 @@ class _GetInfoState extends State<GetInfo> {
           ),
           // SizedBox(height: height * c.loginPadding),
           CustomInputField(
+            autofillHints: [AutofillHints.username],
             focus: widget.usernameFocus,
             label: AppLocalizations.of(context)!.userName,
             controller: widget.usernameController,
@@ -465,6 +471,7 @@ class _GetInfoState extends State<GetInfo> {
           ),
           SizedBox(height: height * c.loginPadding),
           CustomInputField(
+            autofillHints: [AutofillHints.email],
             label: AppLocalizations.of(context)!.email,
             focus: widget.emailFocus,
             controller: widget.emailController,
@@ -488,6 +495,7 @@ class _GetInfoState extends State<GetInfo> {
                     children: [
                       Text(AppLocalizations.of(context)!.month),
                       CustomInputField(
+                        autofillHints: [AutofillHints.birthdayMonth],
                         filter: r'[0-9]*',
                         showCounter: false,
                         maxLen: 2,
@@ -507,6 +515,7 @@ class _GetInfoState extends State<GetInfo> {
                       children: [
                         Text(AppLocalizations.of(context)!.day),
                         CustomInputField(
+                          autofillHints: [AutofillHints.birthdayDay],
                           filter: r'[0-9]*',
                           showCounter: false,
                           maxLen: 2,
@@ -525,6 +534,7 @@ class _GetInfoState extends State<GetInfo> {
                     children: [
                       Text(AppLocalizations.of(context)!.year),
                       CustomInputField(
+                        autofillHints: [AutofillHints.birthdayYear],
                         filter: r'[0-9]*',
                         showCounter: false,
                         maxLen: 4,
@@ -614,7 +624,6 @@ class GetPassword extends StatefulWidget {
 
 class _GetPasswordState extends State<GetPassword> {
   bool isLoading = false;
-  bool goodPassword = false;
   @override
   Widget build(BuildContext context) {
     final width = c.widthGetter(context);
@@ -642,76 +651,12 @@ class _GetPasswordState extends State<GetPassword> {
               color: Theme.of(context).colorScheme.onSurface,
             ),
             SizedBox(height: height * 0.04),
-            CustomInputField(
-              onEditingComplete: () =>
-                  widget.confirmPasswordFocus.requestFocus(),
-              label: AppLocalizations.of(context)!.password,
-              focus: widget.passwordFocus,
-              controller: widget.passwordController,
-              inputType: TextInputType.visiblePassword,
-              password: true,
+            CreatePassword(
+              passwordController: widget.passwordController,
+              confirmPasswordController: widget.confirmPasswordController,
+              passwordFocus: widget.passwordFocus,
+              confirmPasswordFocus: widget.confirmPasswordFocus,
             ),
-            SizedBox(height: height * c.loginPadding),
-            CustomInputField(
-              // onEditingComplete: () => signUpPressed(),
-              textInputAction: TextInputAction.done,
-              label: AppLocalizations.of(context)!.confirmPassword,
-              focus: widget.confirmPasswordFocus,
-              controller: widget.confirmPasswordController,
-              inputType: TextInputType.visiblePassword,
-              password: true,
-            ),
-            SizedBox(height: height * 0.02),
-            AnimatedBuilder(
-                animation: Listenable.merge([
-                  widget.passwordController,
-                  widget.confirmPasswordController
-                ]),
-                builder: (context, _) {
-                  final List<bool> passed =
-                      List.generate(6, (index) => false, growable: false);
-                  final pass1 = widget.passwordController.text;
-                  final pass2 = widget.confirmPasswordController.text;
-                  passed[0] = (pass1).length >= 7 && (pass1).length <= 32;
-                  passed[1] = pass1.contains(RegExp(r'[a-z]'));
-                  passed[2] = pass1.contains(RegExp(r'[A-Z]'));
-                  passed[3] = pass1.contains(RegExp(r'[0-9]'));
-                  passed[4] = !pass1.contains(RegExp(r'^[A-Za-z0-9]*$'));
-                  passed[5] = pass1 == pass2 && pass1 != '';
-                  final List<String> emojiPassed = List.generate(
-                      6, (index) => passed[index] ? '✅' : '❌',
-                      growable: false);
-                  final filteredListLength =
-                      passed.where((item) => item).length;
-                  final passedPercent =
-                      pass1.isEmpty ? 0.0 : filteredListLength / passed.length;
-                  goodPassword = passed.length == filteredListLength;
-                  return Column(children: [
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        vertical: height * c.loginPadding,
-                      ),
-                      child: LinearProgressIndicator(
-                        minHeight: 12,
-                        value: passedPercent,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                    Container(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        '${emojiPassed[0]}${AppLocalizations.of(context)!.passwordLen}\n'
-                        '${emojiPassed[1]}${AppLocalizations.of(context)!.passwordLower}\n'
-                        '${emojiPassed[2]}${AppLocalizations.of(context)!.passwordUpper}\n'
-                        '${emojiPassed[3]}${AppLocalizations.of(context)!.passwordNumber}\n'
-                        '${emojiPassed[4]}${AppLocalizations.of(context)!.passwordSpecial}\n'
-                        '${emojiPassed[5]}${AppLocalizations.of(context)!.passwordMatch}\n',
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    )
-                  ]);
-                }),
-            //const Spacer(),
             SizedBox(
               height: height * 0.1,
             ),
@@ -720,7 +665,8 @@ class _GetPasswordState extends State<GetPassword> {
               height: width * 0.15,
               child: TextButton(
                 onPressed: () async {
-                  if (!goodPassword) {
+                  if (!isValidPassword(widget.passwordController.text,
+                      widget.confirmPasswordController.text)) {
                     _showWeakPassword(context);
                     return;
                   }
