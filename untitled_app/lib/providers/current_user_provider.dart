@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:untitled_app/interfaces/user.dart';
@@ -122,6 +123,11 @@ class CurrentUser extends _$CurrentUser {
   }
 
   // END LIKES //
+
+  Future<void> signOut() async {
+    await removeFCM(state.user.uid);
+    await FirebaseAuth.instance.signOut();
+  }
 
   void addPollVote(String id, int optionIndex) {
     final votes = Map<String, int>.from(state.pollVotes);
