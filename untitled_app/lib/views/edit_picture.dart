@@ -11,6 +11,7 @@ import 'package:image_to_ascii/image_to_ascii.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:untitled_app/custom_widgets/image_widget.dart';
+import 'package:untitled_app/widgets/blur_loading.dart';
 
 class EditPicture extends StatefulWidget {
   final XFile picture;
@@ -28,14 +29,19 @@ class _EditPictureState extends State<EditPicture> {
   bool densityControllVisible = false;
   bool downloading = false;
   GlobalKey imageKey = GlobalKey();
+  bool isLoading = false;
 
   Future<void> convert() async {
+    setState(() {
+      isLoading = true;
+    });
     final cropped = await cropToAspectRatio(widget.picture.path,
         desiredWidth: density, vScale: 0.75);
     final img =
         await convertImageToAscii(cropped, dark: isDark, color: isColor);
     setState(() {
       asciiPicture = img;
+      isLoading = false;
     });
   }
 
@@ -177,7 +183,25 @@ class _EditPictureState extends State<EditPicture> {
               child: asciiPicture == null
                   ? const Center(child: CircularProgressIndicator())
                   : RepaintBoundary(
-                      key: imageKey, child: ImageWidget(ascii: asciiPicture!)),
+                      key: imageKey,
+                      child: Stack(
+                        children: [
+                          Align(
+                            child: ImageWidget(ascii: asciiPicture!),
+                          ),
+                          if (isLoading)
+                            SizedBox.expand(
+                              child: BackdropFilter(
+                                filter:
+                                    ui.ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                                child: Container(
+                                  color: Colors.transparent,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
             ),
           ),
           AnimatedContainer(
