@@ -112,7 +112,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get exitCreateAccountBody =>
-      'Are you sure you want to go back? your information will be deleted.';
+      'Are you sure you want to go back? Your information will be deleted.';
+
+  @override
+  String get exitCreateGroupTitle => 'Return to group page?';
+
+  @override
+  String get exitCreateGroupBody =>
+      'Are you sure you want to go back? Your group information will be deleted.';
 
   @override
   String get exitEditProfileTitle => 'Are you sure you want to exit?';

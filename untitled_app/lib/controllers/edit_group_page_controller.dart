@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:untitled_app/providers/user_provider.dart';
+import 'package:untitled_app/types/user.dart';
 import 'package:untitled_app/widgets/user_card.dart';
 import 'package:untitled_app/custom_widgets/warning_dialog.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
@@ -17,10 +19,10 @@ class EditGroupPageController extends ChangeNotifier {
   final searchTextController = TextEditingController();
   final PageController pageController = PageController();
   final selectedPeopleScroll = ScrollController();
-  List<AppUser> selectedPeople = [];
-  List<AppUser> hits = [];
-  List<AppUser> membersList = [];
-  List<AppUser> addedMembers = [];
+  List<UserModel> selectedPeople = [];
+  List<UserModel> hits = [];
+  List<UserModel> membersList = [];
+  List<UserModel> addedMembers = [];
   bool isLoading = false;
   bool showEmojiKeyboard = false;
   Timer? _debounce;
@@ -40,7 +42,7 @@ class EditGroupPageController extends ChangeNotifier {
       AppUser user = AppUser();
       Map<String, dynamic>? userData = await user.readUserData(uid);
       if (userData != null) {
-        membersList.add(AppUser.fromJson(userData));
+        membersList.add(UserModel.fromJson(userData));
       }
     }
     notifyListeners();
@@ -116,12 +118,12 @@ class EditGroupPageController extends ChangeNotifier {
   }
 
   bool isUserSelected(AppUser user) {
-    for (AppUser slectedUser in selectedPeople) {
+    for (UserModel slectedUser in selectedPeople) {
       if (user.uid == slectedUser.uid) {
         return true;
       }
     }
-    for (AppUser slectedUser in membersList) {
+    for (UserModel slectedUser in membersList) {
       if (user.uid == slectedUser.uid) {
         return true;
       }

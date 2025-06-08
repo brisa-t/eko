@@ -293,8 +293,20 @@ abstract class AppLocalizations {
   /// No description provided for @exitCreateAccountBody.
   ///
   /// In en, this message translates to:
-  /// **'Are you sure you want to go back? your information will be deleted.'**
+  /// **'Are you sure you want to go back? Your information will be deleted.'**
   String get exitCreateAccountBody;
+
+  /// No description provided for @exitCreateGroupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Return to group page?'**
+  String get exitCreateGroupTitle;
+
+  /// No description provided for @exitCreateGroupBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to go back? Your group information will be deleted.'**
+  String get exitCreateGroupBody;
 
   /// No description provided for @exitEditProfileTitle.
   ///

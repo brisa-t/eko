@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:untitled_app/models/users.dart';
+import 'package:untitled_app/types/user.dart';
 import 'package:untitled_app/widgets/profile_picture.dart';
 
 class SelectedUser extends StatelessWidget {
-  final AppUser user;
+  final UserModel user;
   final bool selected;
   final int index;
   final void Function(int) setter;

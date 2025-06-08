@@ -118,6 +118,13 @@ class AppLocalizationsEs extends AppLocalizations {
       'Estas seguro de que quieres regresar a la página de inicio? Tu informacion será borrada.';
 
   @override
+  String get exitCreateGroupTitle => 'Return to group page?';
+
+  @override
+  String get exitCreateGroupBody =>
+      'Are you sure you want to go back? Your group information will be deleted.';
+
+  @override
   String get exitEditProfileTitle => 'Estas seguro de que quieres salir?';
 
   @override

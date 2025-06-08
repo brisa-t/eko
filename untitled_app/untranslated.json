@@ -5,6 +5,8 @@
     "needTwoOptions",
     "votes",
     "removeVote",
+    "exitCreateGroupTitle",
+    "exitCreateGroupBody",
     "signIn",
     "signInToComment",
     "dislikes",

@@ -220,7 +220,7 @@ final goRouter = GoRouter(
                 GoRoute(
                   path: 'create_group',
                   name: 'create_group',
-                  builder: (context, state) => const CreateGroupPage(),
+                  builder: (context, state) => const CreateGroup(),
                   routes: [
                     GoRoute(
                       path: 'pick_emoji',

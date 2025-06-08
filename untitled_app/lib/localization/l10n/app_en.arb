@@ -54,7 +54,10 @@
 
 
     "exitCreateAccountTitle":"Return to welcome page?",
-    "exitCreateAccountBody":"Are you sure you want to go back? your information will be deleted.",
+    "exitCreateAccountBody":"Are you sure you want to go back? Your information will be deleted.",
+
+	"exitCreateGroupTitle":"Return to group page?",
+	"exitCreateGroupBody":"Are you sure you want to go back? Your group information will be deleted.",
 
 
     "exitEditProfileTitle":"Are you sure you want to exit?",
