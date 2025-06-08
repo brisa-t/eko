@@ -6,7 +6,7 @@ part of '../../providers/presence_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$presenceHash() => r'560ea37b27cf0d0f2ac1885b6ab566a15bc32c18';
+String _$presenceHash() => r'3ea4bbd9f532f6868d238ac591e716063d993a8b';
 
 /// See also [Presence].
 @ProviderFor(Presence)

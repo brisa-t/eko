@@ -18,6 +18,8 @@ class Presence extends _$Presence with WidgetsBindingObserver {
   OnlineStatus build() {
     WidgetsBinding.instance.addObserver(this);
     _init();
+    ref.onDispose(() => _onlineRef?.remove());
+    ref.onDispose(() => _statusSubscription?.cancel());
     return const OnlineStatus(online: false, id: '', lastChanged: 0);
   }
 
@@ -44,8 +46,6 @@ class Presence extends _$Presence with WidgetsBindingObserver {
         );
       }
     });
-    ref.onDispose(_onlineRef!.remove);
-    ref.onDispose(_statusSubscription!.cancel);
 
     // set offline on disconnect
     await _onlineRef!.onDisconnect().update({'online': false});
