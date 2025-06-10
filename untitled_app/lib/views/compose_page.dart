@@ -478,7 +478,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
                                   child: image != null
-                                      ? ImageWidget(ascii: image!)
+                                      ? Align(child: ImageWidget(ascii: image!))
                                       : Image.network(
                                           // gif!.images!.fixedWidth.url,
                                           gif ?? '',

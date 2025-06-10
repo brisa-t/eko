@@ -142,7 +142,7 @@ class _InnerCameraPageState extends State<InnerCameraPage> {
                   } else if (snapshot.hasData && snapshot.data != null) {
                     return Align(
                       child: ImageWidget(
-                          ascii: AsciiImage.fromV0String(snapshot.data!)),
+                          ascii: AsciiImage.fromSimpleString(snapshot.data!)),
                     );
                   }
                   return Center(child: CircularProgressIndicator());
