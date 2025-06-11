@@ -548,6 +548,12 @@ abstract class AppLocalizations {
   /// **'Add title...'**
   String get addTitle;
 
+  /// No description provided for @create.
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get create;
+
   /// No description provided for @createNewPost.
   ///
   /// In en, this message translates to:

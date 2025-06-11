@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -6,8 +8,12 @@ import 'package:untitled_app/custom_widgets/warning_dialog.dart';
 import 'package:untitled_app/interfaces/search.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import 'package:untitled_app/models/search_model.dart';
+import 'package:untitled_app/providers/current_user_provider.dart';
+import 'package:untitled_app/providers/group_list_provider.dart';
 import 'package:untitled_app/providers/nav_bar_provider.dart';
+import 'package:untitled_app/types/group.dart';
 import 'package:untitled_app/widgets/infinite_scrolly.dart';
+import 'package:untitled_app/widgets/loading_spinner.dart';
 import 'package:untitled_app/widgets/shimmer_loaders.dart';
 import 'package:untitled_app/widgets/user_card.dart';
 import 'package:untitled_app/widgets/user_search_bar.dart';
@@ -117,8 +123,10 @@ class _CreateGroupState extends ConsumerState<CreateGroup> {
                 ),
                 TextButton(
                     onPressed: () async {
+                      FocusManager.instance.primaryFocus?.unfocus();
                       if (index == 0) {
-                        if (nameController.text.length < c.minGroupName) {
+                        if (nameController.text.trim().length <
+                            c.minGroupName) {
                           await showMyDialog(
                               'Name too short',
                               'Name must be at least ${c.minGroupName} characters.',
@@ -131,9 +139,47 @@ class _CreateGroupState extends ConsumerState<CreateGroup> {
                         setState(() {
                           index = 1;
                         });
+                      } else {
+                        isLoading = true;
+                        showDialog(
+                          barrierDismissible: false,
+                          barrierColor: Theme.of(context).colorScheme.surface,
+                          context: context,
+                          builder: (context) => PopScope(
+                              canPop: false,
+                              child: Center(
+                                child: LoadingSpinner(),
+                              )),
+                        );
+                        final now = DateTime.now().toUtc().toIso8601String();
+                        final group = GroupModel(
+                            name: nameController.text.trim(),
+                            description: descriptionController.text.trim(),
+                            lastActivity: now,
+                            createdOn: now,
+                            icon: groupIcon,
+                            members: List<String>.from([
+                              ref.read(currentUserProvider).user.uid,
+                              ...selectedPeople.set
+                            ]),
+                            notSeen: []);
+                        final doc = await FirebaseFirestore.instance
+                            .collection('groups')
+                            .add(group.toJson());
+                        final newGroup = group.copyWith(id: doc.id);
+                        ref
+                            .read(groupListProvider.notifier)
+                            .insertAtIndex(0, newGroup);
+                        if (context.mounted) {
+                          context.pop();
+                          context.pop();
+                        }
+                        isLoading = false;
                       }
                     },
-                    child: Text(AppLocalizations.of(context)!.next)),
+                    child: Text(index == 0
+                        ? AppLocalizations.of(context)!.next
+                        : AppLocalizations.of(context)!.create)),
               ],
             ),
           ),
@@ -150,7 +196,7 @@ class _CreateGroupState extends ConsumerState<CreateGroup> {
                 ),
                 AddPeople(
                   selectedPeople: selectedPeople,
-                )
+                ),
               ],
             ),
           ),

@@ -245,6 +245,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get addTitle => 'Add title...';
 
   @override
+  String get create => 'Create';
+
+  @override
   String get createNewPost => 'Create new post';
 
   @override

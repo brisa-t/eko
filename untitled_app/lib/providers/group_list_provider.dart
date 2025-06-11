@@ -66,4 +66,11 @@ class GroupList extends _$GroupList {
     state = ([], false);
     await getter();
   }
+
+  void insertAtIndex(int index, GroupModel group) {
+    final newList = [...state.$1];
+    newList.insert(index, group.id);
+    _timestamps.insert(index, group.createdOn);
+    state = (newList, state.$2);
+  }
 }

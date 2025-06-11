@@ -16,6 +16,7 @@
     "comment",
     "addText",
     "addTitle",
+    "create",
     "createNewPost",
     "clear",
     "settings",

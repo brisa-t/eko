@@ -6,7 +6,7 @@ part of '../../providers/group_list_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$groupListHash() => r'ac1dc81591989a1018ecb7a05e96c06fd6caf27c';
+String _$groupListHash() => r'9039919840c12f772ad0a3c89d101dbeddd90708';
 
 /// See also [GroupList].
 @ProviderFor(GroupList)
