@@ -34,19 +34,25 @@ class SearchInterface {
   }
 
   static Future<(List<MapEntry<String, int>>, bool)> getter(
-      List<MapEntry<String, int>> list, WidgetRef ref, String query) async {
+      List<MapEntry<String, int>> list, WidgetRef ref, String query,
+      {excludeCurrent = false}) async {
     final hits =
         await hitsQuery(query, page: list.isEmpty ? 0 : list.last.value + 1);
-    int offset = 0;
     final List<Future<UserModel>> asyncUsers = [];
-    for (final obj in hits) {
-      if (obj.key == ref.watch(currentUserProvider).user.uid) {
-        offset++;
-        continue;
+    List<MapEntry<String, int>> filteredHits = [];
+    if (excludeCurrent) {
+      for (final obj in hits) {
+        if (obj.key != ref.watch(currentUserProvider).user.uid) {
+          filteredHits.add(obj);
+          asyncUsers.add(ref.read(userProvider(obj.key).future));
+        }
       }
-      asyncUsers.add(ref.read(userProvider(obj.key).future));
+    } else {
+      filteredHits = hits;
+      asyncUsers
+          .addAll(hits.map((obj) => ref.read(userProvider(obj.key).future)));
     }
     await Future.wait(asyncUsers);
-    return (hits, hits.length < c.usersOnSearch - offset);
+    return (filteredHits, hits.length < c.usersOnSearch);
   }
 }

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:untitled_app/interfaces/search.dart';
 import 'package:untitled_app/widgets/infinite_scrolly.dart';
 import 'package:untitled_app/widgets/shimmer_loaders.dart';
+import 'package:untitled_app/widgets/user_search_bar.dart';
 import '../widgets/user_card.dart';
 import 'package:untitled_app/localization/generated/app_localizations.dart';
 import '../utilities/constants.dart' as c;
@@ -28,45 +29,6 @@ class FloatingSearchBar extends SliverPersistentHeaderDelegate {
   @override
   bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) =>
       false;
-}
-
-class _SearchBar extends StatelessWidget {
-  final TextEditingController controller;
-  const _SearchBar({required this.controller});
-
-  @override
-  Widget build(BuildContext context) {
-    final width = c.widthGetter(context);
-    final height = MediaQuery.sizeOf(context).height;
-    return DecoratedBox(
-      decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface),
-      child: TextField(
-        cursorColor: Theme.of(context).colorScheme.onSurface,
-        decoration: InputDecoration(
-          contentPadding: EdgeInsets.all(height * 0.01),
-          prefixIcon: Padding(
-            padding: EdgeInsets.all(width * 0.035),
-            child: Image.asset(
-                (Theme.of(context).brightness == Brightness.dark)
-                    ? 'images/algolia_logo_white.png'
-                    : 'images/algolia_logo_blue.png',
-                width: width * 0.05,
-                height: width * 0.05),
-          ),
-          hintText: AppLocalizations.of(context)!.search,
-          filled: true,
-          fillColor: Theme.of(context).colorScheme.outlineVariant,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10.0),
-            borderSide: BorderSide.none,
-          ),
-        ),
-        controller: controller,
-        keyboardType: TextInputType.text,
-        style: const TextStyle(fontSize: 20),
-      ),
-    );
-  }
 }
 
 class SearchPage extends ConsumerStatefulWidget {
@@ -144,7 +106,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             length: 12,
           ),
           widget: userCardBuilder,
-          header: _SearchBar(controller: controller),
+          header: UserSearchBar(controller: controller),
         ),
       ),
     );

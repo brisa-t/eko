@@ -227,8 +227,7 @@ final goRouter = GoRouter(
                       name: 'pick_emoji',
                       pageBuilder: (context, state) {
                         return NoTransitionPage(
-                          child: EmojiSelector(
-                              onPressed: state.extra! as void Function(String)),
+                          child: EmojiSelector(),
                         );
                       },
                       //builder: (context, state) => EmojiSelector(onPressed: state.extra! as void Function(String)),

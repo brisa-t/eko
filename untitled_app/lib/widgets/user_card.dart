@@ -15,60 +15,13 @@ Widget userCardBuilder(String uid) {
   );
 }
 
-Widget blockedPageBuilder(dynamic uid) {
-  return UserCard(
-    uid: uid.uid,
-    blockedPage: true,
-  );
-}
-
-class UserCard extends ConsumerStatefulWidget {
-  final bool blockedPage;
-  final bool? initialBool;
-  final bool groupSearch;
-  final bool tagSearch;
-  final String uid;
-  final void Function(String)? onTagCardTap;
-  final void Function(dynamic, bool)? adder;
-  const UserCard(
-      {super.key,
-      required this.uid,
-      this.blockedPage = false,
-      this.groupSearch = false,
-      this.tagSearch = false,
-      this.onTagCardTap,
-      this.adder,
-      this.initialBool});
-
-  @override
-  ConsumerState<UserCard> createState() => _UserCardState();
-}
-
-class _UserCardState extends ConsumerState<UserCard> {
-  late bool added;
-
-  @override
-  void initState() {
-    super.initState();
-    if (widget.groupSearch) {
-      added = widget.adder != null ? widget.initialBool ?? false : false;
-    }
-  }
-
-  void onCardPressed() {
-    if (!widget.blockedPage) {
-      context.push('/feed/sub_profile/${widget.uid}');
-    }
-  }
-
-  void unblockPressed(UserModel user) {
-    ref.read(currentUserProvider.notifier).unBlockUser(widget.uid);
-  }
+class FollowButton extends ConsumerWidget {
+  final UserModel user;
+  const FollowButton({super.key, required this.user});
 
   Future<void> onFollowPressed(WidgetRef ref, UserModel user) async {
     final isFollowing =
         ref.watch(currentUserProvider).user.following.contains(user.uid);
-
     if (isFollowing) {
       await ref.read(currentUserProvider.notifier).removeFollower(user.uid);
     } else {
@@ -76,35 +29,78 @@ class _UserCardState extends ConsumerState<UserCard> {
     }
   }
 
-  void onAddPressed(UserModel user) {
-    if (widget.adder != null) {
-      widget.adder!(user, !added);
-      setState(() => added = !added);
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final width = c.widthGetter(context);
+    final currentUser = ref.watch(currentUserProvider);
+    if (user.uid == currentUser.user.uid) {
+      return SizedBox();
     }
+    return InkWell(
+      onTap: () => onFollowPressed(ref, user),
+      child: Container(
+        width: width * 0.25,
+        height: width * 0.08,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.all(Radius.circular(10)),
+          color: currentUser.user.following.contains(user.uid)
+              ? Theme.of(context).colorScheme.outlineVariant
+              : Theme.of(context).colorScheme.primaryContainer,
+        ),
+        child: Text(
+          currentUser.user.following.contains(user.uid)
+              ? AppLocalizations.of(context)!.following
+              : AppLocalizations.of(context)!.follow,
+          maxLines: 1,
+          style: TextStyle(
+            fontSize: 13,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
+      ),
+    );
   }
+}
+
+//action widget will default to follow and onCardPressed will defualt to go to profile. to overide this explicitly pass a value such as SizedBox or (){}
+class UserCard extends ConsumerWidget {
+  final bool showBlockedUsers;
+  final Widget Function(UserModel)? actionWidget;
+  final String uid;
+  final void Function(UserModel)? onCardPressed;
+  const UserCard({
+    super.key,
+    required this.uid,
+    this.actionWidget,
+    this.showBlockedUsers = false,
+    this.onCardPressed,
+  });
+
+  // void unblockPressed(UserModel user) {
+  //   ref.read(currentUserProvider.notifier).unBlockUser(uid);
+  // }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final width = c.widthGetter(context);
     final height = MediaQuery.sizeOf(context).height;
-    final userAsync = ref.watch(userProvider(widget.uid));
+    final userAsync = ref.watch(userProvider(uid));
 
     return userAsync.when(
       data: (user) {
         final currentUser = ref.watch(currentUserProvider);
-        if (!widget.blockedPage &&
+        if (!showBlockedUsers &&
             (currentUser.blockedUsers.contains(user.uid) ||
                 currentUser.blockedBy.contains(user.uid))) {
           return SizedBox.shrink();
         }
         return InkWell(
           onTap: () {
-            if (widget.groupSearch) {
-              onAddPressed(user);
-            } else if (widget.tagSearch) {
-              widget.onTagCardTap?.call(user.username);
+            if (onCardPressed != null) {
+              onCardPressed!(user);
             } else {
-              onCardPressed();
+              context.push('/feed/sub_profile/${user.uid}');
             }
           },
           child: Padding(
@@ -156,65 +152,10 @@ class _UserCardState extends ConsumerState<UserCard> {
                     ),
                   ],
                 ),
-                if (user.uid == currentUser.user.uid)
-                  Container()
-                else if (widget.groupSearch)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 15),
-                    child: added
-                        ? const Icon(Icons.check_circle)
-                        : const Icon(Icons.circle_outlined),
-                  )
-                else if (widget.tagSearch)
-                  Container()
-                else if (widget.blockedPage)
-                  InkWell(
-                    onTap: () => unblockPressed(user),
-                    child: Container(
-                      width: width * 0.25,
-                      height: width * 0.1,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(5)),
-                        color: Theme.of(context).colorScheme.outlineVariant,
-                      ),
-                      child: Text(
-                        AppLocalizations.of(context)!.unblock,
-                        maxLines: 1,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                      ),
-                    ),
-                  )
+                if (actionWidget != null)
+                  actionWidget!(user)
                 else
-                  InkWell(
-                    onTap: () => onFollowPressed(ref, user),
-                    child: Container(
-                      width: width * 0.25,
-                      height: width * 0.08,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(10)),
-                        color: currentUser.user.following.contains(user.uid)
-                            ? Theme.of(context).colorScheme.outlineVariant
-                            : Theme.of(context).colorScheme.primaryContainer,
-                      ),
-                      child: Text(
-                        currentUser.user.following.contains(user.uid)
-                            ? AppLocalizations.of(context)!.following
-                            : AppLocalizations.of(context)!.follow,
-                        maxLines: 1,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                      ),
-                    ),
-                  ),
+                  FollowButton(user: user)
               ],
             ),
           ),

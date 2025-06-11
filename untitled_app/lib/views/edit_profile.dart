@@ -248,20 +248,20 @@ class _EditProfileState extends ConsumerState<EditProfile> {
                     ],
                   ),
                 ),
-                ProfileInputFeild(
+                ProfileInputField(
                   controller: nameController,
                   label: AppLocalizations.of(context)!.name,
                   maxLength: c.maxNameChars,
                 ),
                 SizedBox(height: height * 0.01),
-                ProfileInputFeild(
+                ProfileInputField(
                   controller: bioController,
                   label: AppLocalizations.of(context)!.bioTitle,
                   maxLength: c.maxBioChars,
                   inputType: TextInputType.multiline,
                 ),
                 SizedBox(height: height * 0.01),
-                ProfileInputFeild(
+                ProfileInputField(
                   focus: usernameFocus,
                   label: AppLocalizations.of(context)!.userName,
                   controller: usernameController,

@@ -91,8 +91,8 @@ class EditGroupPageController extends ChangeNotifier {
   Widget groupSearchPageBuilder(dynamic uid) {
     return UserCard(
       uid: uid,
-      groupSearch: true,
-      adder: addRemovePersonToList,
+      // groupSearch: true,
+      // adder: addRemovePersonToList,
     );
   }
 

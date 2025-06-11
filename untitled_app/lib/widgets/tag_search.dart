@@ -108,8 +108,8 @@ class _TagSearchState extends State<TagSearch> {
                   itemCount: data.length,
                   itemBuilder: (context, index) => UserCard(
                     uid: data[index],
-                    tagSearch: true,
-                    onTagCardTap: widget.onCardTap,
+                    actionWidget: (_) => SizedBox(),
+                    onCardPressed: (user) => widget.onCardTap(user.username),
                   ),
                 ),
               );

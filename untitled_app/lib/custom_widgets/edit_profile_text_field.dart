@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../utilities/constants.dart' as c;
 
-class ProfileInputFeild extends StatelessWidget {
+class ProfileInputField extends StatelessWidget {
   final String label;
   final TextEditingController? controller;
   final String? Function(String?)? validatorFunction;
@@ -20,7 +20,7 @@ class ProfileInputFeild extends StatelessWidget {
   final void Function()? onTap;
   final void Function(PointerDownEvent)? onTapOutside;
   final void Function()? onEditingComplete;
-  const ProfileInputFeild(
+  const ProfileInputField(
       {required this.label,
       this.controller,
       this.onChanged,

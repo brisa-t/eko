@@ -424,9 +424,6 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                 ],
               ),
               SizedBox(height: height * 0.01),
-              // ConstrainedBox(
-              //   constraints: BoxConstraints(maxHeight: height * 0.5),
-              //   child:
               TextField(
                 textCapitalization: TextCapitalization.sentences,
                 focusNode: titleFocus,
