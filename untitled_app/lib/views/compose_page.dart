@@ -1,13 +1,9 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:cross_file/cross_file.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gallery_saver_plus/gallery_saver.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_to_ascii/image_to_ascii.dart';
-import 'package:universal_html/js_util.dart';
 import 'package:untitled_app/custom_widgets/error_snack_bar.dart';
 import 'package:untitled_app/widgets/group_card.dart';
 import 'package:untitled_app/custom_widgets/image_widget.dart';
@@ -306,16 +302,17 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                 },
                 child: const Icon(Icons.poll),
               ),
-              FloatingActionButton.small(
-                  heroTag: null,
-                  child: const Icon(Icons.perm_media),
-                  onPressed: () async {
-                    final state = _key.currentState;
-                    if (state != null) {
-                      state.toggle();
-                    }
-                    _addImagePressed();
-                  }),
+              if (!kIsWeb)
+                FloatingActionButton.small(
+                    heroTag: null,
+                    child: const Icon(Icons.perm_media),
+                    onPressed: () async {
+                      final state = _key.currentState;
+                      if (state != null) {
+                        state.toggle();
+                      }
+                      _addImagePressed();
+                    }),
               FloatingActionButton.small(
                 heroTag: null,
                 onPressed: () {

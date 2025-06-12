@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart' show debugPrint;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:untitled_app/interfaces/user.dart';
 import 'package:untitled_app/types/auth.dart';
@@ -35,13 +36,13 @@ class Auth extends _$Auth {
     try {
       final UserCredential user =
           await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: email,
+        email: email.trim(),
         password: password,
       );
       if (user.user?.uid == null) return 'unknown';
       final userData = {
         'uid': user.user?.uid,
-        'email': email,
+        'email': email.trim(),
         'username': username,
         'name': name,
         'fcmTokens': [],
@@ -78,10 +79,11 @@ class Auth extends _$Auth {
       {required String email, required String password}) async {
     try {
       final UserCredential user = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: email, password: password);
+          .signInWithEmailAndPassword(email: email.trim(), password: password);
       if (user.user != null) addFCM(user.user!.uid);
       return ('success');
     } on FirebaseAuthException catch (e) {
+      debugPrint(e.code);
       return (e.code);
     }
   }

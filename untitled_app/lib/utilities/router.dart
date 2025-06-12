@@ -1,4 +1,5 @@
 import 'package:cross_file/cross_file.dart' show XFile;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:untitled_app/custom_widgets/safe_area.dart';
@@ -251,19 +252,21 @@ final goRouter = GoRouter(
                 );
               },
               routes: [
-                GoRoute(
-                  path: '/camera',
-                  name: 'camera',
-                  builder: (context, state) => const CameraPage(),
-                ),
-                GoRoute(
-                  path: '/edit_picture',
-                  name: 'edit_picture',
-                  builder: (context, state) {
-                    final file = state.extra as XFile;
-                    return EditPicture(picture: file);
-                  },
-                ),
+                if (!kIsWeb)
+                  GoRoute(
+                    path: '/camera',
+                    name: 'camera',
+                    builder: (context, state) => const CameraPage(),
+                  ),
+                if (!kIsWeb)
+                  GoRoute(
+                    path: '/edit_picture',
+                    name: 'edit_picture',
+                    builder: (context, state) {
+                      final file = state.extra as XFile;
+                      return EditPicture(picture: file);
+                    },
+                  ),
                 GoRoute(
                   path: '/gif',
                   name: 'gif',

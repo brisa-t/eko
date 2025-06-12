@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -97,31 +98,32 @@ class _Header extends ConsumerWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              InkWell(
-                onTap: () {
-                  ref.read(navBarProvider.notifier).disable();
-                  context
-                      .push('/profile/edit_profile')
-                      .then((_) => ref.read(navBarProvider.notifier).enable());
-                },
-                child: Container(
-                  width: width * 0.45,
-                  height: width * 0.09,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(Radius.circular(10)),
-                    color: Theme.of(context).colorScheme.surfaceContainer,
-                  ),
-                  child: Text(
-                    AppLocalizations.of(context)!.editProfile,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Theme.of(context).colorScheme.onSurface,
+              //the username chager doesn't work on web i think could be firebase outage
+              if (!kIsWeb)
+                InkWell(
+                  onTap: () {
+                    ref.read(navBarProvider.notifier).disable();
+                    context.push('/profile/edit_profile').then(
+                        (_) => ref.read(navBarProvider.notifier).enable());
+                  },
+                  child: Container(
+                    width: width * 0.45,
+                    height: width * 0.09,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.all(Radius.circular(10)),
+                      color: Theme.of(context).colorScheme.surfaceContainer,
+                    ),
+                    child: Text(
+                      AppLocalizations.of(context)!.editProfile,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              SizedBox(width: width * 0.02),
+              if (!kIsWeb) SizedBox(width: width * 0.02),
               InkWell(
                 onTap: () {
                   ref.read(navBarProvider.notifier).disable();

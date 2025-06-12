@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 <head>
   <!--
     If you are serving your web app in a path other than the root, change the
@@ -19,110 +18,22 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="description" content="Keep a tight circle">
 
   <!-- iOS meta tags & icons -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="Eko">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <link rel="apple-touch-icon" href="icons/1024.png">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png" />
+<link rel="icon" href="/eko_logo_black.svg" media="(prefers-color-scheme: light)">
+<link rel="icon" href="/eko_logo_white.svg" media="(prefers-color-scheme: dark)">
 
   <title>Eko</title>
   <link rel="manifest" href="manifest.json">
-
-  <script>
-    // The value below is injected by flutter build, do not touch.
-    var serviceWorkerVersion = null;
-  </script>
-  <!-- This script adds the flutter initialization JS code -->
-  <script src="flutter.js" defer></script>
-
-  <style>
-    .loader {
-      margin: auto;
-      width: 50%;
-      top: 60%;
-      border: 10px solid #f3f3f3;
-      border-radius: 50%;
-      border-top: 10px solid #878787;
-      width: 80px;
-      height: 80px;
-      -webkit-animation: spin 1.5s linear infinite;
-      /* Safari */
-      animation: spin 1.5s linear infinite;
-    }
-
-    /* Safari */
-    @-webkit-keyframes spin {
-      0% {
-        -webkit-transform: rotate(0deg);
-      }
-
-      100% {
-        -webkit-transform: rotate(360deg);
-      }
-    }
-
-    @keyframes spin {
-      0% {
-        transform: rotate(0deg);
-      }
-
-      100% {
-        transform: rotate(360deg);
-      }
-    }
-
-    .image {
-      padding: 13% 0 2% 0;
-      width: 300px;
-      height: 168px;
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
-      /* width: 50%; */
-      /* position: absolute;
-      top: 40%;
-      left: 45%;
-
-      margin: -60px 0 0 -60px; */
-
-
-
-    }
-  </style>
-
 </head>
-
 <body>
-
-  <div id="loading"></div>
-
-  <div><img src="\assets\images\eko_logo_light.png" class="image"></div>
-  <div class="loader"></div>
-  <script>
-    window.addEventListener('load', function (ev) {
-      var loading = document.querySelector('#loading');
-      loading.textContent = "Loading entrypoint...";
-      _flutter.loader.loadEntrypoint({
-        serviceWorker: {
-          serviceWorkerVersion: serviceWorkerVersion,
-        },
-        onEntrypointLoaded: async function (engineInitializer) {
-          loading.textContent = "Initializing engine...";
-          let appRunner = await engineInitializer.initializeEngine();
-
-          loading.textContent = "Running app...";
-          await appRunner.runApp();
-        }
-      });
-    });
-  </script>
-
-
+  <script src="flutter_bootstrap.js" async></script>
 </body>
-
 </html>
