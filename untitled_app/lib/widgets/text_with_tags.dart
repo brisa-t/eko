@@ -40,6 +40,7 @@ class _TextWithTagsState extends ConsumerState<TextWithTags> {
       text: TextSpan(
         style: widget.baseTextStyle ??
             TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
               fontFamily: DefaultTextStyle.of(context).style.fontFamily,
             ),
         children: widget.text.map((chunk) {

@@ -48,6 +48,8 @@ class ProfilePicture extends ConsumerWidget {
                                 }
                                 return const LoadingProfileImage();
                               },
+                              errorBuilder: (context, _, __) =>
+                                  Image.asset('images/default.jpg'),
                             )
                           : CachedNetworkImage(
                               fit: BoxFit.fill,

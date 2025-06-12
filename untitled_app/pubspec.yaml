@@ -32,9 +32,9 @@ dependencies:
     sdk: flutter
   flutter_web_plugins:
     sdk: flutter   
-  http: ^1.1.0
+  http: ^1.4.0
   cupertino_icons: ^1.0.2
-  firebase_core: ^3.13.0
+  firebase_core: ^3.14.0
   firebase_analytics: ^11.4.5
   firebase_auth: ^5.5.3
   flutter_localizations:
@@ -48,7 +48,7 @@ dependencies:
   firebase_in_app_messaging: ^0.8.1+5
   overlay_support: ^2.1.0
   package_info_plus: ^8.3.0
-  share_plus: ^10.1.4
+  share_plus: ^11.0.0
   image_picker: ^1.1.2
   image_cropper: ^9.1.0
   firebase_storage: ^12.4.5
@@ -61,14 +61,14 @@ dependencies:
   shared_preferences: ^2.5.3
   eraser: ^3.0.0
   firebase_messaging: ^15.2.5
-  extended_image: ^8.2.0
+  extended_image: ^10.0.1
   loading_indicator: ^3.1.1
-  permission_handler: ^11.0.1
+  permission_handler: ^12.0.0+1
   cloud_functions: ^5.3.4
   emoji_picker_flutter: ^4.3.0
   flutter_hooks: ^0.21.2
   universal_html: ^2.2.4
-  firebase_database: ^11.3.5
+  firebase_database: ^11.3.7
   like_button: 
     path: ./like_button-custom/
   flutter_dotenv: ^5.2.1
@@ -89,6 +89,8 @@ dependencies:
   cross_file: ^0.3.4+2
   gallery_saver_plus: ^3.2.4
   sensors_plus: ^6.1.1
+  uuid: ^4.5.1
+  firebase_database_web: ^0.2.6+13
 
 dev_dependencies:
   # flutter_test:
@@ -101,7 +103,7 @@ dev_dependencies:
   # rules and activating additional ones.
   build_runner: ^2.4.15
   custom_lint: ^0.7.5
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
   freezed: ^3.0.6
   json_serializable: ^6.9.5
   riverpod_generator: ^2.6.5
