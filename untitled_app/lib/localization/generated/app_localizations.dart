@@ -773,7 +773,7 @@ abstract class AppLocalizations {
   /// No description provided for @crossGroupRepost.
   ///
   /// In en, this message translates to:
-  /// **'You may not post chamber posts in public or in another group.'**
+  /// **'You may not eko chamber posts in public or in another group.'**
   String get crossGroupRepost;
 
   /// No description provided for @groups.

@@ -359,7 +359,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get crossGroupRepost =>
-      'You may not post chamber posts in public or in another group.';
+      'You may not eko chamber posts in public or in another group.';
 
   @override
   String get groups => 'Groups';
