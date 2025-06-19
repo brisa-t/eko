@@ -21,13 +21,15 @@ import 'package:untitled_app/widgets/infinite_scrolly.dart';
 import 'package:untitled_app/widgets/poll_creator.dart';
 import 'package:untitled_app/widgets/post_card.dart';
 import 'package:untitled_app/widgets/profile_picture.dart';
+import 'package:untitled_app/widgets/repost_card.dart';
 import 'package:untitled_app/widgets/tag_search.dart';
 import '../utilities/constants.dart' as c;
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 
 class ComposePage extends ConsumerStatefulWidget {
   final String? groupId;
-  const ComposePage({super.key, this.groupId});
+  final String? repostId;
+  const ComposePage({super.key, this.groupId, this.repostId});
   @override
   ConsumerState<ComposePage> createState() => _ComposePageState();
 }
@@ -35,6 +37,7 @@ class ComposePage extends ConsumerStatefulWidget {
 class _ComposePageState extends ConsumerState<ComposePage> {
   final _key = GlobalKey<ExpandableFabState>();
   String? audiance;
+  String? repostId;
   String? gif;
   AsciiImage? image;
   bool isPoll = false;
@@ -57,11 +60,18 @@ class _ComposePageState extends ConsumerState<ComposePage> {
         audiance = widget.groupId;
       });
     }
+    if (oldWidget.repostId != widget.repostId) {
+      setState(() {
+        repostId = widget.repostId;
+      });
+    }
   }
 
   @override
   void initState() {
     bodyFocus.addListener(bodyFocusListen);
+    repostId = widget.repostId;
+    audiance = widget.groupId;
     super.initState();
   }
 
@@ -137,6 +147,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
 
   void _clear() {
     setState(() {
+      repostId = null;
       isPoll = false;
       pollOptions = ['', ''];
       gif = null;
@@ -207,6 +218,7 @@ class _ComposePageState extends ConsumerState<ComposePage> {
       pollOptions: isPoll ? pollOptions : null,
       imageString: image,
       gifUrl: gif,
+      repostId: repostId,
       title: parseTextToTags(title),
       body: parseTextToTags(body),
     );
@@ -458,6 +470,11 @@ class _ComposePageState extends ConsumerState<ComposePage> {
                             }
                             return SizedBox();
                           }),
+                      if (widget.repostId != null)
+                        RepostCard(
+                            postId: widget.repostId!,
+                            isLoggedIn: true,
+                            isPreview: true),
                       if (gif != null || image != null)
                         FittedBox(
                           fit: BoxFit.scaleDown,

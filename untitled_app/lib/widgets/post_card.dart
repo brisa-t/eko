@@ -14,6 +14,7 @@ import 'package:untitled_app/providers/post_provider.dart';
 import 'package:untitled_app/types/post.dart';
 import 'package:untitled_app/widgets/divider.dart';
 import 'package:untitled_app/widgets/like_buttons.dart';
+import 'package:untitled_app/widgets/repost_card.dart';
 import 'package:untitled_app/widgets/shimmer_loaders.dart';
 import 'package:untitled_app/widgets/profile_picture.dart';
 import 'package:untitled_app/widgets/text_with_tags.dart';
@@ -173,7 +174,7 @@ class _PostCardState extends ConsumerState<PostCard> {
     context.go('/');
   }
 
-  sharePressed(String id) async {
+  void sharePressed(String id) async {
     if (kIsWeb) {
       Clipboard.setData(ClipboardData(
           text: 'Check out my post on Echo: ${c.appURL}/feed/post/$id'));
@@ -183,8 +184,8 @@ class _PostCardState extends ConsumerState<PostCard> {
     } else {
       if (!sharing) {
         sharing = true;
-        await Share.share(
-            'Check out my post on Echo: ${c.appURL}/feed/post/$id');
+        await SharePlus.instance.share(ShareParams(
+            text: 'Check out my post on Eko: ${c.appURL}/feed/post/$id'));
         sharing = false;
       }
     }
@@ -319,6 +320,14 @@ class PostCardFromPost extends ConsumerWidget {
                             ),
                           ),
                         const SizedBox(height: 6.0),
+                        if (post.repostId != null)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 6),
+                            child: RepostCard(
+                                postId: post.repostId!,
+                                isLoggedIn: isLoggedIn,
+                                isPreview: isPreview),
+                          ),
                         if (post.gifUrl != null)
                           Padding(
                               padding: EdgeInsets.only(bottom: 6),
@@ -350,64 +359,87 @@ class PostCardFromPost extends ConsumerWidget {
                 horizontal: c.postPaddingHoriz,
                 //vertical: c.postPaddingVert-8,
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(width: width * 0.115 + 8),
-                  LikeButtons(
-                    post: post,
-                    disabled: isPreview,
-                  ),
-                  SizedBox(
-                    width: 5,
-                  ),
-                  InkWell(
-                    onTap: () {
-                      if (isLoggedIn) {
-                        if (!isPreview && !isPostPage) {
-                          context.push('/feed/post/${post.id}', extra: post);
-                        }
-                      }
-                    },
-                    child: SvgPicture.string(
-                      '''<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#${Theme.of(context).colorScheme.onSurface.toARGB32().toRadixString(16).substring(2)}"  stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-circle"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>''',
-                      width: c.postIconSize,
-                      height: c.postIconSize,
+              child: isPreview
+                  ? SizedBox()
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(width: width * 0.115 + 8),
+                        LikeButtons(
+                          post: post,
+                          disabled: isPreview,
+                        ),
+                        const Spacer(),
+                        InkWell(
+                          onTap: () {
+                            if (isLoggedIn && !isPreview) {
+                              final Map<String, dynamic> queryParameters = {
+                                'repostId': post.id
+                              };
+                              if (post.tags.isNotEmpty &&
+                                  post.tags.first != 'public') {
+                                queryParameters['id'] = post.tags.first;
+                              }
+                              context.goNamed('compose',
+                                  queryParameters: queryParameters);
+                            }
+                          },
+                          child: SvgPicture.string(
+                            '''<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#${Theme.of(context).colorScheme.onSurface.toARGB32().toRadixString(16).substring(2)}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-repeat-icon lucide-repeat"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg>''',
+                            width: c.postIconSize,
+                            height: c.postIconSize,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        InkWell(
+                          onTap: () {
+                            if (isLoggedIn) {
+                              isPreview || sharePressed == null
+                                  ? null
+                                  : sharePressed!(post.id);
+                            }
+                          },
+                          child: SvgPicture.string(
+                            kIsWeb || Platform.isIOS
+                                ? '''<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#${Theme.of(context).colorScheme.onSurface.toARGB32().toRadixString(16).substring(2)}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-share"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/></svg>'''
+                                : '''<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#${Theme.of(context).colorScheme.onSurface.toARGB32().toRadixString(16).substring(2)}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-share-2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>''',
+                            width: c.postIconSize,
+                            height: c.postIconSize,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        InkWell(
+                          onTap: () {
+                            if (isLoggedIn) {
+                              if (!isPreview && !isPostPage) {
+                                context.push('/feed/post/${post.id}',
+                                    extra: post);
+                              }
+                            }
+                          },
+                          child: SvgPicture.string(
+                            '''<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#${Theme.of(context).colorScheme.onSurface.toARGB32().toRadixString(16).substring(2)}"  stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-circle"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>''',
+                            width: c.postIconSize,
+                            height: c.postIconSize,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 3,
+                        ),
+                        Count(
+                          count: post.commentCount,
+                          onTap: () {
+                            if (isLoggedIn) {
+                              if (!isPreview && !isPostPage) {
+                                context.push('/feed/post/${post.id}',
+                                    extra: post);
+                              }
+                            }
+                          },
+                        ),
+                      ],
                     ),
-                  ),
-                  SizedBox(
-                    width: 3,
-                  ),
-                  Count(
-                    count: post.commentCount,
-                    onTap: () {
-                      if (isLoggedIn) {
-                        if (!isPreview && !isPostPage) {
-                          context.push('/feed/post/${post.id}', extra: post);
-                        }
-                      }
-                    },
-                  ),
-                  const SizedBox(width: 5),
-                  InkWell(
-                    onTap: () {
-                      if (isLoggedIn) {
-                        isPreview || sharePressed == null
-                            ? null
-                            : sharePressed!(post.id);
-                      }
-                    },
-                    child: SvgPicture.string(
-                      kIsWeb || Platform.isIOS
-                          ? '''<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#${Theme.of(context).colorScheme.onSurface.toARGB32().toRadixString(16).substring(2)}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-share"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/></svg>'''
-                          : '''<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#${Theme.of(context).colorScheme.onSurface.toARGB32().toRadixString(16).substring(2)}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-share-2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>''',
-                      width: c.postIconSize,
-                      height: c.postIconSize,
-                    ),
-                  ),
-                ],
-              ),
             ),
             if (!isPreview)
               Padding(

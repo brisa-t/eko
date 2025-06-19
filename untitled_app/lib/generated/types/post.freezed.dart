@@ -36,6 +36,7 @@ mixin _$PostModel implements DiagnosticableTreeMixin {
   String get createdAt;
   List<String>? get pollOptions;
   Map<String, int>? get pollVoteCounts;
+  String? get repostId;
 
   /// Create a copy of PostModel
   /// with the given fields replaced by the non-null parameter values.
@@ -63,7 +64,8 @@ mixin _$PostModel implements DiagnosticableTreeMixin {
       ..add(DiagnosticsProperty('commentCount', commentCount))
       ..add(DiagnosticsProperty('createdAt', createdAt))
       ..add(DiagnosticsProperty('pollOptions', pollOptions))
-      ..add(DiagnosticsProperty('pollVoteCounts', pollVoteCounts));
+      ..add(DiagnosticsProperty('pollVoteCounts', pollVoteCounts))
+      ..add(DiagnosticsProperty('repostId', repostId));
   }
 
   @override
@@ -89,7 +91,9 @@ mixin _$PostModel implements DiagnosticableTreeMixin {
             const DeepCollectionEquality()
                 .equals(other.pollOptions, pollOptions) &&
             const DeepCollectionEquality()
-                .equals(other.pollVoteCounts, pollVoteCounts));
+                .equals(other.pollVoteCounts, pollVoteCounts) &&
+            (identical(other.repostId, repostId) ||
+                other.repostId == repostId));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -108,11 +112,12 @@ mixin _$PostModel implements DiagnosticableTreeMixin {
       commentCount,
       createdAt,
       const DeepCollectionEquality().hash(pollOptions),
-      const DeepCollectionEquality().hash(pollVoteCounts));
+      const DeepCollectionEquality().hash(pollVoteCounts),
+      repostId);
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'PostModel(uid: $uid, id: $id, gifUrl: $gifUrl, imageString: $imageString, title: $title, body: $body, tags: $tags, likes: $likes, dislikes: $dislikes, commentCount: $commentCount, createdAt: $createdAt, pollOptions: $pollOptions, pollVoteCounts: $pollVoteCounts)';
+    return 'PostModel(uid: $uid, id: $id, gifUrl: $gifUrl, imageString: $imageString, title: $title, body: $body, tags: $tags, likes: $likes, dislikes: $dislikes, commentCount: $commentCount, createdAt: $createdAt, pollOptions: $pollOptions, pollVoteCounts: $pollVoteCounts, repostId: $repostId)';
   }
 }
 
@@ -138,7 +143,8 @@ abstract mixin class $PostModelCopyWith<$Res> {
       int commentCount,
       @JsonKey(name: 'time') String createdAt,
       List<String>? pollOptions,
-      Map<String, int>? pollVoteCounts});
+      Map<String, int>? pollVoteCounts,
+      String? repostId});
 }
 
 /// @nodoc
@@ -166,6 +172,7 @@ class _$PostModelCopyWithImpl<$Res> implements $PostModelCopyWith<$Res> {
     Object? createdAt = null,
     Object? pollOptions = freezed,
     Object? pollVoteCounts = freezed,
+    Object? repostId = freezed,
   }) {
     return _then(_self.copyWith(
       uid: null == uid
@@ -220,6 +227,10 @@ class _$PostModelCopyWithImpl<$Res> implements $PostModelCopyWith<$Res> {
           ? _self.pollVoteCounts
           : pollVoteCounts // ignore: cast_nullable_to_non_nullable
               as Map<String, int>?,
+      repostId: freezed == repostId
+          ? _self.repostId
+          : repostId // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -246,7 +257,8 @@ class _PostModel extends PostModel with DiagnosticableTreeMixin {
       this.commentCount = 0,
       @JsonKey(name: 'time') required this.createdAt,
       final List<String>? pollOptions,
-      final Map<String, int>? pollVoteCounts})
+      final Map<String, int>? pollVoteCounts,
+      this.repostId})
       : _title = title,
         _body = body,
         _tags = tags,
@@ -328,6 +340,9 @@ class _PostModel extends PostModel with DiagnosticableTreeMixin {
     return EqualUnmodifiableMapView(value);
   }
 
+  @override
+  final String? repostId;
+
   /// Create a copy of PostModel
   /// with the given fields replaced by the non-null parameter values.
   @override
@@ -359,7 +374,8 @@ class _PostModel extends PostModel with DiagnosticableTreeMixin {
       ..add(DiagnosticsProperty('commentCount', commentCount))
       ..add(DiagnosticsProperty('createdAt', createdAt))
       ..add(DiagnosticsProperty('pollOptions', pollOptions))
-      ..add(DiagnosticsProperty('pollVoteCounts', pollVoteCounts));
+      ..add(DiagnosticsProperty('pollVoteCounts', pollVoteCounts))
+      ..add(DiagnosticsProperty('repostId', repostId));
   }
 
   @override
@@ -385,7 +401,9 @@ class _PostModel extends PostModel with DiagnosticableTreeMixin {
             const DeepCollectionEquality()
                 .equals(other._pollOptions, _pollOptions) &&
             const DeepCollectionEquality()
-                .equals(other._pollVoteCounts, _pollVoteCounts));
+                .equals(other._pollVoteCounts, _pollVoteCounts) &&
+            (identical(other.repostId, repostId) ||
+                other.repostId == repostId));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -404,11 +422,12 @@ class _PostModel extends PostModel with DiagnosticableTreeMixin {
       commentCount,
       createdAt,
       const DeepCollectionEquality().hash(_pollOptions),
-      const DeepCollectionEquality().hash(_pollVoteCounts));
+      const DeepCollectionEquality().hash(_pollVoteCounts),
+      repostId);
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'PostModel(uid: $uid, id: $id, gifUrl: $gifUrl, imageString: $imageString, title: $title, body: $body, tags: $tags, likes: $likes, dislikes: $dislikes, commentCount: $commentCount, createdAt: $createdAt, pollOptions: $pollOptions, pollVoteCounts: $pollVoteCounts)';
+    return 'PostModel(uid: $uid, id: $id, gifUrl: $gifUrl, imageString: $imageString, title: $title, body: $body, tags: $tags, likes: $likes, dislikes: $dislikes, commentCount: $commentCount, createdAt: $createdAt, pollOptions: $pollOptions, pollVoteCounts: $pollVoteCounts, repostId: $repostId)';
   }
 }
 
@@ -437,7 +456,8 @@ abstract mixin class _$PostModelCopyWith<$Res>
       int commentCount,
       @JsonKey(name: 'time') String createdAt,
       List<String>? pollOptions,
-      Map<String, int>? pollVoteCounts});
+      Map<String, int>? pollVoteCounts,
+      String? repostId});
 }
 
 /// @nodoc
@@ -465,6 +485,7 @@ class __$PostModelCopyWithImpl<$Res> implements _$PostModelCopyWith<$Res> {
     Object? createdAt = null,
     Object? pollOptions = freezed,
     Object? pollVoteCounts = freezed,
+    Object? repostId = freezed,
   }) {
     return _then(_PostModel(
       uid: null == uid
@@ -519,6 +540,10 @@ class __$PostModelCopyWithImpl<$Res> implements _$PostModelCopyWith<$Res> {
           ? _self._pollVoteCounts
           : pollVoteCounts // ignore: cast_nullable_to_non_nullable
               as Map<String, int>?,
+      repostId: freezed == repostId
+          ? _self.repostId
+          : repostId // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }

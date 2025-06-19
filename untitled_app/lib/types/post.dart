@@ -54,6 +54,7 @@ abstract class PostModel with _$PostModel {
     @JsonKey(name: 'time') required String createdAt,
     List<String>? pollOptions,
     Map<String, int>? pollVoteCounts,
+    String? repostId,
   }) = _PostModel;
 
   factory PostModel.fromJson(Map<String, dynamic> json) =>

@@ -30,6 +30,7 @@ _PostModel _$PostModelFromJson(Map<String, dynamic> json) => _PostModel(
       pollVoteCounts: (json['pollVoteCounts'] as Map<String, dynamic>?)?.map(
         (k, e) => MapEntry(k, (e as num).toInt()),
       ),
+      repostId: json['repostId'] as String?,
     );
 
 Map<String, dynamic> _$PostModelToJson(_PostModel instance) =>
@@ -47,4 +48,5 @@ Map<String, dynamic> _$PostModelToJson(_PostModel instance) =>
       'time': instance.createdAt,
       'pollOptions': instance.pollOptions,
       'pollVoteCounts': instance.pollVoteCounts,
+      'repostId': instance.repostId,
     };

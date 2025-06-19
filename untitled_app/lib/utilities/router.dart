@@ -257,8 +257,10 @@ final goRouter = GoRouter(
               name: 'compose',
               pageBuilder: (context, state) {
                 final String? id = state.uri.queryParameters['id'];
+                final String? repostId = state.uri.queryParameters['repostId'];
+                print('${state.uri.queryParameters} $repostId');
                 return NoTransitionPage(
-                  child: ComposePage(groupId: id),
+                  child: ComposePage(groupId: id, repostId: repostId),
                 );
               },
               routes: [

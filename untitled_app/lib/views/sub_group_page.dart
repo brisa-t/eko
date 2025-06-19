@@ -122,7 +122,6 @@ class SubGroupPage extends ConsumerWidget {
       floatingActionButton: SizedBox(
         width: 70,
         child: FloatingActionButton(
-          heroTag: null,
           onPressed: () {
             context.goNamed('compose',
                 queryParameters:
