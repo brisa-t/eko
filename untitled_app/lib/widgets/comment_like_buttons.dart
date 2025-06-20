@@ -6,6 +6,7 @@ import 'package:like_button/like_button.dart';
 import 'package:untitled_app/providers/comment_provider.dart';
 import 'package:untitled_app/providers/current_user_provider.dart';
 import 'package:untitled_app/types/comment.dart';
+import 'package:untitled_app/widgets/icons.dart' as icons;
 import '../utilities/constants.dart' as c;
 
 class Count extends StatelessWidget {
@@ -45,27 +46,25 @@ class CommentLikeButtons extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(currentUserProvider);
+    final fillColor = Color(0xFFFF3040);
     return Column(children: [
       Row(
         children: [
           LikeButton(
             isLiked: user.likedPosts.contains(comment.id),
             likeBuilder: (isLiked) {
-              return SvgPicture.string(
-                '''
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-           fill="${isLiked ? '#FF3040' : 'none'}" 
-               stroke="${isLiked ? '#FF3040' : '#${Theme.of(context).colorScheme.onSurface.toARGB32().toRadixString(16).substring(2)}'}" 
-               stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M9 18v-6H5l7-7 7 7h-4v6H9z"/>
-                    </svg>
-                    ''',
-                width: c.postIconSize,
-                height: c.postIconSize,
+              return icons.Like(
+                size: c.postIconSize,
+                fillColor: isLiked ? fillColor : null,
+                strokeColor: isLiked
+                    ? fillColor
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
               );
             },
             onTap: (isLiked) async {
-              ref.read(commentProvider(comment.id).notifier).likeCommentToggle();
+              ref
+                  .read(commentProvider(comment.id).notifier)
+                  .likeCommentToggle();
               return !isLiked;
             },
             likeCountAnimationType: LikeCountAnimationType.none,
@@ -93,17 +92,12 @@ class CommentLikeButtons extends ConsumerWidget {
           LikeButton(
             isLiked: user.dislikedPosts.contains(comment.id), //dislike
             likeBuilder: (isDisliked) {
-              return SvgPicture.string(
-                '''
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-           fill="${isDisliked ? '#FF3040' : 'none'}" 
-               stroke="${isDisliked ? '#FF3040' : '#${Theme.of(context).colorScheme.onSurface.toARGB32().toRadixString(16).substring(2)}'}" 
-               stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M15 6v6h4l-7 7-7-7h4V6h6z"/>
-                    </svg>
-                    ''',
-                width: c.postIconSize,
-                height: c.postIconSize,
+              return icons.Dislike(
+                size: c.postIconSize,
+                fillColor: isDisliked ? fillColor : null,
+                strokeColor: isDisliked
+                    ? fillColor
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
               );
             },
             onTap: (isDisliked) async {
